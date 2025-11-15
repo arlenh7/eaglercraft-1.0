@@ -1,159 +1,196 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ModelBiped extends ModelBase {
-	public ModelRenderer bipedHead;
-	public ModelRenderer field_1285_b;
-	public ModelRenderer field_1284_c;
-	public ModelRenderer bipedRightArm;
-	public ModelRenderer bipedLeftArm;
-	public ModelRenderer bipedRightLeg;
-	public ModelRenderer bipedLeftLeg;
-	public ModelRenderer field_20098_h;
-	public ModelRenderer field_20097_i;
-	public boolean field_1279_h;
-	public boolean field_1278_i;
-	public boolean field_1277_j;
 
-	public ModelBiped() {
-		this(0.0F);
-	}
+// Referenced classes of package net.minecraft.src:
+//            ModelBase, ModelRenderer, MathHelper, Entity
 
-	public ModelBiped(float var1) {
-		this(var1, 0.0F);
-	}
+public class ModelBiped extends ModelBase
+{
 
-	public ModelBiped(float var1, float var2) {
-		this.field_1279_h = false;
-		this.field_1278_i = false;
-		this.field_1277_j = false;
-		this.field_20097_i = new ModelRenderer(0, 0);
-		this.field_20097_i.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, var1);
-		this.field_20098_h = new ModelRenderer(24, 0);
-		this.field_20098_h.addBox(-3.0F, -6.0F, -1.0F, 6, 6, 1, var1);
-		this.bipedHead = new ModelRenderer(0, 0);
-		this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1);
-		this.bipedHead.setPosition(0.0F, 0.0F + var2, 0.0F);
-		this.field_1285_b = new ModelRenderer(32, 0);
-		this.field_1285_b.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1 + 0.5F);
-		this.field_1285_b.setPosition(0.0F, 0.0F + var2, 0.0F);
-		this.field_1284_c = new ModelRenderer(16, 16);
-		this.field_1284_c.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, var1);
-		this.field_1284_c.setPosition(0.0F, 0.0F + var2, 0.0F);
-		this.bipedRightArm = new ModelRenderer(40, 16);
-		this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, var1);
-		this.bipedRightArm.setPosition(-5.0F, 2.0F + var2, 0.0F);
-		this.bipedLeftArm = new ModelRenderer(40, 16);
-		this.bipedLeftArm.mirror = true;
-		this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1);
-		this.bipedLeftArm.setPosition(5.0F, 2.0F + var2, 0.0F);
-		this.bipedRightLeg = new ModelRenderer(0, 16);
-		this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
-		this.bipedRightLeg.setPosition(-2.0F, 12.0F + var2, 0.0F);
-		this.bipedLeftLeg = new ModelRenderer(0, 16);
-		this.bipedLeftLeg.mirror = true;
-		this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
-		this.bipedLeftLeg.setPosition(2.0F, 12.0F + var2, 0.0F);
-	}
+    public ModelRenderer bipedHead;
+    public ModelRenderer bipedHeadwear;
+    public ModelRenderer bipedBody;
+    public ModelRenderer bipedRightArm;
+    public ModelRenderer bipedLeftArm;
+    public ModelRenderer bipedRightLeg;
+    public ModelRenderer bipedLeftLeg;
+    public ModelRenderer bipedEars;
+    public ModelRenderer bipedCloak;
+    public int field_1279_h;
+    public int field_1278_i;
+    public boolean isSneak;
+    public boolean field_40333_u;
 
-	public void render(float var1, float var2, float var3, float var4, float var5, float var6) {
-		this.setRotationAngles(var1, var2, var3, var4, var5, var6);
-		this.bipedHead.render(var6);
-		this.field_1284_c.render(var6);
-		this.bipedRightArm.render(var6);
-		this.bipedLeftArm.render(var6);
-		this.bipedRightLeg.render(var6);
-		this.bipedLeftLeg.render(var6);
-		this.field_1285_b.render(var6);
-	}
+    public ModelBiped()
+    {
+        this(0.0F);
+    }
 
-	public void setRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6) {
-		this.bipedHead.rotateAngleY = var4 / (180.0F / (float)Math.PI);
-		this.bipedHead.rotateAngleX = var5 / (180.0F / (float)Math.PI);
-		this.field_1285_b.rotateAngleY = this.bipedHead.rotateAngleY;
-		this.field_1285_b.rotateAngleX = this.bipedHead.rotateAngleX;
-		this.bipedRightArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 2.0F * var2 * 0.5F;
-		this.bipedLeftArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 2.0F * var2 * 0.5F;
-		this.bipedRightArm.rotateAngleZ = 0.0F;
-		this.bipedLeftArm.rotateAngleZ = 0.0F;
-		this.bipedRightLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 1.4F * var2;
-		this.bipedLeftLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
-		this.bipedRightLeg.rotateAngleY = 0.0F;
-		this.bipedLeftLeg.rotateAngleY = 0.0F;
-		if(this.field_1243_l) {
-			this.bipedRightArm.rotateAngleX += (float)Math.PI * -0.2F;
-			this.bipedLeftArm.rotateAngleX += (float)Math.PI * -0.2F;
-			this.bipedRightLeg.rotateAngleX = (float)Math.PI * -0.4F;
-			this.bipedLeftLeg.rotateAngleX = (float)Math.PI * -0.4F;
-			this.bipedRightLeg.rotateAngleY = (float)Math.PI * 0.1F;
-			this.bipedLeftLeg.rotateAngleY = (float)Math.PI * -0.1F;
-		}
+    public ModelBiped(float f)
+    {
+        this(f, 0.0F);
+    }
 
-		if(this.field_1279_h) {
-			this.bipedLeftArm.rotateAngleX = this.bipedLeftArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
-		}
+    public ModelBiped(float f, float f1)
+    {
+        field_1279_h = 0;
+        field_1278_i = 0;
+        isSneak = false;
+        field_40333_u = false;
+        bipedCloak = new ModelRenderer(this, 0, 0);
+        bipedCloak.addBox(-5F, 0.0F, -1F, 10, 16, 1, f);
+        bipedEars = new ModelRenderer(this, 24, 0);
+        bipedEars.addBox(-3F, -6F, -1F, 6, 6, 1, f);
+        bipedHead = new ModelRenderer(this, 0, 0);
+        bipedHead.addBox(-4F, -8F, -4F, 8, 8, 8, f);
+        bipedHead.setRotationPoint(0.0F, 0.0F + f1, 0.0F);
+        bipedHeadwear = new ModelRenderer(this, 32, 0);
+        bipedHeadwear.addBox(-4F, -8F, -4F, 8, 8, 8, f + 0.5F);
+        bipedHeadwear.setRotationPoint(0.0F, 0.0F + f1, 0.0F);
+        bipedBody = new ModelRenderer(this, 16, 16);
+        bipedBody.addBox(-4F, 0.0F, -2F, 8, 12, 4, f);
+        bipedBody.setRotationPoint(0.0F, 0.0F + f1, 0.0F);
+        bipedRightArm = new ModelRenderer(this, 40, 16);
+        bipedRightArm.addBox(-3F, -2F, -2F, 4, 12, 4, f);
+        bipedRightArm.setRotationPoint(-5F, 2.0F + f1, 0.0F);
+        bipedLeftArm = new ModelRenderer(this, 40, 16);
+        bipedLeftArm.mirror = true;
+        bipedLeftArm.addBox(-1F, -2F, -2F, 4, 12, 4, f);
+        bipedLeftArm.setRotationPoint(5F, 2.0F + f1, 0.0F);
+        bipedRightLeg = new ModelRenderer(this, 0, 16);
+        bipedRightLeg.addBox(-2F, 0.0F, -2F, 4, 12, 4, f);
+        bipedRightLeg.setRotationPoint(-2F, 12F + f1, 0.0F);
+        bipedLeftLeg = new ModelRenderer(this, 0, 16);
+        bipedLeftLeg.mirror = true;
+        bipedLeftLeg.addBox(-2F, 0.0F, -2F, 4, 12, 4, f);
+        bipedLeftLeg.setRotationPoint(2.0F, 12F + f1, 0.0F);
+    }
 
-		if(this.field_1278_i) {
-			this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
-		}
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        setRotationAngles(f, f1, f2, f3, f4, f5);
+        bipedHead.render(f5);
+        bipedBody.render(f5);
+        bipedRightArm.render(f5);
+        bipedLeftArm.render(f5);
+        bipedRightLeg.render(f5);
+        bipedLeftLeg.render(f5);
+        bipedHeadwear.render(f5);
+    }
 
-		this.bipedRightArm.rotateAngleY = 0.0F;
-		this.bipedLeftArm.rotateAngleY = 0.0F;
-		if(this.field_1244_k > -9990.0F) {
-			float var7 = this.field_1244_k;
-			this.field_1284_c.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(var7) * (float)Math.PI * 2.0F) * 0.2F;
-			this.bipedRightArm.offsetZ = MathHelper.sin(this.field_1284_c.rotateAngleY) * 5.0F;
-			this.bipedRightArm.offsetX = -MathHelper.cos(this.field_1284_c.rotateAngleY) * 5.0F;
-			this.bipedLeftArm.offsetZ = -MathHelper.sin(this.field_1284_c.rotateAngleY) * 5.0F;
-			this.bipedLeftArm.offsetX = MathHelper.cos(this.field_1284_c.rotateAngleY) * 5.0F;
-			this.bipedRightArm.rotateAngleY += this.field_1284_c.rotateAngleY;
-			this.bipedLeftArm.rotateAngleY += this.field_1284_c.rotateAngleY;
-			this.bipedLeftArm.rotateAngleX += this.field_1284_c.rotateAngleY;
-			var7 = 1.0F - this.field_1244_k;
-			var7 *= var7;
-			var7 *= var7;
-			var7 = 1.0F - var7;
-			float var8 = MathHelper.sin(var7 * (float)Math.PI);
-			float var9 = MathHelper.sin(this.field_1244_k * (float)Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F) * (12.0F / 16.0F);
-			this.bipedRightArm.rotateAngleX = (float)((double)this.bipedRightArm.rotateAngleX - ((double)var8 * 1.2D + (double)var9));
-			this.bipedRightArm.rotateAngleY += this.field_1284_c.rotateAngleY * 2.0F;
-			this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.field_1244_k * (float)Math.PI) * -0.4F;
-		}
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        bipedHead.rotateAngleY = f3 / 57.29578F;
+        bipedHead.rotateAngleX = f4 / 57.29578F;
+        bipedHeadwear.rotateAngleY = bipedHead.rotateAngleY;
+        bipedHeadwear.rotateAngleX = bipedHead.rotateAngleX;
+        bipedRightArm.rotateAngleX = MathHelper.cos(f * 0.6662F + 3.141593F) * 2.0F * f1 * 0.5F;
+        bipedLeftArm.rotateAngleX = MathHelper.cos(f * 0.6662F) * 2.0F * f1 * 0.5F;
+        bipedRightArm.rotateAngleZ = 0.0F;
+        bipedLeftArm.rotateAngleZ = 0.0F;
+        bipedRightLeg.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
+        bipedLeftLeg.rotateAngleX = MathHelper.cos(f * 0.6662F + 3.141593F) * 1.4F * f1;
+        bipedRightLeg.rotateAngleY = 0.0F;
+        bipedLeftLeg.rotateAngleY = 0.0F;
+        if(isRiding)
+        {
+            bipedRightArm.rotateAngleX += -0.6283185F;
+            bipedLeftArm.rotateAngleX += -0.6283185F;
+            bipedRightLeg.rotateAngleX = -1.256637F;
+            bipedLeftLeg.rotateAngleX = -1.256637F;
+            bipedRightLeg.rotateAngleY = 0.3141593F;
+            bipedLeftLeg.rotateAngleY = -0.3141593F;
+        }
+        if(field_1279_h != 0)
+        {
+            bipedLeftArm.rotateAngleX = bipedLeftArm.rotateAngleX * 0.5F - 0.3141593F * (float)field_1279_h;
+        }
+        if(field_1278_i != 0)
+        {
+            bipedRightArm.rotateAngleX = bipedRightArm.rotateAngleX * 0.5F - 0.3141593F * (float)field_1278_i;
+        }
+        bipedRightArm.rotateAngleY = 0.0F;
+        bipedLeftArm.rotateAngleY = 0.0F;
+        if(onGround > -9990F)
+        {
+            float f6 = onGround;
+            bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(f6) * 3.141593F * 2.0F) * 0.2F;
+            bipedRightArm.rotationPointZ = MathHelper.sin(bipedBody.rotateAngleY) * 5F;
+            bipedRightArm.rotationPointX = -MathHelper.cos(bipedBody.rotateAngleY) * 5F;
+            bipedLeftArm.rotationPointZ = -MathHelper.sin(bipedBody.rotateAngleY) * 5F;
+            bipedLeftArm.rotationPointX = MathHelper.cos(bipedBody.rotateAngleY) * 5F;
+            bipedRightArm.rotateAngleY += bipedBody.rotateAngleY;
+            bipedLeftArm.rotateAngleY += bipedBody.rotateAngleY;
+            bipedLeftArm.rotateAngleX += bipedBody.rotateAngleY;
+            f6 = 1.0F - onGround;
+            f6 *= f6;
+            f6 *= f6;
+            f6 = 1.0F - f6;
+            float f8 = MathHelper.sin(f6 * 3.141593F);
+            float f10 = MathHelper.sin(onGround * 3.141593F) * -(bipedHead.rotateAngleX - 0.7F) * 0.75F;
+            bipedRightArm.rotateAngleX -= (double)f8 * 1.2D + (double)f10;
+            bipedRightArm.rotateAngleY += bipedBody.rotateAngleY * 2.0F;
+            bipedRightArm.rotateAngleZ = MathHelper.sin(onGround * 3.141593F) * -0.4F;
+        }
+        if(isSneak)
+        {
+            bipedBody.rotateAngleX = 0.5F;
+            bipedRightLeg.rotateAngleX -= 0.0F;
+            bipedLeftLeg.rotateAngleX -= 0.0F;
+            bipedRightArm.rotateAngleX += 0.4F;
+            bipedLeftArm.rotateAngleX += 0.4F;
+            bipedRightLeg.rotationPointZ = 4F;
+            bipedLeftLeg.rotationPointZ = 4F;
+            bipedRightLeg.rotationPointY = 9F;
+            bipedLeftLeg.rotationPointY = 9F;
+            bipedHead.rotationPointY = 1.0F;
+        } else
+        {
+            bipedBody.rotateAngleX = 0.0F;
+            bipedRightLeg.rotationPointZ = 0.0F;
+            bipedLeftLeg.rotationPointZ = 0.0F;
+            bipedRightLeg.rotationPointY = 12F;
+            bipedLeftLeg.rotationPointY = 12F;
+            bipedHead.rotationPointY = 0.0F;
+        }
+        bipedRightArm.rotateAngleZ += MathHelper.cos(f2 * 0.09F) * 0.05F + 0.05F;
+        bipedLeftArm.rotateAngleZ -= MathHelper.cos(f2 * 0.09F) * 0.05F + 0.05F;
+        bipedRightArm.rotateAngleX += MathHelper.sin(f2 * 0.067F) * 0.05F;
+        bipedLeftArm.rotateAngleX -= MathHelper.sin(f2 * 0.067F) * 0.05F;
+        if(field_40333_u)
+        {
+            float f7 = 0.0F;
+            float f9 = 0.0F;
+            bipedRightArm.rotateAngleZ = 0.0F;
+            bipedLeftArm.rotateAngleZ = 0.0F;
+            bipedRightArm.rotateAngleY = -(0.1F - f7 * 0.6F) + bipedHead.rotateAngleY;
+            bipedLeftArm.rotateAngleY = (0.1F - f7 * 0.6F) + bipedHead.rotateAngleY + 0.4F;
+            bipedRightArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
+            bipedLeftArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
+            bipedRightArm.rotateAngleX -= f7 * 1.2F - f9 * 0.4F;
+            bipedLeftArm.rotateAngleX -= f7 * 1.2F - f9 * 0.4F;
+            bipedRightArm.rotateAngleZ += MathHelper.cos(f2 * 0.09F) * 0.05F + 0.05F;
+            bipedLeftArm.rotateAngleZ -= MathHelper.cos(f2 * 0.09F) * 0.05F + 0.05F;
+            bipedRightArm.rotateAngleX += MathHelper.sin(f2 * 0.067F) * 0.05F;
+            bipedLeftArm.rotateAngleX -= MathHelper.sin(f2 * 0.067F) * 0.05F;
+        }
+    }
 
-		if(this.field_1277_j) {
-			this.field_1284_c.rotateAngleX = 0.5F;
-			this.bipedRightLeg.rotateAngleX -= 0.0F;
-			this.bipedLeftLeg.rotateAngleX -= 0.0F;
-			this.bipedRightArm.rotateAngleX += 0.4F;
-			this.bipedLeftArm.rotateAngleX += 0.4F;
-			this.bipedRightLeg.offsetZ = 4.0F;
-			this.bipedLeftLeg.offsetZ = 4.0F;
-			this.bipedRightLeg.offsetY = 9.0F;
-			this.bipedLeftLeg.offsetY = 9.0F;
-			this.bipedHead.offsetY = 1.0F;
-		} else {
-			this.field_1284_c.rotateAngleX = 0.0F;
-			this.bipedRightLeg.offsetZ = 0.0F;
-			this.bipedLeftLeg.offsetZ = 0.0F;
-			this.bipedRightLeg.offsetY = 12.0F;
-			this.bipedLeftLeg.offsetY = 12.0F;
-			this.bipedHead.offsetY = 0.0F;
-		}
+    public void renderEars(float f)
+    {
+        bipedEars.rotateAngleY = bipedHead.rotateAngleY;
+        bipedEars.rotateAngleX = bipedHead.rotateAngleX;
+        bipedEars.rotationPointX = 0.0F;
+        bipedEars.rotationPointY = 0.0F;
+        bipedEars.render(f);
+    }
 
-		this.bipedRightArm.rotateAngleZ += MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
-		this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
-		this.bipedRightArm.rotateAngleX += MathHelper.sin(var3 * 0.067F) * 0.05F;
-		this.bipedLeftArm.rotateAngleX -= MathHelper.sin(var3 * 0.067F) * 0.05F;
-	}
-
-	public void func_20095_a(float var1) {
-		this.field_20098_h.rotateAngleY = this.bipedHead.rotateAngleY;
-		this.field_20098_h.rotateAngleX = this.bipedHead.rotateAngleX;
-		this.field_20098_h.offsetX = 0.0F;
-		this.field_20098_h.offsetY = 0.0F;
-		this.field_20098_h.render(var1);
-	}
-
-	public void func_20096_b(float var1) {
-		this.field_20097_i.render(var1);
-	}
+    public void renderCloak(float f)
+    {
+        bipedCloak.render(f);
+    }
 }

@@ -1,55 +1,69 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.Tessellator;
+import java.util.Random;
 
-public class EntityRainFX extends EntityFX {
-	public EntityRainFX(World var1, double var2, double var4, double var6) {
-		super(var1, var2, var4, var6, 0.0D, 0.0D, 0.0D);
-		this.motionX *= (double)0.3F;
-		this.motionY = (double)((float)Math.random() * 0.2F + 0.1F);
-		this.motionZ *= (double)0.3F;
-		this.particleRed = 1.0F;
-		this.particleBlue = 1.0F;
-		this.particleGreen = 1.0F;
-		this.field_670_b = 19 + this.rand.nextInt(4);
-		this.setSize(0.01F, 0.01F);
-		this.field_664_h = 0.06F;
-		this.field_666_f = (int)(8.0D / (Math.random() * 0.8D + 0.2D));
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, MathHelper, World, Material, 
+//            BlockFluid, Tessellator
 
-	public void func_406_a(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-		super.func_406_a(var1, var2, var3, var4, var5, var6, var7);
-	}
+public class EntityRainFX extends EntityFX
+{
 
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.motionY -= (double)this.field_664_h;
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= (double)0.98F;
-		this.motionY *= (double)0.98F;
-		this.motionZ *= (double)0.98F;
-		if(this.field_666_f-- <= 0) {
-			this.setEntityDead();
-		}
+    public EntityRainFX(World world, double d, double d1, double d2)
+    {
+        super(world, d, d1, d2, 0.0D, 0.0D, 0.0D);
+        motionX *= 0.30000001192092896D;
+        motionY = (float)Math.random() * 0.2F + 0.1F;
+        motionZ *= 0.30000001192092896D;
+        particleRed = 1.0F;
+        particleGreen = 1.0F;
+        particleBlue = 1.0F;
+        func_40099_c(19 + rand.nextInt(4));
+        setSize(0.01F, 0.01F);
+        particleGravity = 0.06F;
+        particleMaxAge = (int)(8D / (Math.random() * 0.80000000000000004D + 0.20000000000000001D));
+    }
 
-		if(this.onGround) {
-			if(Math.random() < 0.5D) {
-				this.setEntityDead();
-			}
+    public void renderParticle(Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        super.renderParticle(tessellator, f, f1, f2, f3, f4, f5);
+    }
 
-			this.motionX *= (double)0.7F;
-			this.motionZ *= (double)0.7F;
-		}
-
-		Material var1 = this.worldObj.getBlockMaterial(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
-		if(var1.getIsLiquid() || var1.func_878_a()) {
-			double var2 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockFluids.setFluidHeight(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
-			if(this.posY < var2) {
-				this.setEntityDead();
-			}
-		}
-
-	}
+    public void onUpdate()
+    {
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        motionY -= particleGravity;
+        moveEntity(motionX, motionY, motionZ);
+        motionX *= 0.98000001907348633D;
+        motionY *= 0.98000001907348633D;
+        motionZ *= 0.98000001907348633D;
+        if(particleMaxAge-- <= 0)
+        {
+            setEntityDead();
+        }
+        if(onGround)
+        {
+            if(Math.random() < 0.5D)
+            {
+                setEntityDead();
+            }
+            motionX *= 0.69999998807907104D;
+            motionZ *= 0.69999998807907104D;
+        }
+        Material material = worldObj.getBlockMaterial(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
+        if(material.getIsLiquid() || material.isSolid())
+        {
+            double d = (float)(MathHelper.floor_double(posY) + 1) - BlockFluid.getFluidHeightPercent(worldObj.getBlockMetadata(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)));
+            if(posY < d)
+            {
+                setEntityDead();
+            }
+        }
+    }
 }

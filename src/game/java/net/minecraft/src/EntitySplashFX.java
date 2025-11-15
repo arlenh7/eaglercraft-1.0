@@ -1,15 +1,27 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntitySplashFX extends EntityRainFX {
-	public EntitySplashFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
-		super(var1, var2, var4, var6);
-		this.field_664_h = 0.04F;
-		++this.field_670_b;
-		if(var10 == 0.0D && (var8 != 0.0D || var12 != 0.0D)) {
-			this.motionX = var8;
-			this.motionY = var10 + 0.1D;
-			this.motionZ = var12;
-		}
 
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityRainFX, World
+
+public class EntitySplashFX extends EntityRainFX
+{
+
+    public EntitySplashFX(World world, double d, double d1, double d2, 
+            double d3, double d4, double d5)
+    {
+        super(world, d, d1, d2);
+        particleGravity = 0.04F;
+        func_40099_c(func_40100_q() + 1);
+        if(d4 == 0.0D && (d3 != 0.0D || d5 != 0.0D))
+        {
+            motionX = d3;
+            motionY = d4 + 0.10000000000000001D;
+            motionZ = d5;
+        }
+    }
 }

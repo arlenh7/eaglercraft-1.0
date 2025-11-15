@@ -1,36 +1,50 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityBubbleFX extends EntityFX {
-	public EntityBubbleFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
-		super(var1, var2, var4, var6, var8, var10, var12);
-		this.particleRed = 1.0F;
-		this.particleBlue = 1.0F;
-		this.particleGreen = 1.0F;
-		this.field_670_b = 32;
-		this.setSize(0.02F, 0.02F);
-		this.field_665_g *= this.rand.nextFloat() * 0.6F + 0.2F;
-		this.motionX = var8 * (double)0.2F + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.02F);
-		this.motionY = var10 * (double)0.2F + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.02F);
-		this.motionZ = var12 * (double)0.2F + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.02F);
-		this.field_666_f = (int)(8.0D / (Math.random() * 0.8D + 0.2D));
-	}
+import java.util.Random;
 
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.motionY += 0.002D;
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= (double)0.85F;
-		this.motionY *= (double)0.85F;
-		this.motionZ *= (double)0.85F;
-		if(this.worldObj.getBlockMaterial(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) != Material.water) {
-			this.setEntityDead();
-		}
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, MathHelper, World, Material
 
-		if(this.field_666_f-- <= 0) {
-			this.setEntityDead();
-		}
+public class EntityBubbleFX extends EntityFX
+{
 
-	}
+    public EntityBubbleFX(World world, double d, double d1, double d2, 
+            double d3, double d4, double d5)
+    {
+        super(world, d, d1, d2, d3, d4, d5);
+        particleRed = 1.0F;
+        particleGreen = 1.0F;
+        particleBlue = 1.0F;
+        func_40099_c(32);
+        setSize(0.02F, 0.02F);
+        particleScale = particleScale * (rand.nextFloat() * 0.6F + 0.2F);
+        motionX = d3 * 0.20000000298023224D + (double)((float)(Math.random() * 2D - 1.0D) * 0.02F);
+        motionY = d4 * 0.20000000298023224D + (double)((float)(Math.random() * 2D - 1.0D) * 0.02F);
+        motionZ = d5 * 0.20000000298023224D + (double)((float)(Math.random() * 2D - 1.0D) * 0.02F);
+        particleMaxAge = (int)(8D / (Math.random() * 0.80000000000000004D + 0.20000000000000001D));
+    }
+
+    public void onUpdate()
+    {
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        motionY += 0.002D;
+        moveEntity(motionX, motionY, motionZ);
+        motionX *= 0.85000002384185791D;
+        motionY *= 0.85000002384185791D;
+        motionZ *= 0.85000002384185791D;
+        if(worldObj.getBlockMaterial(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)) != Material.water)
+        {
+            setEntityDead();
+        }
+        if(particleMaxAge-- <= 0)
+        {
+            setEntityDead();
+        }
+    }
 }

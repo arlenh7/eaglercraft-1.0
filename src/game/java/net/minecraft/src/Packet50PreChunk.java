@@ -1,35 +1,49 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet50PreChunk extends Packet {
-	public int xPosition;
-	public int yPosition;
-	public boolean mode;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet50PreChunk() {
-		this.isChunkDataPacket = false;
-	}
+public class Packet50PreChunk extends Packet
+{
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.readInt();
-		this.mode = var1.read() != 0;
-	}
+    public int xPosition;
+    public int yPosition;
+    public boolean mode;
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.xPosition);
-		var1.writeInt(this.yPosition);
-		var1.write(this.mode ? 1 : 0);
-	}
+    public Packet50PreChunk()
+    {
+        isChunkDataPacket = false;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handlePreChunk(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.readInt();
+        mode = datainputstream.read() != 0;
+    }
 
-	public int getPacketSize() {
-		return 9;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeInt(yPosition);
+        dataoutputstream.write(mode ? 1 : 0);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handlePreChunk(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 9;
+    }
 }

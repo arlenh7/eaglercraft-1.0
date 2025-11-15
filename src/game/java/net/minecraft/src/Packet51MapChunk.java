@@ -1,65 +1,82 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class Packet51MapChunk extends Packet {
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
-	public int xSize;
-	public int ySize;
-	public int zSize;
-	public byte[] chunk;
-	private int chunkSize;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet51MapChunk() {
-		this.isChunkDataPacket = true;
-	}
+public class Packet51MapChunk extends Packet
+{
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.readShort();
-		this.zPosition = var1.readInt();
-		this.xSize = var1.read() + 1;
-		this.ySize = var1.read() + 1;
-		this.zSize = var1.read() + 1;
-		int var2 = var1.readInt();
-		byte[] var3 = new byte[var2];
-		var1.readFully(var3);
-		this.chunk = new byte[this.xSize * this.ySize * this.zSize * 5 / 2];
-		Inflater var4 = new Inflater();
-		var4.setInput(var3);
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
+    public int xSize;
+    public int ySize;
+    public int zSize;
+    public byte chunk[];
+    private int chunkSize;
 
-		try {
-			var4.inflate(this.chunk);
-		} catch (DataFormatException var9) {
-			throw new IOException("Bad compressed data format");
-		} finally {
-			var4.end();
-		}
+    public Packet51MapChunk()
+    {
+        isChunkDataPacket = true;
+    }
 
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.readShort();
+        zPosition = datainputstream.readInt();
+        xSize = datainputstream.read() + 1;
+        ySize = datainputstream.read() + 1;
+        zSize = datainputstream.read() + 1;
+        chunkSize = datainputstream.readInt();
+        byte abyte0[] = new byte[chunkSize];
+        datainputstream.readFully(abyte0);
+        chunk = new byte[(xSize * ySize * zSize * 5) / 2];
+        Inflater inflater = new Inflater();
+        inflater.setInput(abyte0);
+        try
+        {
+            inflater.inflate(chunk);
+        }
+        catch(DataFormatException dataformatexception)
+        {
+            throw new IOException("Bad compressed data format");
+        }
+        finally
+        {
+            inflater.end();
+        }
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.xPosition);
-		var1.writeShort(this.yPosition);
-		var1.writeInt(this.zPosition);
-		var1.write(this.xSize - 1);
-		var1.write(this.ySize - 1);
-		var1.write(this.zSize - 1);
-		var1.writeInt(this.chunkSize);
-		var1.write(this.chunk, 0, this.chunkSize);
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeShort(yPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.write(xSize - 1);
+        dataoutputstream.write(ySize - 1);
+        dataoutputstream.write(zSize - 1);
+        dataoutputstream.writeInt(chunkSize);
+        dataoutputstream.write(chunk, 0, chunkSize);
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleMapChunk(this);
-	}
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleMapChunk(this);
+    }
 
-	public int getPacketSize() {
-		return 17 + this.chunkSize;
-	}
+    public int getPacketSize()
+    {
+        return 17 + chunkSize;
+    }
 }

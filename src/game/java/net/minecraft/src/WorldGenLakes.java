@@ -1,102 +1,165 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenLakes extends WorldGenerator {
-	private int field_15235_a;
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Material, Block, 
+//            EnumSkyBlock, WorldChunkManager, BiomeGenBase, BlockMycelium, 
+//            BlockGrass
 
-	public WorldGenLakes(int var1) {
-		this.field_15235_a = var1;
-	}
+public class WorldGenLakes extends WorldGenerator
+{
 
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		var3 -= 8;
+    private int blockIndex;
 
-		for(var5 -= 8; var4 > 0 && var1.func_20084_d(var3, var4, var5); --var4) {
-		}
+    public WorldGenLakes(int i)
+    {
+        blockIndex = i;
+    }
 
-		var4 -= 4;
-		boolean[] var6 = new boolean[2048];
-		int var7 = var2.nextInt(4) + 4;
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        i -= 8;
+        for(k -= 8; j > 0 && world.isAirBlock(i, j, k); j--) { }
+        j -= 4;
+        boolean aflag[] = new boolean[2048];
+        int l = random.nextInt(4) + 4;
+        for(int i1 = 0; i1 < l; i1++)
+        {
+            double d = random.nextDouble() * 6D + 3D;
+            double d1 = random.nextDouble() * 4D + 2D;
+            double d2 = random.nextDouble() * 6D + 3D;
+            double d3 = random.nextDouble() * (16D - d - 2D) + 1.0D + d / 2D;
+            double d4 = random.nextDouble() * (8D - d1 - 4D) + 2D + d1 / 2D;
+            double d5 = random.nextDouble() * (16D - d2 - 2D) + 1.0D + d2 / 2D;
+            for(int l4 = 1; l4 < 15; l4++)
+            {
+                for(int i5 = 1; i5 < 15; i5++)
+                {
+                    for(int j5 = 1; j5 < 7; j5++)
+                    {
+                        double d6 = ((double)l4 - d3) / (d / 2D);
+                        double d7 = ((double)j5 - d4) / (d1 / 2D);
+                        double d8 = ((double)i5 - d5) / (d2 / 2D);
+                        double d9 = d6 * d6 + d7 * d7 + d8 * d8;
+                        if(d9 < 1.0D)
+                        {
+                            aflag[(l4 * 16 + i5) * 8 + j5] = true;
+                        }
+                    }
 
-		int var8;
-		for(var8 = 0; var8 < var7; ++var8) {
-			double var9 = var2.nextDouble() * 6.0D + 3.0D;
-			double var11 = var2.nextDouble() * 4.0D + 2.0D;
-			double var13 = var2.nextDouble() * 6.0D + 3.0D;
-			double var15 = var2.nextDouble() * (16.0D - var9 - 2.0D) + 1.0D + var9 / 2.0D;
-			double var17 = var2.nextDouble() * (8.0D - var11 - 4.0D) + 2.0D + var11 / 2.0D;
-			double var19 = var2.nextDouble() * (16.0D - var13 - 2.0D) + 1.0D + var13 / 2.0D;
+                }
 
-			for(int var21 = 1; var21 < 15; ++var21) {
-				for(int var22 = 1; var22 < 15; ++var22) {
-					for(int var23 = 1; var23 < 7; ++var23) {
-						double var24 = ((double)var21 - var15) / (var9 / 2.0D);
-						double var26 = ((double)var23 - var17) / (var11 / 2.0D);
-						double var28 = ((double)var22 - var19) / (var13 / 2.0D);
-						double var30 = var24 * var24 + var26 * var26 + var28 * var28;
-						if(var30 < 1.0D) {
-							var6[(var21 * 16 + var22) * 8 + var23] = true;
-						}
-					}
-				}
-			}
-		}
+            }
 
-		int var10;
-		int var32;
-		boolean var33;
-		for(var8 = 0; var8 < 16; ++var8) {
-			for(var32 = 0; var32 < 16; ++var32) {
-				for(var10 = 0; var10 < 8; ++var10) {
-					var33 = !var6[(var8 * 16 + var32) * 8 + var10] && (var8 < 15 && var6[((var8 + 1) * 16 + var32) * 8 + var10] || var8 > 0 && var6[((var8 - 1) * 16 + var32) * 8 + var10] || var32 < 15 && var6[(var8 * 16 + var32 + 1) * 8 + var10] || var32 > 0 && var6[(var8 * 16 + (var32 - 1)) * 8 + var10] || var10 < 7 && var6[(var8 * 16 + var32) * 8 + var10 + 1] || var10 > 0 && var6[(var8 * 16 + var32) * 8 + (var10 - 1)]);
-					if(var33) {
-						Material var12 = var1.getBlockMaterial(var3 + var8, var4 + var10, var5 + var32);
-						if(var10 >= 4 && var12.getIsLiquid()) {
-							return false;
-						}
+        }
 
-						if(var10 < 4 && !var12.func_878_a() && var1.getBlockId(var3 + var8, var4 + var10, var5 + var32) != this.field_15235_a) {
-							return false;
-						}
-					}
-				}
-			}
-		}
+        for(int j1 = 0; j1 < 16; j1++)
+        {
+            for(int k2 = 0; k2 < 16; k2++)
+            {
+                for(int l3 = 0; l3 < 8; l3++)
+                {
+                    boolean flag = !aflag[(j1 * 16 + k2) * 8 + l3] && (j1 < 15 && aflag[((j1 + 1) * 16 + k2) * 8 + l3] || j1 > 0 && aflag[((j1 - 1) * 16 + k2) * 8 + l3] || k2 < 15 && aflag[(j1 * 16 + (k2 + 1)) * 8 + l3] || k2 > 0 && aflag[(j1 * 16 + (k2 - 1)) * 8 + l3] || l3 < 7 && aflag[(j1 * 16 + k2) * 8 + (l3 + 1)] || l3 > 0 && aflag[(j1 * 16 + k2) * 8 + (l3 - 1)]);
+                    if(!flag)
+                    {
+                        continue;
+                    }
+                    Material material = world.getBlockMaterial(i + j1, j + l3, k + k2);
+                    if(l3 >= 4 && material.getIsLiquid())
+                    {
+                        return false;
+                    }
+                    if(l3 < 4 && !material.isSolid() && world.getBlockId(i + j1, j + l3, k + k2) != blockIndex)
+                    {
+                        return false;
+                    }
+                }
 
-		for(var8 = 0; var8 < 16; ++var8) {
-			for(var32 = 0; var32 < 16; ++var32) {
-				for(var10 = 0; var10 < 8; ++var10) {
-					if(var6[(var8 * 16 + var32) * 8 + var10]) {
-						var1.setBlockWithNotify(var3 + var8, var4 + var10, var5 + var32, var10 >= 4 ? 0 : this.field_15235_a);
-					}
-				}
-			}
-		}
+            }
 
-		for(var8 = 0; var8 < 16; ++var8) {
-			for(var32 = 0; var32 < 16; ++var32) {
-				for(var10 = 4; var10 < 8; ++var10) {
-					if(var6[(var8 * 16 + var32) * 8 + var10] && var1.getBlockId(var3 + var8, var4 + var10 - 1, var5 + var32) == Block.dirt.blockID && var1.getSavedLightValue(EnumSkyBlock.Sky, var3 + var8, var4 + var10, var5 + var32) > 0) {
-						var1.setBlockWithNotify(var3 + var8, var4 + var10 - 1, var5 + var32, Block.grass.blockID);
-					}
-				}
-			}
-		}
+        }
 
-		if(Block.blocksList[this.field_15235_a].blockMaterial == Material.lava) {
-			for(var8 = 0; var8 < 16; ++var8) {
-				for(var32 = 0; var32 < 16; ++var32) {
-					for(var10 = 0; var10 < 8; ++var10) {
-						var33 = !var6[(var8 * 16 + var32) * 8 + var10] && (var8 < 15 && var6[((var8 + 1) * 16 + var32) * 8 + var10] || var8 > 0 && var6[((var8 - 1) * 16 + var32) * 8 + var10] || var32 < 15 && var6[(var8 * 16 + var32 + 1) * 8 + var10] || var32 > 0 && var6[(var8 * 16 + (var32 - 1)) * 8 + var10] || var10 < 7 && var6[(var8 * 16 + var32) * 8 + var10 + 1] || var10 > 0 && var6[(var8 * 16 + var32) * 8 + (var10 - 1)]);
-						if(var33 && (var10 < 4 || var2.nextInt(2) != 0) && var1.getBlockMaterial(var3 + var8, var4 + var10, var5 + var32).func_878_a()) {
-							var1.setBlockWithNotify(var3 + var8, var4 + var10, var5 + var32, Block.stone.blockID);
-						}
-					}
-				}
-			}
-		}
+        for(int k1 = 0; k1 < 16; k1++)
+        {
+            for(int l2 = 0; l2 < 16; l2++)
+            {
+                for(int i4 = 0; i4 < 8; i4++)
+                {
+                    if(aflag[(k1 * 16 + l2) * 8 + i4])
+                    {
+                        world.setBlock(i + k1, j + i4, k + l2, i4 < 4 ? blockIndex : 0);
+                    }
+                }
 
-		return true;
-	}
+            }
+
+        }
+
+        for(int l1 = 0; l1 < 16; l1++)
+        {
+            for(int i3 = 0; i3 < 16; i3++)
+            {
+                for(int j4 = 4; j4 < 8; j4++)
+                {
+                    if(!aflag[(l1 * 16 + i3) * 8 + j4] || world.getBlockId(i + l1, (j + j4) - 1, k + i3) != Block.dirt.blockID || world.getSavedLightValue(EnumSkyBlock.Sky, i + l1, j + j4, k + i3) <= 0)
+                    {
+                        continue;
+                    }
+                    BiomeGenBase biomegenbase = world.getWorldChunkManager().getBiomeGenAt(i + l1, k + i3);
+                    if(biomegenbase.topBlock == Block.mycelium.blockID)
+                    {
+                        world.setBlock(i + l1, (j + j4) - 1, k + i3, Block.mycelium.blockID);
+                    } else
+                    {
+                        world.setBlock(i + l1, (j + j4) - 1, k + i3, Block.grass.blockID);
+                    }
+                }
+
+            }
+
+        }
+
+        if(Block.blocksList[blockIndex].blockMaterial == Material.lava)
+        {
+            for(int i2 = 0; i2 < 16; i2++)
+            {
+                for(int j3 = 0; j3 < 16; j3++)
+                {
+                    for(int k4 = 0; k4 < 8; k4++)
+                    {
+                        boolean flag1 = !aflag[(i2 * 16 + j3) * 8 + k4] && (i2 < 15 && aflag[((i2 + 1) * 16 + j3) * 8 + k4] || i2 > 0 && aflag[((i2 - 1) * 16 + j3) * 8 + k4] || j3 < 15 && aflag[(i2 * 16 + (j3 + 1)) * 8 + k4] || j3 > 0 && aflag[(i2 * 16 + (j3 - 1)) * 8 + k4] || k4 < 7 && aflag[(i2 * 16 + j3) * 8 + (k4 + 1)] || k4 > 0 && aflag[(i2 * 16 + j3) * 8 + (k4 - 1)]);
+                        if(flag1 && (k4 < 4 || random.nextInt(2) != 0) && world.getBlockMaterial(i + i2, j + k4, k + j3).isSolid())
+                        {
+                            world.setBlock(i + i2, j + k4, k + j3, Block.stone.blockID);
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+        if(Block.blocksList[blockIndex].blockMaterial == Material.water)
+        {
+            for(int j2 = 0; j2 < 16; j2++)
+            {
+                for(int k3 = 0; k3 < 16; k3++)
+                {
+                    byte byte0 = 4;
+                    if(world.func_40471_p(i + j2, j + byte0, k + k3))
+                    {
+                        world.setBlock(i + j2, j + byte0, k + k3, Block.ice.blockID);
+                    }
+                }
+
+            }
+
+        }
+        return true;
+    }
 }

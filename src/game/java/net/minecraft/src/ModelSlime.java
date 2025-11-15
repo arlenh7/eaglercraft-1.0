@@ -1,38 +1,51 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ModelSlime extends ModelBase {
-	ModelRenderer field_1258_a;
-	ModelRenderer field_1257_b;
-	ModelRenderer field_1260_c;
-	ModelRenderer field_1259_d;
 
-	public ModelSlime(int var1) {
-		this.field_1258_a = new ModelRenderer(0, var1);
-		this.field_1258_a.func_921_a(-4.0F, 16.0F, -4.0F, 8, 8, 8);
-		if(var1 > 0) {
-			this.field_1258_a = new ModelRenderer(0, var1);
-			this.field_1258_a.func_921_a(-3.0F, 17.0F, -3.0F, 6, 6, 6);
-			this.field_1257_b = new ModelRenderer(32, 0);
-			this.field_1257_b.func_921_a(-3.25F, 18.0F, -3.5F, 2, 2, 2);
-			this.field_1260_c = new ModelRenderer(32, 4);
-			this.field_1260_c.func_921_a(1.25F, 18.0F, -3.5F, 2, 2, 2);
-			this.field_1259_d = new ModelRenderer(32, 8);
-			this.field_1259_d.func_921_a(0.0F, 21.0F, -3.5F, 1, 1, 1);
-		}
+// Referenced classes of package net.minecraft.src:
+//            ModelBase, ModelRenderer, Entity
 
-	}
+public class ModelSlime extends ModelBase
+{
 
-	public void setRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6) {
-	}
+    ModelRenderer slimeBodies;
+    ModelRenderer slimeRightEye;
+    ModelRenderer slimeLeftEye;
+    ModelRenderer slimeMouth;
 
-	public void render(float var1, float var2, float var3, float var4, float var5, float var6) {
-		this.setRotationAngles(var1, var2, var3, var4, var5, var6);
-		this.field_1258_a.render(var6);
-		if(this.field_1257_b != null) {
-			this.field_1257_b.render(var6);
-			this.field_1260_c.render(var6);
-			this.field_1259_d.render(var6);
-		}
+    public ModelSlime(int i)
+    {
+        slimeBodies = new ModelRenderer(this, 0, i);
+        slimeBodies.addBox(-4F, 16F, -4F, 8, 8, 8);
+        if(i > 0)
+        {
+            slimeBodies = new ModelRenderer(this, 0, i);
+            slimeBodies.addBox(-3F, 17F, -3F, 6, 6, 6);
+            slimeRightEye = new ModelRenderer(this, 32, 0);
+            slimeRightEye.addBox(-3.25F, 18F, -3.5F, 2, 2, 2);
+            slimeLeftEye = new ModelRenderer(this, 32, 4);
+            slimeLeftEye.addBox(1.25F, 18F, -3.5F, 2, 2, 2);
+            slimeMouth = new ModelRenderer(this, 32, 8);
+            slimeMouth.addBox(0.0F, 21F, -3.5F, 1, 1, 1);
+        }
+    }
 
-	}
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5)
+    {
+    }
+
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        setRotationAngles(f, f1, f2, f3, f4, f5);
+        slimeBodies.render(f5);
+        if(slimeRightEye != null)
+        {
+            slimeRightEye.render(f5);
+            slimeLeftEye.render(f5);
+            slimeMouth.render(f5);
+        }
+    }
 }

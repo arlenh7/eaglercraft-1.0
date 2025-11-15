@@ -1,48 +1,63 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet14BlockDig extends Packet {
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
-	public int face;
-	public int status;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet14BlockDig() {
-	}
+public class Packet14BlockDig extends Packet
+{
 
-	public Packet14BlockDig(int var1, int var2, int var3, int var4, int var5) {
-		this.status = var1;
-		this.xPosition = var2;
-		this.yPosition = var3;
-		this.zPosition = var4;
-		this.face = var5;
-	}
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
+    public int face;
+    public int status;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.status = var1.read();
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.read();
-		this.zPosition = var1.readInt();
-		this.face = var1.read();
-	}
+    public Packet14BlockDig()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.write(this.status);
-		var1.writeInt(this.xPosition);
-		var1.write(this.yPosition);
-		var1.writeInt(this.zPosition);
-		var1.write(this.face);
-	}
+    public Packet14BlockDig(int i, int j, int k, int l, int i1)
+    {
+        status = i;
+        xPosition = j;
+        yPosition = k;
+        zPosition = l;
+        face = i1;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleBlockDig(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        status = datainputstream.read();
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.read();
+        zPosition = datainputstream.readInt();
+        face = datainputstream.read();
+    }
 
-	public int getPacketSize() {
-		return 11;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.write(status);
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.write(yPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.write(face);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleBlockDig(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 11;
+    }
 }

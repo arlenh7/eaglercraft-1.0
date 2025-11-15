@@ -1,44 +1,74 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class NextTickListEntry implements Comparable<Object> {
-	private static long nextTickEntryID = 0L;
-	public int xCoord;
-	public int yCoord;
-	public int zCoord;
-	public int blockID;
-	public long scheduledTime;
-	private long tickEntryID = nextTickEntryID++;
 
-	public NextTickListEntry(int var1, int var2, int var3, int var4) {
-		this.xCoord = var1;
-		this.yCoord = var2;
-		this.zCoord = var3;
-		this.blockID = var4;
-	}
+public class NextTickListEntry
+    implements Comparable
+{
 
-	public boolean equals(Object var1) {
-		if(!(var1 instanceof NextTickListEntry)) {
-			return false;
-		} else {
-			NextTickListEntry var2 = (NextTickListEntry)var1;
-			return this.xCoord == var2.xCoord && this.yCoord == var2.yCoord && this.zCoord == var2.zCoord && this.blockID == var2.blockID;
-		}
-	}
+    private static long nextTickEntryID = 0L;
+    public int xCoord;
+    public int yCoord;
+    public int zCoord;
+    public int blockID;
+    public long scheduledTime;
+    private long tickEntryID;
 
-	public int hashCode() {
-		return (this.xCoord * 128 * 1024 + this.zCoord * 128 + this.yCoord) * 256 + this.blockID;
-	}
+    public NextTickListEntry(int i, int j, int k, int l)
+    {
+        tickEntryID = nextTickEntryID++;
+        xCoord = i;
+        yCoord = j;
+        zCoord = k;
+        blockID = l;
+    }
 
-	public NextTickListEntry setScheduledTime(long var1) {
-		this.scheduledTime = var1;
-		return this;
-	}
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof NextTickListEntry)
+        {
+            NextTickListEntry nextticklistentry = (NextTickListEntry)obj;
+            return xCoord == nextticklistentry.xCoord && yCoord == nextticklistentry.yCoord && zCoord == nextticklistentry.zCoord && blockID == nextticklistentry.blockID;
+        } else
+        {
+            return false;
+        }
+    }
 
-	public int a(NextTickListEntry var1) {
-		return this.scheduledTime < var1.scheduledTime ? -1 : (this.scheduledTime > var1.scheduledTime ? 1 : (this.tickEntryID < var1.tickEntryID ? -1 : (this.tickEntryID > var1.tickEntryID ? 1 : 0)));
-	}
+    public int hashCode()
+    {
+        return (xCoord * 1024 * 1024 + zCoord * 1024 + yCoord) * 256 + blockID;
+    }
 
-	public int compareTo(Object var1) {
-		return this.a((NextTickListEntry)var1);
-	}
+    public NextTickListEntry setScheduledTime(long l)
+    {
+        scheduledTime = l;
+        return this;
+    }
+
+    public int comparer(NextTickListEntry nextticklistentry)
+    {
+        if(scheduledTime < nextticklistentry.scheduledTime)
+        {
+            return -1;
+        }
+        if(scheduledTime > nextticklistentry.scheduledTime)
+        {
+            return 1;
+        }
+        if(tickEntryID < nextticklistentry.tickEntryID)
+        {
+            return -1;
+        }
+        return tickEntryID <= nextticklistentry.tickEntryID ? 0 : 1;
+    }
+
+    public int compareTo(Object obj)
+    {
+        return comparer((NextTickListEntry)obj);
+    }
+
 }

@@ -1,211 +1,189 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class NoiseGeneratorPerlin extends NoiseGenerator {
-	private int[] permutations;
-	public double xCoord;
-	public double yCoord;
-	public double zCoord;
+// Referenced classes of package net.minecraft.src:
+//            NoiseGenerator
 
-	public NoiseGeneratorPerlin() {
-		this(new Random());
-	}
+public class NoiseGeneratorPerlin extends NoiseGenerator
+{
 
-	public NoiseGeneratorPerlin(Random var1) {
-		this.permutations = new int[512];
-		this.xCoord = var1.nextDouble() * 256.0D;
-		this.yCoord = var1.nextDouble() * 256.0D;
-		this.zCoord = var1.nextDouble() * 256.0D;
+    private int permutations[];
+    public double xCoord;
+    public double yCoord;
+    public double zCoord;
 
-		int var2;
-		for(var2 = 0; var2 < 256; this.permutations[var2] = var2++) {
-		}
+    public NoiseGeneratorPerlin()
+    {
+        this(new Random());
+    }
 
-		for(var2 = 0; var2 < 256; ++var2) {
-			int var3 = var1.nextInt(256 - var2) + var2;
-			int var4 = this.permutations[var2];
-			this.permutations[var2] = this.permutations[var3];
-			this.permutations[var3] = var4;
-			this.permutations[var2 + 256] = this.permutations[var2];
-		}
+    public NoiseGeneratorPerlin(Random random)
+    {
+        permutations = new int[512];
+        xCoord = random.nextDouble() * 256D;
+        yCoord = random.nextDouble() * 256D;
+        zCoord = random.nextDouble() * 256D;
+        for(int i = 0; i < 256; i++)
+        {
+            permutations[i] = i;
+        }
 
-	}
+        for(int j = 0; j < 256; j++)
+        {
+            int k = random.nextInt(256 - j) + j;
+            int l = permutations[j];
+            permutations[j] = permutations[k];
+            permutations[k] = l;
+            permutations[j + 256] = permutations[j];
+        }
 
-	public double generateNoise(double var1, double var3, double var5) {
-		double var7 = var1 + this.xCoord;
-		double var9 = var3 + this.yCoord;
-		double var11 = var5 + this.zCoord;
-		int var13 = (int)var7;
-		int var14 = (int)var9;
-		int var15 = (int)var11;
-		if(var7 < (double)var13) {
-			--var13;
-		}
+    }
 
-		if(var9 < (double)var14) {
-			--var14;
-		}
+    public final double lerp(double d, double d1, double d2)
+    {
+        return d1 + d * (d2 - d1);
+    }
 
-		if(var11 < (double)var15) {
-			--var15;
-		}
+    public final double func_4110_a(int i, double d, double d1)
+    {
+        int j = i & 0xf;
+        double d2 = (double)(1 - ((j & 8) >> 3)) * d;
+        double d3 = j >= 4 ? j != 12 && j != 14 ? d1 : d : 0.0D;
+        return ((j & 1) != 0 ? -d2 : d2) + ((j & 2) != 0 ? -d3 : d3);
+    }
 
-		int var16 = var13 & 255;
-		int var17 = var14 & 255;
-		int var18 = var15 & 255;
-		var7 -= (double)var13;
-		var9 -= (double)var14;
-		var11 -= (double)var15;
-		double var19 = var7 * var7 * var7 * (var7 * (var7 * 6.0D - 15.0D) + 10.0D);
-		double var21 = var9 * var9 * var9 * (var9 * (var9 * 6.0D - 15.0D) + 10.0D);
-		double var23 = var11 * var11 * var11 * (var11 * (var11 * 6.0D - 15.0D) + 10.0D);
-		int var25 = this.permutations[var16] + var17;
-		int var26 = this.permutations[var25] + var18;
-		int var27 = this.permutations[var25 + 1] + var18;
-		int var28 = this.permutations[var16 + 1] + var17;
-		int var29 = this.permutations[var28] + var18;
-		int var30 = this.permutations[var28 + 1] + var18;
-		return this.lerp(var23, this.lerp(var21, this.lerp(var19, this.grad(this.permutations[var26], var7, var9, var11), this.grad(this.permutations[var29], var7 - 1.0D, var9, var11)), this.lerp(var19, this.grad(this.permutations[var27], var7, var9 - 1.0D, var11), this.grad(this.permutations[var30], var7 - 1.0D, var9 - 1.0D, var11))), this.lerp(var21, this.lerp(var19, this.grad(this.permutations[var26 + 1], var7, var9, var11 - 1.0D), this.grad(this.permutations[var29 + 1], var7 - 1.0D, var9, var11 - 1.0D)), this.lerp(var19, this.grad(this.permutations[var27 + 1], var7, var9 - 1.0D, var11 - 1.0D), this.grad(this.permutations[var30 + 1], var7 - 1.0D, var9 - 1.0D, var11 - 1.0D))));
-	}
+    public final double grad(int i, double d, double d1, double d2)
+    {
+        int j = i & 0xf;
+        double d3 = j >= 8 ? d1 : d;
+        double d4 = j >= 4 ? j != 12 && j != 14 ? d2 : d : d1;
+        return ((j & 1) != 0 ? -d3 : d3) + ((j & 2) != 0 ? -d4 : d4);
+    }
 
-	public final double lerp(double var1, double var3, double var5) {
-		return var3 + var1 * (var5 - var3);
-	}
+    public void func_805_a(double ad[], double d, double d1, double d2, 
+            int i, int j, int k, double d3, double d4, 
+            double d5, double d6)
+    {
+        if(j == 1)
+        {
+            boolean flag = false;
+            boolean flag1 = false;
+            boolean flag2 = false;
+            boolean flag3 = false;
+            double d8 = 0.0D;
+            double d10 = 0.0D;
+            int j3 = 0;
+            double d12 = 1.0D / d6;
+            for(int i4 = 0; i4 < i; i4++)
+            {
+                double d14 = d + (double)i4 * d3 + xCoord;
+                int j4 = (int)d14;
+                if(d14 < (double)j4)
+                {
+                    j4--;
+                }
+                int k4 = j4 & 0xff;
+                d14 -= j4;
+                double d17 = d14 * d14 * d14 * (d14 * (d14 * 6D - 15D) + 10D);
+                for(int l4 = 0; l4 < k; l4++)
+                {
+                    double d19 = d2 + (double)l4 * d5 + zCoord;
+                    int j5 = (int)d19;
+                    if(d19 < (double)j5)
+                    {
+                        j5--;
+                    }
+                    int l5 = j5 & 0xff;
+                    d19 -= j5;
+                    double d21 = d19 * d19 * d19 * (d19 * (d19 * 6D - 15D) + 10D);
+                    int l = permutations[k4] + 0;
+                    int j1 = permutations[l] + l5;
+                    int k1 = permutations[k4 + 1] + 0;
+                    int l1 = permutations[k1] + l5;
+                    double d9 = lerp(d17, func_4110_a(permutations[j1], d14, d19), grad(permutations[l1], d14 - 1.0D, 0.0D, d19));
+                    double d11 = lerp(d17, grad(permutations[j1 + 1], d14, 0.0D, d19 - 1.0D), grad(permutations[l1 + 1], d14 - 1.0D, 0.0D, d19 - 1.0D));
+                    double d23 = lerp(d21, d9, d11);
+                    ad[j3++] += d23 * d12;
+                }
 
-	public final double func_4110_a(int var1, double var2, double var4) {
-		int var6 = var1 & 15;
-		double var7 = (double)(1 - ((var6 & 8) >> 3)) * var2;
-		double var9 = var6 < 4 ? 0.0D : (var6 != 12 && var6 != 14 ? var4 : var2);
-		return ((var6 & 1) == 0 ? var7 : -var7) + ((var6 & 2) == 0 ? var9 : -var9);
-	}
+            }
 
-	public final double grad(int var1, double var2, double var4, double var6) {
-		int var8 = var1 & 15;
-		double var9 = var8 < 8 ? var2 : var4;
-		double var11 = var8 < 4 ? var4 : (var8 != 12 && var8 != 14 ? var6 : var2);
-		return ((var8 & 1) == 0 ? var9 : -var9) + ((var8 & 2) == 0 ? var11 : -var11);
-	}
+            return;
+        }
+        int i1 = 0;
+        double d7 = 1.0D / d6;
+        int i2 = -1;
+        boolean flag4 = false;
+        boolean flag5 = false;
+        boolean flag6 = false;
+        boolean flag7 = false;
+        boolean flag8 = false;
+        boolean flag9 = false;
+        double d13 = 0.0D;
+        double d15 = 0.0D;
+        double d16 = 0.0D;
+        double d18 = 0.0D;
+        for(int i5 = 0; i5 < i; i5++)
+        {
+            double d20 = d + (double)i5 * d3 + xCoord;
+            int k5 = (int)d20;
+            if(d20 < (double)k5)
+            {
+                k5--;
+            }
+            int i6 = k5 & 0xff;
+            d20 -= k5;
+            double d22 = d20 * d20 * d20 * (d20 * (d20 * 6D - 15D) + 10D);
+            for(int j6 = 0; j6 < k; j6++)
+            {
+                double d24 = d2 + (double)j6 * d5 + zCoord;
+                int k6 = (int)d24;
+                if(d24 < (double)k6)
+                {
+                    k6--;
+                }
+                int l6 = k6 & 0xff;
+                d24 -= k6;
+                double d25 = d24 * d24 * d24 * (d24 * (d24 * 6D - 15D) + 10D);
+                for(int i7 = 0; i7 < j; i7++)
+                {
+                    double d26 = d1 + (double)i7 * d4 + yCoord;
+                    int j7 = (int)d26;
+                    if(d26 < (double)j7)
+                    {
+                        j7--;
+                    }
+                    int k7 = j7 & 0xff;
+                    d26 -= j7;
+                    double d27 = d26 * d26 * d26 * (d26 * (d26 * 6D - 15D) + 10D);
+                    if(i7 == 0 || k7 != i2)
+                    {
+                        i2 = k7;
+                        int j2 = permutations[i6] + k7;
+                        int k2 = permutations[j2] + l6;
+                        int l2 = permutations[j2 + 1] + l6;
+                        int i3 = permutations[i6 + 1] + k7;
+                        int k3 = permutations[i3] + l6;
+                        int l3 = permutations[i3 + 1] + l6;
+                        d13 = lerp(d22, grad(permutations[k2], d20, d26, d24), grad(permutations[k3], d20 - 1.0D, d26, d24));
+                        d15 = lerp(d22, grad(permutations[l2], d20, d26 - 1.0D, d24), grad(permutations[l3], d20 - 1.0D, d26 - 1.0D, d24));
+                        d16 = lerp(d22, grad(permutations[k2 + 1], d20, d26, d24 - 1.0D), grad(permutations[k3 + 1], d20 - 1.0D, d26, d24 - 1.0D));
+                        d18 = lerp(d22, grad(permutations[l2 + 1], d20, d26 - 1.0D, d24 - 1.0D), grad(permutations[l3 + 1], d20 - 1.0D, d26 - 1.0D, d24 - 1.0D));
+                    }
+                    double d28 = lerp(d27, d13, d15);
+                    double d29 = lerp(d27, d16, d18);
+                    double d30 = lerp(d25, d28, d29);
+                    ad[i1++] += d30 * d7;
+                }
 
-	public double func_801_a(double var1, double var3) {
-		return this.generateNoise(var1, var3, 0.0D);
-	}
+            }
 
-	public void func_805_a(double[] var1, double var2, double var4, double var6, int var8, int var9, int var10, double var11, double var13, double var15, double var17) {
-		int var10001;
-		int var19;
-		int var22;
-		double var31;
-		double var35;
-		int var37;
-		double var38;
-		int var40;
-		int var41;
-		double var42;
-		int var75;
-		if(var9 == 1) {
-			double var70 = 0.0D;
-			double var73 = 0.0D;
-			var75 = 0;
-			double var77 = 1.0D / var17;
+        }
 
-			for(int var30 = 0; var30 < var8; ++var30) {
-				var31 = (var2 + (double)var30) * var11 + this.xCoord;
-				int var78 = (int)var31;
-				if(var31 < (double)var78) {
-					--var78;
-				}
-
-				int var34 = var78 & 255;
-				var31 -= (double)var78;
-				var35 = var31 * var31 * var31 * (var31 * (var31 * 6.0D - 15.0D) + 10.0D);
-
-				for(var37 = 0; var37 < var10; ++var37) {
-					var38 = (var6 + (double)var37) * var15 + this.zCoord;
-					var40 = (int)var38;
-					if(var38 < (double)var40) {
-						--var40;
-					}
-
-					var41 = var40 & 255;
-					var38 -= (double)var40;
-					var42 = var38 * var38 * var38 * (var38 * (var38 * 6.0D - 15.0D) + 10.0D);
-					var19 = this.permutations[var34] + 0;
-					int var66 = this.permutations[var19] + var41;
-					int var67 = this.permutations[var34 + 1] + 0;
-					var22 = this.permutations[var67] + var41;
-					var70 = this.lerp(var35, this.func_4110_a(this.permutations[var66], var31, var38), this.grad(this.permutations[var22], var31 - 1.0D, 0.0D, var38));
-					var73 = this.lerp(var35, this.grad(this.permutations[var66 + 1], var31, 0.0D, var38 - 1.0D), this.grad(this.permutations[var22 + 1], var31 - 1.0D, 0.0D, var38 - 1.0D));
-					double var79 = this.lerp(var42, var70, var73);
-					var10001 = var75++;
-					var1[var10001] += var79 * var77;
-				}
-			}
-
-		} else {
-			var19 = 0;
-			double var20 = 1.0D / var17;
-			var22 = -1;
-			double var29 = 0.0D;
-			var31 = 0.0D;
-			double var33 = 0.0D;
-			var35 = 0.0D;
-
-			for(var37 = 0; var37 < var8; ++var37) {
-				var38 = (var2 + (double)var37) * var11 + this.xCoord;
-				var40 = (int)var38;
-				if(var38 < (double)var40) {
-					--var40;
-				}
-
-				var41 = var40 & 255;
-				var38 -= (double)var40;
-				var42 = var38 * var38 * var38 * (var38 * (var38 * 6.0D - 15.0D) + 10.0D);
-
-				for(int var44 = 0; var44 < var10; ++var44) {
-					double var45 = (var6 + (double)var44) * var15 + this.zCoord;
-					int var47 = (int)var45;
-					if(var45 < (double)var47) {
-						--var47;
-					}
-
-					int var48 = var47 & 255;
-					var45 -= (double)var47;
-					double var49 = var45 * var45 * var45 * (var45 * (var45 * 6.0D - 15.0D) + 10.0D);
-
-					for(int var51 = 0; var51 < var9; ++var51) {
-						double var52 = (var4 + (double)var51) * var13 + this.yCoord;
-						int var54 = (int)var52;
-						if(var52 < (double)var54) {
-							--var54;
-						}
-
-						int var55 = var54 & 255;
-						var52 -= (double)var54;
-						double var56 = var52 * var52 * var52 * (var52 * (var52 * 6.0D - 15.0D) + 10.0D);
-						if(var51 == 0 || var55 != var22) {
-							var22 = var55;
-							int var69 = this.permutations[var41] + var55;
-							int var71 = this.permutations[var69] + var48;
-							int var72 = this.permutations[var69 + 1] + var48;
-							int var74 = this.permutations[var41 + 1] + var55;
-							var75 = this.permutations[var74] + var48;
-							int var76 = this.permutations[var74 + 1] + var48;
-							var29 = this.lerp(var42, this.grad(this.permutations[var71], var38, var52, var45), this.grad(this.permutations[var75], var38 - 1.0D, var52, var45));
-							var31 = this.lerp(var42, this.grad(this.permutations[var72], var38, var52 - 1.0D, var45), this.grad(this.permutations[var76], var38 - 1.0D, var52 - 1.0D, var45));
-							var33 = this.lerp(var42, this.grad(this.permutations[var71 + 1], var38, var52, var45 - 1.0D), this.grad(this.permutations[var75 + 1], var38 - 1.0D, var52, var45 - 1.0D));
-							var35 = this.lerp(var42, this.grad(this.permutations[var72 + 1], var38, var52 - 1.0D, var45 - 1.0D), this.grad(this.permutations[var76 + 1], var38 - 1.0D, var52 - 1.0D, var45 - 1.0D));
-						}
-
-						double var58 = this.lerp(var56, var29, var31);
-						double var60 = this.lerp(var56, var33, var35);
-						double var62 = this.lerp(var49, var58, var60);
-						var10001 = var19++;
-						var1[var10001] += var62 * var20;
-					}
-				}
-			}
-
-		}
-	}
+    }
 }

@@ -1,42 +1,51 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class StringTranslate
+{
 
-import net.lax1dude.eaglercraft.EagRuntime;
-import net.lax1dude.eaglercraft.HString;
+    private static StringTranslate instance = new StringTranslate();
+    private Properties translateTable;
 
-public class StringTranslate {
-	private static StringTranslate field_20165_a = new StringTranslate();
-	private Properties field_20164_b = new Properties();
-	private static Logger LOGGER = LogManager.getLogger();
+    private StringTranslate()
+    {
+        translateTable = new Properties();
+        try
+        {
+            translateTable.load((net.minecraft.src.StringTranslate.class).getResourceAsStream("/lang/en_US.lang"));
+            translateTable.load((net.minecraft.src.StringTranslate.class).getResourceAsStream("/lang/stats_US.lang"));
+        }
+        catch(IOException ioexception)
+        {
+            ioexception.printStackTrace();
+        }
+    }
 
-	private StringTranslate() {
-		try {
-			this.field_20164_b.load(EagRuntime.getRequiredResourceStream("/lang/en_US.lang"));
-		} catch (IOException var2) {
-			LOGGER.error(var2);
-		}
+    public static StringTranslate getInstance()
+    {
+        return instance;
+    }
 
-	}
+    public String translateKey(String s)
+    {
+        return translateTable.getProperty(s, s);
+    }
 
-	public static StringTranslate func_20162_a() {
-		return field_20165_a;
-	}
+    public String translateKeyFormat(String s, Object aobj[])
+    {
+        String s1 = translateTable.getProperty(s, s);
+        return String.format(s1, aobj);
+    }
 
-	public String func_20163_a(String var1) {
-		return this.field_20164_b.getProperty(var1, var1);
-	}
+    public String translateNamedKey(String s)
+    {
+        return translateTable.getProperty((new StringBuilder()).append(s).append(".name").toString(), "");
+    }
 
-	public String func_20160_a(String var1, Object... var2) {
-		String var3 = this.field_20164_b.getProperty(var1, var1);
-		return HString.format(var3, var2);
-	}
-
-	public String func_20161_b(String var1) {
-		return this.field_20164_b.getProperty(var1 + ".name", "");
-	}
 }

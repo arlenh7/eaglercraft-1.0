@@ -1,200 +1,308 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockLever extends Block {
-	protected BlockLever(int var1, int var2) {
-		super(var1, var2, Material.circuits);
-	}
+import java.util.Random;
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, IBlockAccess, 
+//            AxisAlignedBB, EntityPlayer
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+public class BlockLever extends Block
+{
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    protected BlockLever(int i, int j)
+    {
+        super(i, j, Material.circuits);
+    }
 
-	public int getRenderType() {
-		return 12;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        return null;
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var1.isBlockOpaqueCube(var2 - 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2 + 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2, var3, var4 - 1) ? true : (var1.isBlockOpaqueCube(var2, var3, var4 + 1) ? true : var1.isBlockOpaqueCube(var2, var3 - 1, var4))));
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public void onBlockPlaced(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		int var7 = var6 & 8;
-		var6 &= 7;
-		if(var5 == 1 && var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-			var6 = 5 + var1.rand.nextInt(2);
-		}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-		if(var5 == 2 && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var6 = 4;
-		}
+    public int getRenderType()
+    {
+        return 12;
+    }
 
-		if(var5 == 3 && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var6 = 3;
-		}
+    public boolean canPlaceBlockOnSide(World world, int i, int j, int k, int l)
+    {
+        if(l == 1 && world.isBlockNormalCube(i, j - 1, k))
+        {
+            return true;
+        }
+        if(l == 2 && world.isBlockNormalCube(i, j, k + 1))
+        {
+            return true;
+        }
+        if(l == 3 && world.isBlockNormalCube(i, j, k - 1))
+        {
+            return true;
+        }
+        if(l == 4 && world.isBlockNormalCube(i + 1, j, k))
+        {
+            return true;
+        }
+        return l == 5 && world.isBlockNormalCube(i - 1, j, k);
+    }
 
-		if(var5 == 4 && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var6 = 2;
-		}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        if(world.isBlockNormalCube(i - 1, j, k))
+        {
+            return true;
+        }
+        if(world.isBlockNormalCube(i + 1, j, k))
+        {
+            return true;
+        }
+        if(world.isBlockNormalCube(i, j, k - 1))
+        {
+            return true;
+        }
+        if(world.isBlockNormalCube(i, j, k + 1))
+        {
+            return true;
+        }
+        return world.isBlockNormalCube(i, j - 1, k);
+    }
 
-		if(var5 == 5 && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var6 = 1;
-		}
+    public void onBlockPlaced(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        int j1 = i1 & 8;
+        i1 &= 7;
+        i1 = -1;
+        if(l == 1 && world.isBlockNormalCube(i, j - 1, k))
+        {
+            i1 = 5 + world.rand.nextInt(2);
+        }
+        if(l == 2 && world.isBlockNormalCube(i, j, k + 1))
+        {
+            i1 = 4;
+        }
+        if(l == 3 && world.isBlockNormalCube(i, j, k - 1))
+        {
+            i1 = 3;
+        }
+        if(l == 4 && world.isBlockNormalCube(i + 1, j, k))
+        {
+            i1 = 2;
+        }
+        if(l == 5 && world.isBlockNormalCube(i - 1, j, k))
+        {
+            i1 = 1;
+        }
+        if(i1 == -1)
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+            return;
+        } else
+        {
+            world.setBlockMetadataWithNotify(i, j, k, i1 + j1);
+            return;
+        }
+    }
 
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var6 + var7);
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        if(checkIfAttachedToBlock(world, i, j, k))
+        {
+            int i1 = world.getBlockMetadata(i, j, k) & 7;
+            boolean flag = false;
+            if(!world.isBlockNormalCube(i - 1, j, k) && i1 == 1)
+            {
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i + 1, j, k) && i1 == 2)
+            {
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i, j, k - 1) && i1 == 3)
+            {
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i, j, k + 1) && i1 == 4)
+            {
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i, j - 1, k) && i1 == 5)
+            {
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i, j - 1, k) && i1 == 6)
+            {
+                flag = true;
+            }
+            if(flag)
+            {
+                dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+                world.setBlockWithNotify(i, j, k, 0);
+            }
+        }
+    }
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		if(var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 1);
-		} else if(var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
-		} else if(var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
-		} else if(var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 4);
-		} else if(var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 5 + var1.rand.nextInt(2));
-		}
+    private boolean checkIfAttachedToBlock(World world, int i, int j, int k)
+    {
+        if(!canPlaceBlockAt(world, i, j, k))
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+            return false;
+        } else
+        {
+            return true;
+        }
+    }
 
-		this.checkIfAttachedToBlock(var1, var2, var3, var4);
-	}
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        int l = iblockaccess.getBlockMetadata(i, j, k) & 7;
+        float f = 0.1875F;
+        if(l == 1)
+        {
+            setBlockBounds(0.0F, 0.2F, 0.5F - f, f * 2.0F, 0.8F, 0.5F + f);
+        } else
+        if(l == 2)
+        {
+            setBlockBounds(1.0F - f * 2.0F, 0.2F, 0.5F - f, 1.0F, 0.8F, 0.5F + f);
+        } else
+        if(l == 3)
+        {
+            setBlockBounds(0.5F - f, 0.2F, 0.0F, 0.5F + f, 0.8F, f * 2.0F);
+        } else
+        if(l == 4)
+        {
+            setBlockBounds(0.5F - f, 0.2F, 1.0F - f * 2.0F, 0.5F + f, 0.8F, 1.0F);
+        } else
+        {
+            float f1 = 0.25F;
+            setBlockBounds(0.5F - f1, 0.0F, 0.5F - f1, 0.5F + f1, 0.6F, 0.5F + f1);
+        }
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		if(this.checkIfAttachedToBlock(var1, var2, var3, var4)) {
-			int var6 = var1.getBlockMetadata(var2, var3, var4) & 7;
-			boolean var7 = false;
-			if(!var1.isBlockOpaqueCube(var2 - 1, var3, var4) && var6 == 1) {
-				var7 = true;
-			}
+    public void onBlockClicked(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        blockActivated(world, i, j, k, entityplayer);
+    }
 
-			if(!var1.isBlockOpaqueCube(var2 + 1, var3, var4) && var6 == 2) {
-				var7 = true;
-			}
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(world.multiplayerWorld)
+        {
+            return true;
+        }
+        int l = world.getBlockMetadata(i, j, k);
+        int i1 = l & 7;
+        int j1 = 8 - (l & 8);
+        world.setBlockMetadataWithNotify(i, j, k, i1 + j1);
+        world.markBlocksDirty(i, j, k, i, j, k);
+        world.playSoundEffect((double)i + 0.5D, (double)j + 0.5D, (double)k + 0.5D, "random.click", 0.3F, j1 <= 0 ? 0.5F : 0.6F);
+        world.notifyBlocksOfNeighborChange(i, j, k, blockID);
+        if(i1 == 1)
+        {
+            world.notifyBlocksOfNeighborChange(i - 1, j, k, blockID);
+        } else
+        if(i1 == 2)
+        {
+            world.notifyBlocksOfNeighborChange(i + 1, j, k, blockID);
+        } else
+        if(i1 == 3)
+        {
+            world.notifyBlocksOfNeighborChange(i, j, k - 1, blockID);
+        } else
+        if(i1 == 4)
+        {
+            world.notifyBlocksOfNeighborChange(i, j, k + 1, blockID);
+        } else
+        {
+            world.notifyBlocksOfNeighborChange(i, j - 1, k, blockID);
+        }
+        return true;
+    }
 
-			if(!var1.isBlockOpaqueCube(var2, var3, var4 - 1) && var6 == 3) {
-				var7 = true;
-			}
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        if((l & 8) > 0)
+        {
+            world.notifyBlocksOfNeighborChange(i, j, k, blockID);
+            int i1 = l & 7;
+            if(i1 == 1)
+            {
+                world.notifyBlocksOfNeighborChange(i - 1, j, k, blockID);
+            } else
+            if(i1 == 2)
+            {
+                world.notifyBlocksOfNeighborChange(i + 1, j, k, blockID);
+            } else
+            if(i1 == 3)
+            {
+                world.notifyBlocksOfNeighborChange(i, j, k - 1, blockID);
+            } else
+            if(i1 == 4)
+            {
+                world.notifyBlocksOfNeighborChange(i, j, k + 1, blockID);
+            } else
+            {
+                world.notifyBlocksOfNeighborChange(i, j - 1, k, blockID);
+            }
+        }
+        super.onBlockRemoval(world, i, j, k);
+    }
 
-			if(!var1.isBlockOpaqueCube(var2, var3, var4 + 1) && var6 == 4) {
-				var7 = true;
-			}
+    public boolean isPoweringTo(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        return (iblockaccess.getBlockMetadata(i, j, k) & 8) > 0;
+    }
 
-			if(!var1.isBlockOpaqueCube(var2, var3 - 1, var4) && var6 == 5) {
-				var7 = true;
-			}
+    public boolean isIndirectlyPoweringTo(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        if((i1 & 8) == 0)
+        {
+            return false;
+        }
+        int j1 = i1 & 7;
+        if(j1 == 6 && l == 1)
+        {
+            return true;
+        }
+        if(j1 == 5 && l == 1)
+        {
+            return true;
+        }
+        if(j1 == 4 && l == 2)
+        {
+            return true;
+        }
+        if(j1 == 3 && l == 3)
+        {
+            return true;
+        }
+        if(j1 == 2 && l == 4)
+        {
+            return true;
+        }
+        return j1 == 1 && l == 5;
+    }
 
-			if(var7) {
-				this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-				var1.setBlockWithNotify(var2, var3, var4, 0);
-			}
-		}
-
-	}
-
-	private boolean checkIfAttachedToBlock(World var1, int var2, int var3, int var4) {
-		if(!this.canPlaceBlockAt(var1, var2, var3, var4)) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4) & 7;
-		float var6 = 3.0F / 16.0F;
-		if(var5 == 1) {
-			this.setBlockBounds(0.0F, 0.2F, 0.5F - var6, var6 * 2.0F, 0.8F, 0.5F + var6);
-		} else if(var5 == 2) {
-			this.setBlockBounds(1.0F - var6 * 2.0F, 0.2F, 0.5F - var6, 1.0F, 0.8F, 0.5F + var6);
-		} else if(var5 == 3) {
-			this.setBlockBounds(0.5F - var6, 0.2F, 0.0F, 0.5F + var6, 0.8F, var6 * 2.0F);
-		} else if(var5 == 4) {
-			this.setBlockBounds(0.5F - var6, 0.2F, 1.0F - var6 * 2.0F, 0.5F + var6, 0.8F, 1.0F);
-		} else {
-			var6 = 0.25F;
-			this.setBlockBounds(0.5F - var6, 0.0F, 0.5F - var6, 0.5F + var6, 0.6F, 0.5F + var6);
-		}
-
-	}
-
-	public void onBlockClicked(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		this.blockActivated(var1, var2, var3, var4, var5);
-	}
-
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		if(var1.multiplayerWorld) {
-			return true;
-		} else {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			int var7 = var6 & 7;
-			int var8 = 8 - (var6 & 8);
-			var1.setBlockMetadataWithNotify(var2, var3, var4, var7 + var8);
-			var1.func_701_b(var2, var3, var4, var2, var3, var4);
-			var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.click", 0.3F, var8 > 0 ? 0.6F : 0.5F);
-			var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
-			if(var7 == 1) {
-				var1.notifyBlocksOfNeighborChange(var2 - 1, var3, var4, this.blockID);
-			} else if(var7 == 2) {
-				var1.notifyBlocksOfNeighborChange(var2 + 1, var3, var4, this.blockID);
-			} else if(var7 == 3) {
-				var1.notifyBlocksOfNeighborChange(var2, var3, var4 - 1, this.blockID);
-			} else if(var7 == 4) {
-				var1.notifyBlocksOfNeighborChange(var2, var3, var4 + 1, this.blockID);
-			} else {
-				var1.notifyBlocksOfNeighborChange(var2, var3 - 1, var4, this.blockID);
-			}
-
-			return true;
-		}
-	}
-
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4);
-		if((var5 & 8) > 0) {
-			var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
-			int var6 = var5 & 7;
-			if(var6 == 1) {
-				var1.notifyBlocksOfNeighborChange(var2 - 1, var3, var4, this.blockID);
-			} else if(var6 == 2) {
-				var1.notifyBlocksOfNeighborChange(var2 + 1, var3, var4, this.blockID);
-			} else if(var6 == 3) {
-				var1.notifyBlocksOfNeighborChange(var2, var3, var4 - 1, this.blockID);
-			} else if(var6 == 4) {
-				var1.notifyBlocksOfNeighborChange(var2, var3, var4 + 1, this.blockID);
-			} else {
-				var1.notifyBlocksOfNeighborChange(var2, var3 - 1, var4, this.blockID);
-			}
-		}
-
-		super.onBlockRemoval(var1, var2, var3, var4);
-	}
-
-	public boolean isPoweringTo(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		return (var1.getBlockMetadata(var2, var3, var4) & 8) > 0;
-	}
-
-	public boolean isIndirectlyPoweringTo(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if((var6 & 8) == 0) {
-			return false;
-		} else {
-			int var7 = var6 & 7;
-			return var7 == 5 && var5 == 1 ? true : (var7 == 4 && var5 == 2 ? true : (var7 == 3 && var5 == 3 ? true : (var7 == 2 && var5 == 4 ? true : var7 == 1 && var5 == 5)));
-		}
-	}
-
-	public boolean canProvidePower() {
-		return true;
-	}
+    public boolean canProvidePower()
+    {
+        return true;
+    }
 }

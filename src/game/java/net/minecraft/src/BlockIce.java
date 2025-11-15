@@ -1,39 +1,66 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockIce extends BlockBreakable {
-	public BlockIce(int var1, int var2) {
-		super(var1, var2, Material.ice, false);
-		this.slipperiness = 0.98F;
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            BlockBreakable, Material, World, Block, 
+//            EnumSkyBlock, IBlockAccess, EntityPlayer, ItemStack
 
-	public int getRenderBlockPass() {
-		return 1;
-	}
+public class BlockIce extends BlockBreakable
+{
 
-	public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		return super.shouldSideBeRendered(var1, var2, var3, var4, 1 - var5);
-	}
+    public BlockIce(int i, int j)
+    {
+        super(i, j, Material.ice, false);
+        slipperiness = 0.98F;
+        setTickOnLoad(true);
+    }
 
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		Material var5 = var1.getBlockMaterial(var2, var3 - 1, var4);
-		if(var5.getIsSolid() || var5.getIsLiquid()) {
-			var1.setBlockWithNotify(var2, var3, var4, Block.waterStill.blockID);
-		}
+    public int getRenderBlockPass()
+    {
+        return 1;
+    }
 
-	}
+    public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        return super.shouldSideBeRendered(iblockaccess, i, j, k, 1 - l);
+    }
 
-	public int quantityDropped(Random var1) {
-		return 0;
-	}
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        super.harvestBlock(world, entityplayer, i, j, k, l);
+        Material material = world.getBlockMaterial(i, j - 1, k);
+        if(material.getIsSolid() || material.getIsLiquid())
+        {
+            world.setBlockWithNotify(i, j, k, Block.waterMoving.blockID);
+        }
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(var1.getSavedLightValue(EnumSkyBlock.Block, var2, var3, var4) > 11 - Block.lightOpacity[this.blockID]) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, Block.waterMoving.blockID);
-		}
+    public int quantityDropped(Random random)
+    {
+        return 0;
+    }
 
-	}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) > 11 - Block.lightOpacity[blockID])
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, Block.waterStill.blockID);
+        }
+    }
+
+    public int getMobilityFlag()
+    {
+        return 0;
+    }
+
+    protected ItemStack func_41049_c_(int i)
+    {
+        return null;
+    }
 }

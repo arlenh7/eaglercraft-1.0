@@ -1,48 +1,71 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemTool extends Item {
-	private Block[] blocksEffectiveAgainst;
-	private float efficiencyOnProperMaterial = 4.0F;
-	private int damageVsEntity;
-	protected int ingredientQuality;
 
-	public ItemTool(int var1, int var2, int var3, Block[] var4) {
-		super(var1);
-		this.ingredientQuality = var3;
-		this.blocksEffectiveAgainst = var4;
-		this.maxStackSize = 1;
-		this.maxDamage = 32 << var3;
-		if(var3 == 3) {
-			this.maxDamage *= 4;
-		}
+// Referenced classes of package net.minecraft.src:
+//            Item, EnumToolMaterial, ItemStack, Block, 
+//            EntityLiving, Entity
 
-		this.efficiencyOnProperMaterial = (float)((var3 + 1) * 2);
-		this.damageVsEntity = var2 + var3;
-	}
+public class ItemTool extends Item
+{
 
-	public float getStrVsBlock(ItemStack var1, Block var2) {
-		for(int var3 = 0; var3 < this.blocksEffectiveAgainst.length; ++var3) {
-			if(this.blocksEffectiveAgainst[var3] == var2) {
-				return this.efficiencyOnProperMaterial;
-			}
-		}
+    private Block blocksEffectiveAgainst[];
+    protected float efficiencyOnProperMaterial;
+    private int damageVsEntity;
+    protected EnumToolMaterial toolMaterial;
 
-		return 1.0F;
-	}
+    protected ItemTool(int i, int j, EnumToolMaterial enumtoolmaterial, Block ablock[])
+    {
+        super(i);
+        efficiencyOnProperMaterial = 4F;
+        toolMaterial = enumtoolmaterial;
+        blocksEffectiveAgainst = ablock;
+        maxStackSize = 1;
+        setMaxDamage(enumtoolmaterial.getMaxUses());
+        efficiencyOnProperMaterial = enumtoolmaterial.getEfficiencyOnProperMaterial();
+        damageVsEntity = j + enumtoolmaterial.getDamageVsEntity();
+    }
 
-	public void hitEntity(ItemStack var1, EntityLiving var2) {
-		var1.damageItem(2);
-	}
+    public float getStrVsBlock(ItemStack itemstack, Block block)
+    {
+        for(int i = 0; i < blocksEffectiveAgainst.length; i++)
+        {
+            if(blocksEffectiveAgainst[i] == block)
+            {
+                return efficiencyOnProperMaterial;
+            }
+        }
 
-	public void hitBlock(ItemStack var1, int var2, int var3, int var4, int var5) {
-		var1.damageItem(1);
-	}
+        return 1.0F;
+    }
 
-	public int getDamageVsEntity(Entity var1) {
-		return this.damageVsEntity;
-	}
+    public boolean hitEntity(ItemStack itemstack, EntityLiving entityliving, EntityLiving entityliving1)
+    {
+        itemstack.damageItem(2, entityliving1);
+        return true;
+    }
 
-	public boolean isFull3D() {
-		return true;
-	}
+    public boolean onBlockDestroyed(ItemStack itemstack, int i, int j, int k, int l, EntityLiving entityliving)
+    {
+        itemstack.damageItem(1, entityliving);
+        return true;
+    }
+
+    public int getDamageVsEntity(Entity entity)
+    {
+        return damageVsEntity;
+    }
+
+    public boolean isFull3D()
+    {
+        return true;
+    }
+
+    public int getItemEnchantability()
+    {
+        return toolMaterial.getEnchantability();
+    }
 }

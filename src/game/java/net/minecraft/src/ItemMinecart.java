@@ -1,25 +1,40 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemMinecart extends Item {
-	public int field_317_a;
 
-	public ItemMinecart(int var1, int var2) {
-		super(var1);
-		this.maxStackSize = 1;
-		this.field_317_a = var2;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, World, BlockRail, EntityMinecart, 
+//            ItemStack, EntityPlayer
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		int var8 = var3.getBlockId(var4, var5, var6);
-		if(var8 == Block.minecartTrack.blockID) {
-			if(!var3.multiplayerWorld) {
-				var3.entityJoinedWorld(new EntityMinecart(var3, (double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), this.field_317_a));
-			}
+public class ItemMinecart extends Item
+{
 
-			--var1.stackSize;
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public int minecartType;
+
+    public ItemMinecart(int i, int j)
+    {
+        super(i);
+        maxStackSize = 1;
+        minecartType = j;
+    }
+
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockId(i, j, k);
+        if(BlockRail.isRailBlock(i1))
+        {
+            if(!world.multiplayerWorld)
+            {
+                world.entityJoinedWorld(new EntityMinecart(world, (float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, minecartType));
+            }
+            itemstack.stackSize--;
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 }

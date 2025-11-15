@@ -1,32 +1,47 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet2Handshake extends Packet {
-	public String username;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet2Handshake() {
-	}
+public class Packet2Handshake extends Packet
+{
 
-	public Packet2Handshake(String var1) {
-		this.username = var1;
-	}
+    public String username;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.username = var1.readUTF();
-	}
+    public Packet2Handshake()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeUTF(this.username);
-	}
+    public Packet2Handshake(String s)
+    {
+        username = s;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleHandshake(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        username = readString(datainputstream, 32);
+    }
 
-	public int getPacketSize() {
-		return 4 + this.username.length() + 4;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        writeString(username, dataoutputstream);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleHandshake(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 4 + username.length() + 4;
+    }
 }

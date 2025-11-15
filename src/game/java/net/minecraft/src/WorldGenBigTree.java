@@ -1,348 +1,455 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenBigTree extends WorldGenerator {
-	static final byte[] field_882_a = new byte[]{(byte)2, (byte)0, (byte)0, (byte)1, (byte)2, (byte)1};
-	Random field_881_b = new Random();
-	World worldObj;
-	int[] field_879_d = new int[]{0, 0, 0};
-	int field_878_e = 0;
-	int field_877_f;
-	double field_876_g = 0.618D;
-	double field_875_h = 1.0D;
-	double field_874_i = 0.381D;
-	double field_873_j = 1.0D;
-	double field_872_k = 1.0D;
-	int field_871_l = 1;
-	int field_870_m = 12;
-	int field_869_n = 4;
-	int[][] field_868_o;
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, MathHelper, World
 
-	void func_521_a() {
-		this.field_877_f = (int)((double)this.field_878_e * this.field_876_g);
-		if(this.field_877_f >= this.field_878_e) {
-			this.field_877_f = this.field_878_e - 1;
-		}
+public class WorldGenBigTree extends WorldGenerator
+{
 
-		int var1 = (int)(1.382D + Math.pow(this.field_872_k * (double)this.field_878_e / 13.0D, 2.0D));
-		if(var1 < 1) {
-			var1 = 1;
-		}
+    static final byte otherCoordPairs[] = {
+        2, 0, 0, 1, 2, 1
+    };
+    Random rand;
+    World worldObj;
+    int basePos[] = {
+        0, 0, 0
+    };
+    int heightLimit;
+    int height;
+    double heightAttenuation;
+    double field_875_h;
+    double field_874_i;
+    double field_873_j;
+    double field_872_k;
+    int trunkSize;
+    int heightLimitLimit;
+    int leafDistanceLimit;
+    int leafNodes[][];
 
-		int[][] var2 = new int[var1 * this.field_878_e][4];
-		int var3 = this.field_879_d[1] + this.field_878_e - this.field_869_n;
-		int var4 = 1;
-		int var5 = this.field_879_d[1] + this.field_877_f;
-		int var6 = var3 - this.field_879_d[1];
-		var2[0][0] = this.field_879_d[0];
-		var2[0][1] = var3;
-		var2[0][2] = this.field_879_d[2];
-		var2[0][3] = var5;
-		--var3;
+    public WorldGenBigTree(boolean flag)
+    {
+        super(flag);
+        rand = new Random();
+        heightLimit = 0;
+        heightAttenuation = 0.61799999999999999D;
+        field_875_h = 1.0D;
+        field_874_i = 0.38100000000000001D;
+        field_873_j = 1.0D;
+        field_872_k = 1.0D;
+        trunkSize = 1;
+        heightLimitLimit = 12;
+        leafDistanceLimit = 4;
+    }
 
-		while(true) {
-			while(var6 >= 0) {
-				int var7 = 0;
-				float var8 = this.func_528_a(var6);
-				if(var8 < 0.0F) {
-					--var3;
-					--var6;
-				} else {
-					for(double var9 = 0.5D; var7 < var1; ++var7) {
-						double var11 = this.field_873_j * (double)var8 * ((double)this.field_881_b.nextFloat() + 0.328D);
-						double var13 = (double)this.field_881_b.nextFloat() * 2.0D * 3.14159D;
-						int var15 = (int)(var11 * Math.sin(var13) + (double)this.field_879_d[0] + var9);
-						int var16 = (int)(var11 * Math.cos(var13) + (double)this.field_879_d[2] + var9);
-						int[] var17 = new int[]{var15, var3, var16};
-						int[] var18 = new int[]{var15, var3 + this.field_869_n, var16};
-						if(this.func_524_a(var17, var18) == -1) {
-							int[] var19 = new int[]{this.field_879_d[0], this.field_879_d[1], this.field_879_d[2]};
-							double var20 = Math.sqrt(Math.pow((double)Math.abs(this.field_879_d[0] - var17[0]), 2.0D) + Math.pow((double)Math.abs(this.field_879_d[2] - var17[2]), 2.0D));
-							double var22 = var20 * this.field_874_i;
-							if((double)var17[1] - var22 > (double)var5) {
-								var19[1] = var5;
-							} else {
-								var19[1] = (int)((double)var17[1] - var22);
-							}
+    void generateLeafNodeList()
+    {
+        height = (int)((double)heightLimit * heightAttenuation);
+        if(height >= heightLimit)
+        {
+            height = heightLimit - 1;
+        }
+        int i = (int)(1.3819999999999999D + Math.pow((field_872_k * (double)heightLimit) / 13D, 2D));
+        if(i < 1)
+        {
+            i = 1;
+        }
+        int ai[][] = new int[i * heightLimit][4];
+        int j = (basePos[1] + heightLimit) - leafDistanceLimit;
+        int k = 1;
+        int l = basePos[1] + height;
+        int i1 = j - basePos[1];
+        ai[0][0] = basePos[0];
+        ai[0][1] = j;
+        ai[0][2] = basePos[2];
+        ai[0][3] = l;
+        j--;
+        while(i1 >= 0) 
+        {
+            int j1 = 0;
+            float f = func_528_a(i1);
+            if(f < 0.0F)
+            {
+                j--;
+                i1--;
+            } else
+            {
+                double d = 0.5D;
+                for(; j1 < i; j1++)
+                {
+                    double d1 = field_873_j * ((double)f * ((double)rand.nextFloat() + 0.32800000000000001D));
+                    double d2 = (double)rand.nextFloat() * 2D * 3.1415899999999999D;
+                    int k1 = MathHelper.floor_double(d1 * Math.sin(d2) + (double)basePos[0] + d);
+                    int l1 = MathHelper.floor_double(d1 * Math.cos(d2) + (double)basePos[2] + d);
+                    int ai1[] = {
+                        k1, j, l1
+                    };
+                    int ai2[] = {
+                        k1, j + leafDistanceLimit, l1
+                    };
+                    if(checkBlockLine(ai1, ai2) != -1)
+                    {
+                        continue;
+                    }
+                    int ai3[] = {
+                        basePos[0], basePos[1], basePos[2]
+                    };
+                    double d3 = Math.sqrt(Math.pow(Math.abs(basePos[0] - ai1[0]), 2D) + Math.pow(Math.abs(basePos[2] - ai1[2]), 2D));
+                    double d4 = d3 * field_874_i;
+                    if((double)ai1[1] - d4 > (double)l)
+                    {
+                        ai3[1] = l;
+                    } else
+                    {
+                        ai3[1] = (int)((double)ai1[1] - d4);
+                    }
+                    if(checkBlockLine(ai3, ai1) == -1)
+                    {
+                        ai[k][0] = k1;
+                        ai[k][1] = j;
+                        ai[k][2] = l1;
+                        ai[k][3] = ai3[1];
+                        k++;
+                    }
+                }
 
-							if(this.func_524_a(var19, var17) == -1) {
-								var2[var4][0] = var15;
-								var2[var4][1] = var3;
-								var2[var4][2] = var16;
-								var2[var4][3] = var19[1];
-								++var4;
-							}
-						}
-					}
+                j--;
+                i1--;
+            }
+        }
+        leafNodes = new int[k][4];
+        System.arraycopy(ai, 0, leafNodes, 0, k);
+    }
 
-					--var3;
-					--var6;
-				}
-			}
+    void func_523_a(int i, int j, int k, float f, byte byte0, int l)
+    {
+        int i1 = (int)((double)f + 0.61799999999999999D);
+        byte byte1 = otherCoordPairs[byte0];
+        byte byte2 = otherCoordPairs[byte0 + 3];
+        int ai[] = {
+            i, j, k
+        };
+        int ai1[] = {
+            0, 0, 0
+        };
+        int j1 = -i1;
+        int k1 = -i1;
+        ai1[byte0] = ai[byte0];
+        for(; j1 <= i1; j1++)
+        {
+            ai1[byte1] = ai[byte1] + j1;
+            for(int l1 = -i1; l1 <= i1;)
+            {
+                double d = Math.sqrt(Math.pow((double)Math.abs(j1) + 0.5D, 2D) + Math.pow((double)Math.abs(l1) + 0.5D, 2D));
+                if(d > (double)f)
+                {
+                    l1++;
+                } else
+                {
+                    ai1[byte2] = ai[byte2] + l1;
+                    int i2 = worldObj.getBlockId(ai1[0], ai1[1], ai1[2]);
+                    if(i2 != 0 && i2 != 18)
+                    {
+                        l1++;
+                    } else
+                    {
+                        func_41060_a(worldObj, ai1[0], ai1[1], ai1[2], l, 0);
+                        l1++;
+                    }
+                }
+            }
 
-			this.field_868_o = new int[var4][4];
-			System.arraycopy(var2, 0, this.field_868_o, 0, var4);
-			return;
-		}
-	}
+        }
 
-	void func_523_a(int var1, int var2, int var3, float var4, byte var5, int var6) {
-		int var7 = (int)((double)var4 + 0.618D);
-		byte var8 = field_882_a[var5];
-		byte var9 = field_882_a[var5 + 3];
-		int[] var10 = new int[]{var1, var2, var3};
-		int[] var11 = new int[]{0, 0, 0};
-		int var12 = -var7;
-		int var13 = -var7;
+    }
 
-		label32:
-		for(var11[var5] = var10[var5]; var12 <= var7; ++var12) {
-			var11[var8] = var10[var8] + var12;
-			var13 = -var7;
+    float func_528_a(int i)
+    {
+        if((double)i < (double)(float)heightLimit * 0.29999999999999999D)
+        {
+            return -1.618F;
+        }
+        float f = (float)heightLimit / 2.0F;
+        float f1 = (float)heightLimit / 2.0F - (float)i;
+        float f2;
+        if(f1 == 0.0F)
+        {
+            f2 = f;
+        } else
+        if(Math.abs(f1) >= f)
+        {
+            f2 = 0.0F;
+        } else
+        {
+            f2 = (float)Math.sqrt(Math.pow(Math.abs(f), 2D) - Math.pow(Math.abs(f1), 2D));
+        }
+        f2 *= 0.5F;
+        return f2;
+    }
 
-			while(true) {
-				while(true) {
-					if(var13 > var7) {
-						continue label32;
-					}
+    float func_526_b(int i)
+    {
+        if(i < 0 || i >= leafDistanceLimit)
+        {
+            return -1F;
+        }
+        return i != 0 && i != leafDistanceLimit - 1 ? 3F : 2.0F;
+    }
 
-					double var15 = Math.sqrt(Math.pow((double)Math.abs(var12) + 0.5D, 2.0D) + Math.pow((double)Math.abs(var13) + 0.5D, 2.0D));
-					if(var15 > (double)var4) {
-						++var13;
-					} else {
-						var11[var9] = var10[var9] + var13;
-						int var14 = this.worldObj.getBlockId(var11[0], var11[1], var11[2]);
-						if(var14 != 0 && var14 != 18) {
-							++var13;
-						} else {
-							this.worldObj.setBlock(var11[0], var11[1], var11[2], var6);
-							++var13;
-						}
-					}
-				}
-			}
-		}
+    void generateLeafNode(int i, int j, int k)
+    {
+        int l = j;
+        for(int i1 = j + leafDistanceLimit; l < i1; l++)
+        {
+            float f = func_526_b(l - j);
+            func_523_a(i, l, k, f, (byte)1, 18);
+        }
 
-	}
+    }
 
-	float func_528_a(int var1) {
-		if((double)var1 < (double)((float)this.field_878_e) * 0.3D) {
-			return -1.618F;
-		} else {
-			float var2 = (float)this.field_878_e / 2.0F;
-			float var3 = (float)this.field_878_e / 2.0F - (float)var1;
-			float var4;
-			if(var3 == 0.0F) {
-				var4 = var2;
-			} else if(Math.abs(var3) >= var2) {
-				var4 = 0.0F;
-			} else {
-				var4 = (float)Math.sqrt(Math.pow((double)Math.abs(var2), 2.0D) - Math.pow((double)Math.abs(var3), 2.0D));
-			}
+    void placeBlockLine(int ai[], int ai1[], int i)
+    {
+        int ai2[] = {
+            0, 0, 0
+        };
+        byte byte0 = 0;
+        int j = 0;
+        for(; byte0 < 3; byte0++)
+        {
+            ai2[byte0] = ai1[byte0] - ai[byte0];
+            if(Math.abs(ai2[byte0]) > Math.abs(ai2[j]))
+            {
+                j = byte0;
+            }
+        }
 
-			var4 *= 0.5F;
-			return var4;
-		}
-	}
+        if(ai2[j] == 0)
+        {
+            return;
+        }
+        byte byte1 = otherCoordPairs[j];
+        byte byte2 = otherCoordPairs[j + 3];
+        byte byte3;
+        if(ai2[j] > 0)
+        {
+            byte3 = 1;
+        } else
+        {
+            byte3 = -1;
+        }
+        double d = (double)ai2[byte1] / (double)ai2[j];
+        double d1 = (double)ai2[byte2] / (double)ai2[j];
+        int ai3[] = {
+            0, 0, 0
+        };
+        int k = 0;
+        for(int l = ai2[j] + byte3; k != l; k += byte3)
+        {
+            ai3[j] = MathHelper.floor_double((double)(ai[j] + k) + 0.5D);
+            ai3[byte1] = MathHelper.floor_double((double)ai[byte1] + (double)k * d + 0.5D);
+            ai3[byte2] = MathHelper.floor_double((double)ai[byte2] + (double)k * d1 + 0.5D);
+            func_41060_a(worldObj, ai3[0], ai3[1], ai3[2], i, 0);
+        }
 
-	float func_526_b(int var1) {
-		return var1 >= 0 && var1 < this.field_869_n ? (var1 != 0 && var1 != this.field_869_n - 1 ? 3.0F : 2.0F) : -1.0F;
-	}
+    }
 
-	void func_520_a(int var1, int var2, int var3) {
-		int var4 = var2;
+    void generateLeaves()
+    {
+        int i = 0;
+        for(int j = leafNodes.length; i < j; i++)
+        {
+            int k = leafNodes[i][0];
+            int l = leafNodes[i][1];
+            int i1 = leafNodes[i][2];
+            generateLeafNode(k, l, i1);
+        }
 
-		for(int var5 = var2 + this.field_869_n; var4 < var5; ++var4) {
-			float var6 = this.func_526_b(var4 - var2);
-			this.func_523_a(var1, var4, var3, var6, (byte)1, 18);
-		}
+    }
 
-	}
+    boolean leafNodeNeedsBase(int i)
+    {
+        return (double)i >= (double)heightLimit * 0.20000000000000001D;
+    }
 
-	void func_522_a(int[] var1, int[] var2, int var3) {
-		int[] var4 = new int[]{0, 0, 0};
-		byte var5 = 0;
+    void generateTrunk()
+    {
+        int i = basePos[0];
+        int j = basePos[1];
+        int k = basePos[1] + height;
+        int l = basePos[2];
+        int ai[] = {
+            i, j, l
+        };
+        int ai1[] = {
+            i, k, l
+        };
+        placeBlockLine(ai, ai1, 17);
+        if(trunkSize == 2)
+        {
+            ai[0]++;
+            ai1[0]++;
+            placeBlockLine(ai, ai1, 17);
+            ai[2]++;
+            ai1[2]++;
+            placeBlockLine(ai, ai1, 17);
+            ai[0]--;
+            ai1[0]--;
+            placeBlockLine(ai, ai1, 17);
+        }
+    }
 
-		byte var6;
-		for(var6 = 0; var5 < 3; ++var5) {
-			var4[var5] = var2[var5] - var1[var5];
-			if(Math.abs(var4[var5]) > Math.abs(var4[var6])) {
-				var6 = var5;
-			}
-		}
+    void generateLeafNodeBases()
+    {
+        int i = 0;
+        int j = leafNodes.length;
+        int ai[] = {
+            basePos[0], basePos[1], basePos[2]
+        };
+        for(; i < j; i++)
+        {
+            int ai1[] = leafNodes[i];
+            int ai2[] = {
+                ai1[0], ai1[1], ai1[2]
+            };
+            ai[1] = ai1[3];
+            int k = ai[1] - basePos[1];
+            if(leafNodeNeedsBase(k))
+            {
+                placeBlockLine(ai, ai2, 17);
+            }
+        }
 
-		if(var4[var6] != 0) {
-			byte var7 = field_882_a[var6];
-			byte var8 = field_882_a[var6 + 3];
-			byte var9;
-			if(var4[var6] > 0) {
-				var9 = 1;
-			} else {
-				var9 = -1;
-			}
+    }
 
-			double var10 = (double)var4[var7] / (double)var4[var6];
-			double var12 = (double)var4[var8] / (double)var4[var6];
-			int[] var14 = new int[]{0, 0, 0};
-			int var15 = 0;
+    int checkBlockLine(int ai[], int ai1[])
+    {
+        int ai2[] = {
+            0, 0, 0
+        };
+        byte byte0 = 0;
+        int i = 0;
+        for(; byte0 < 3; byte0++)
+        {
+            ai2[byte0] = ai1[byte0] - ai[byte0];
+            if(Math.abs(ai2[byte0]) > Math.abs(ai2[i]))
+            {
+                i = byte0;
+            }
+        }
 
-			for(int var16 = var4[var6] + var9; var15 != var16; var15 += var9) {
-				var14[var6] = MathHelper.floor_double((double)(var1[var6] + var15) + 0.5D);
-				var14[var7] = MathHelper.floor_double((double)var1[var7] + (double)var15 * var10 + 0.5D);
-				var14[var8] = MathHelper.floor_double((double)var1[var8] + (double)var15 * var12 + 0.5D);
-				this.worldObj.setBlock(var14[0], var14[1], var14[2], var3);
-			}
+        if(ai2[i] == 0)
+        {
+            return -1;
+        }
+        byte byte1 = otherCoordPairs[i];
+        byte byte2 = otherCoordPairs[i + 3];
+        byte byte3;
+        if(ai2[i] > 0)
+        {
+            byte3 = 1;
+        } else
+        {
+            byte3 = -1;
+        }
+        double d = (double)ai2[byte1] / (double)ai2[i];
+        double d1 = (double)ai2[byte2] / (double)ai2[i];
+        int ai3[] = {
+            0, 0, 0
+        };
+        int j = 0;
+        int k = ai2[i] + byte3;
+        do
+        {
+            if(j == k)
+            {
+                break;
+            }
+            ai3[i] = ai[i] + j;
+            ai3[byte1] = MathHelper.floor_double((double)ai[byte1] + (double)j * d);
+            ai3[byte2] = MathHelper.floor_double((double)ai[byte2] + (double)j * d1);
+            int l = worldObj.getBlockId(ai3[0], ai3[1], ai3[2]);
+            if(l != 0 && l != 18)
+            {
+                break;
+            }
+            j += byte3;
+        } while(true);
+        if(j == k)
+        {
+            return -1;
+        } else
+        {
+            return Math.abs(j);
+        }
+    }
 
-		}
-	}
+    boolean validTreeLocation()
+    {
+        int ai[] = {
+            basePos[0], basePos[1], basePos[2]
+        };
+        int ai1[] = {
+            basePos[0], (basePos[1] + heightLimit) - 1, basePos[2]
+        };
+        int i = worldObj.getBlockId(basePos[0], basePos[1] - 1, basePos[2]);
+        if(i != 2 && i != 3)
+        {
+            return false;
+        }
+        int j = checkBlockLine(ai, ai1);
+        if(j == -1)
+        {
+            return true;
+        }
+        if(j < 6)
+        {
+            return false;
+        } else
+        {
+            heightLimit = j;
+            return true;
+        }
+    }
 
-	void func_518_b() {
-		int var1 = 0;
+    public void func_517_a(double d, double d1, double d2)
+    {
+        heightLimitLimit = (int)(d * 12D);
+        if(d > 0.5D)
+        {
+            leafDistanceLimit = 5;
+        }
+        field_873_j = d1;
+        field_872_k = d2;
+    }
 
-		for(int var2 = this.field_868_o.length; var1 < var2; ++var1) {
-			int var3 = this.field_868_o[var1][0];
-			int var4 = this.field_868_o[var1][1];
-			int var5 = this.field_868_o[var1][2];
-			this.func_520_a(var3, var4, var5);
-		}
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        worldObj = world;
+        long l = random.nextLong();
+        rand.setSeed(l);
+        basePos[0] = i;
+        basePos[1] = j;
+        basePos[2] = k;
+        if(heightLimit == 0)
+        {
+            heightLimit = 5 + rand.nextInt(heightLimitLimit);
+        }
+        if(!validTreeLocation())
+        {
+            return false;
+        } else
+        {
+            generateLeafNodeList();
+            generateLeaves();
+            generateTrunk();
+            generateLeafNodeBases();
+            return true;
+        }
+    }
 
-	}
-
-	boolean func_527_c(int var1) {
-		return (double)var1 >= (double)this.field_878_e * 0.2D;
-	}
-
-	void func_529_c() {
-		int var1 = this.field_879_d[0];
-		int var2 = this.field_879_d[1];
-		int var3 = this.field_879_d[1] + this.field_877_f;
-		int var4 = this.field_879_d[2];
-		int[] var5 = new int[]{var1, var2, var4};
-		int[] var6 = new int[]{var1, var3, var4};
-		this.func_522_a(var5, var6, 17);
-		if(this.field_871_l == 2) {
-			++var5[0];
-			++var6[0];
-			this.func_522_a(var5, var6, 17);
-			++var5[2];
-			++var6[2];
-			this.func_522_a(var5, var6, 17);
-			var5[0] += -1;
-			var6[0] += -1;
-			this.func_522_a(var5, var6, 17);
-		}
-
-	}
-
-	void func_525_d() {
-		int var1 = 0;
-		int var2 = this.field_868_o.length;
-
-		for(int[] var3 = new int[]{this.field_879_d[0], this.field_879_d[1], this.field_879_d[2]}; var1 < var2; ++var1) {
-			int[] var4 = this.field_868_o[var1];
-			int[] var5 = new int[]{var4[0], var4[1], var4[2]};
-			var3[1] = var4[3];
-			int var6 = var3[1] - this.field_879_d[1];
-			if(this.func_527_c(var6)) {
-				this.func_522_a(var3, var5, 17);
-			}
-		}
-
-	}
-
-	int func_524_a(int[] var1, int[] var2) {
-		int[] var3 = new int[]{0, 0, 0};
-		byte var4 = 0;
-
-		byte var5;
-		for(var5 = 0; var4 < 3; ++var4) {
-			var3[var4] = var2[var4] - var1[var4];
-			if(Math.abs(var3[var4]) > Math.abs(var3[var5])) {
-				var5 = var4;
-			}
-		}
-
-		if(var3[var5] == 0) {
-			return -1;
-		} else {
-			byte var6 = field_882_a[var5];
-			byte var7 = field_882_a[var5 + 3];
-			byte var8;
-			if(var3[var5] > 0) {
-				var8 = 1;
-			} else {
-				var8 = -1;
-			}
-
-			double var9 = (double)var3[var6] / (double)var3[var5];
-			double var11 = (double)var3[var7] / (double)var3[var5];
-			int[] var13 = new int[]{0, 0, 0};
-			int var14 = 0;
-
-			int var15;
-			for(var15 = var3[var5] + var8; var14 != var15; var14 += var8) {
-				var13[var5] = var1[var5] + var14;
-				var13[var6] = (int)((double)var1[var6] + (double)var14 * var9);
-				var13[var7] = (int)((double)var1[var7] + (double)var14 * var11);
-				int var16 = this.worldObj.getBlockId(var13[0], var13[1], var13[2]);
-				if(var16 != 0 && var16 != 18) {
-					break;
-				}
-			}
-
-			return var14 == var15 ? -1 : Math.abs(var14);
-		}
-	}
-
-	boolean func_519_e() {
-		int[] var1 = new int[]{this.field_879_d[0], this.field_879_d[1], this.field_879_d[2]};
-		int[] var2 = new int[]{this.field_879_d[0], this.field_879_d[1] + this.field_878_e - 1, this.field_879_d[2]};
-		int var3 = this.worldObj.getBlockId(this.field_879_d[0], this.field_879_d[1] - 1, this.field_879_d[2]);
-		if(var3 != 2 && var3 != 3) {
-			return false;
-		} else {
-			int var4 = this.func_524_a(var1, var2);
-			if(var4 == -1) {
-				return true;
-			} else if(var4 < 6) {
-				return false;
-			} else {
-				this.field_878_e = var4;
-				return true;
-			}
-		}
-	}
-
-	public void func_517_a(double var1, double var3, double var5) {
-		this.field_870_m = (int)(var1 * 12.0D);
-		if(var1 > 0.5D) {
-			this.field_869_n = 5;
-		}
-
-		this.field_873_j = var3;
-		this.field_872_k = var5;
-	}
-
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		this.worldObj = var1;
-		long var6 = var2.nextLong();
-		this.field_881_b.setSeed(var6);
-		this.field_879_d[0] = var3;
-		this.field_879_d[1] = var4;
-		this.field_879_d[2] = var5;
-		if(this.field_878_e == 0) {
-			this.field_878_e = 5 + this.field_881_b.nextInt(this.field_870_m);
-		}
-
-		if(!this.func_519_e()) {
-			return false;
-		} else {
-			this.func_521_a();
-			this.func_518_b();
-			this.func_529_c();
-			this.func_525_d();
-			return true;
-		}
-	}
 }

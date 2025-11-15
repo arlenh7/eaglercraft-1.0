@@ -1,173 +1,214 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class MapGenCavesHell extends MapGenBase {
-	protected void func_4129_a(int var1, int var2, byte[] var3, double var4, double var6, double var8) {
-		this.func_4128_a(var1, var2, var3, var4, var6, var8, 1.0F + this.rand.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
-	}
+// Referenced classes of package net.minecraft.src:
+//            MapGenBase, MathHelper, World, Block, 
+//            BlockGrass
 
-	protected void func_4128_a(int var1, int var2, byte[] var3, double var4, double var6, double var8, float var10, float var11, float var12, int var13, int var14, double var15) {
-		double var17 = (double)(var1 * 16 + 8);
-		double var19 = (double)(var2 * 16 + 8);
-		float var21 = 0.0F;
-		float var22 = 0.0F;
-		Random var23 = new Random(this.rand.nextLong());
-		if(var14 <= 0) {
-			int var24 = this.field_1306_a * 16 - 16;
-			var14 = var24 - var23.nextInt(var24 / 4);
-		}
+public class MapGenCavesHell extends MapGenBase
+{
 
-		boolean var51 = false;
-		if(var13 == -1) {
-			var13 = var14 / 2;
-			var51 = true;
-		}
+    public MapGenCavesHell()
+    {
+    }
 
-		int var25 = var23.nextInt(var14 / 2) + var14 / 4;
+    protected void generateLargeCaveNode(int i, int j, byte abyte0[], double d, double d1, 
+            double d2)
+    {
+        generateCaveNode(i, j, abyte0, d, d1, d2, 1.0F + rand.nextFloat() * 6F, 0.0F, 0.0F, -1, -1, 0.5D);
+    }
 
-		for(boolean var26 = var23.nextInt(6) == 0; var13 < var14; ++var13) {
-			double var27 = 1.5D + (double)(MathHelper.sin((float)var13 * (float)Math.PI / (float)var14) * var10 * 1.0F);
-			double var29 = var27 * var15;
-			float var31 = MathHelper.cos(var12);
-			float var32 = MathHelper.sin(var12);
-			var4 += (double)(MathHelper.cos(var11) * var31);
-			var6 += (double)var32;
-			var8 += (double)(MathHelper.sin(var11) * var31);
-			if(var26) {
-				var12 *= 0.92F;
-			} else {
-				var12 *= 0.7F;
-			}
+    protected void generateCaveNode(int i, int j, byte abyte0[], double d, double d1, 
+            double d2, float f, float f1, float f2, int k, int l, 
+            double d3)
+    {
+        double d4 = i * 16 + 8;
+        double d5 = j * 16 + 8;
+        float f3 = 0.0F;
+        float f4 = 0.0F;
+        Random random = new Random(rand.nextLong());
+        if(l <= 0)
+        {
+            int i1 = field_1306_a * 16 - 16;
+            l = i1 - random.nextInt(i1 / 4);
+        }
+        boolean flag = false;
+        if(k == -1)
+        {
+            k = l / 2;
+            flag = true;
+        }
+        int j1 = random.nextInt(l / 2) + l / 4;
+        boolean flag1 = random.nextInt(6) == 0;
+        for(; k < l; k++)
+        {
+            double d6 = 1.5D + (double)(MathHelper.sin(((float)k * 3.141593F) / (float)l) * f * 1.0F);
+            double d7 = d6 * d3;
+            float f5 = MathHelper.cos(f2);
+            float f6 = MathHelper.sin(f2);
+            d += MathHelper.cos(f1) * f5;
+            d1 += f6;
+            d2 += MathHelper.sin(f1) * f5;
+            if(flag1)
+            {
+                f2 *= 0.92F;
+            } else
+            {
+                f2 *= 0.7F;
+            }
+            f2 += f4 * 0.1F;
+            f1 += f3 * 0.1F;
+            f4 *= 0.9F;
+            f3 *= 0.75F;
+            f4 += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 2.0F;
+            f3 += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 4F;
+            if(!flag && k == j1 && f > 1.0F)
+            {
+                generateCaveNode(i, j, abyte0, d, d1, d2, random.nextFloat() * 0.5F + 0.5F, f1 - 1.570796F, f2 / 3F, k, l, 1.0D);
+                generateCaveNode(i, j, abyte0, d, d1, d2, random.nextFloat() * 0.5F + 0.5F, f1 + 1.570796F, f2 / 3F, k, l, 1.0D);
+                return;
+            }
+            if(!flag && random.nextInt(4) == 0)
+            {
+                continue;
+            }
+            double d8a = d - d4;
+            double d9a = d2 - d5;
+            double d10a = l - k;
+            double d11 = f + 2.0F + 16F;
+            if((d8a * d8a + d9a * d9a) - d10a * d10a > d11 * d11)
+            {
+                return;
+            }
+            if(d < d4 - 16D - d6 * 2D || d2 < d5 - 16D - d6 * 2D || d > d4 + 16D + d6 * 2D || d2 > d5 + 16D + d6 * 2D)
+            {
+                continue;
+            }
+            int d8 = MathHelper.floor_double(d - d6) - i * 16 - 1;
+            int k1 = (MathHelper.floor_double(d + d6) - i * 16) + 1;
+            int d9 = MathHelper.floor_double(d1 - d7) - 1;
+            int l1 = MathHelper.floor_double(d1 + d7) + 1;
+            int d10 = MathHelper.floor_double(d2 - d6) - j * 16 - 1;
+            int i2 = (MathHelper.floor_double(d2 + d6) - j * 16) + 1;
+            if(d8 < 0)
+            {
+                d8 = 0;
+            }
+            if(k1 > 16)
+            {
+                k1 = 16;
+            }
+            if(d9 < 1)
+            {
+                d9 = 1;
+            }
+            if(l1 > worldObj.field_35472_c - 8)
+            {
+                l1 = worldObj.field_35472_c - 8;
+            }
+            if(d10 < 0)
+            {
+                d10 = 0;
+            }
+            if(i2 > 16)
+            {
+                i2 = 16;
+            }
+            boolean flag2 = false;
+            for(int j2 = d8; !flag2 && j2 < k1; j2++)
+            {
+                for(int l2 = d10; !flag2 && l2 < i2; l2++)
+                {
+                    for(int i3 = l1 + 1; !flag2 && i3 >= d9 - 1; i3--)
+                    {
+                        int j3 = (j2 * 16 + l2) * worldObj.field_35472_c + i3;
+                        if(i3 < 0 || i3 >= worldObj.field_35472_c)
+                        {
+                            continue;
+                        }
+                        if(abyte0[j3] == Block.lavaMoving.blockID || abyte0[j3] == Block.lavaStill.blockID)
+                        {
+                            flag2 = true;
+                        }
+                        if(i3 != d9 - 1 && j2 != d8 && j2 != k1 - 1 && l2 != d10 && l2 != i2 - 1)
+                        {
+                            i3 = d9;
+                        }
+                    }
 
-			var12 += var22 * 0.1F;
-			var11 += var21 * 0.1F;
-			var22 *= 0.9F;
-			var21 *= 12.0F / 16.0F;
-			var22 += (var23.nextFloat() - var23.nextFloat()) * var23.nextFloat() * 2.0F;
-			var21 += (var23.nextFloat() - var23.nextFloat()) * var23.nextFloat() * 4.0F;
-			if(!var51 && var13 == var25 && var10 > 1.0F) {
-				this.func_4128_a(var1, var2, var3, var4, var6, var8, var23.nextFloat() * 0.5F + 0.5F, var11 - (float)Math.PI * 0.5F, var12 / 3.0F, var13, var14, 1.0D);
-				this.func_4128_a(var1, var2, var3, var4, var6, var8, var23.nextFloat() * 0.5F + 0.5F, var11 + (float)Math.PI * 0.5F, var12 / 3.0F, var13, var14, 1.0D);
-				return;
-			}
+                }
 
-			if(var51 || var23.nextInt(4) != 0) {
-				double var33 = var4 - var17;
-				double var35 = var8 - var19;
-				double var37 = (double)(var14 - var13);
-				double var39 = (double)(var10 + 2.0F + 16.0F);
-				if(var33 * var33 + var35 * var35 - var37 * var37 > var39 * var39) {
-					return;
-				}
+            }
 
-				if(var4 >= var17 - 16.0D - var27 * 2.0D && var8 >= var19 - 16.0D - var27 * 2.0D && var4 <= var17 + 16.0D + var27 * 2.0D && var8 <= var19 + 16.0D + var27 * 2.0D) {
-					int var52 = MathHelper.floor_double(var4 - var27) - var1 * 16 - 1;
-					int var34 = MathHelper.floor_double(var4 + var27) - var1 * 16 + 1;
-					int var53 = MathHelper.floor_double(var6 - var29) - 1;
-					int var36 = MathHelper.floor_double(var6 + var29) + 1;
-					int var54 = MathHelper.floor_double(var8 - var27) - var2 * 16 - 1;
-					int var38 = MathHelper.floor_double(var8 + var27) - var2 * 16 + 1;
-					if(var52 < 0) {
-						var52 = 0;
-					}
+            if(flag2)
+            {
+                continue;
+            }
+            for(int k2 = d8; k2 < k1; k2++)
+            {
+                double d12 = (((double)(k2 + i * 16) + 0.5D) - d) / d6;
+                for(int k3 = d10; k3 < i2; k3++)
+                {
+                    double d13 = (((double)(k3 + j * 16) + 0.5D) - d2) / d6;
+                    int l3 = (k2 * 16 + k3) * worldObj.field_35472_c + l1;
+                    for(int i4 = l1 - 1; i4 >= d9; i4--)
+                    {
+                        double d14 = (((double)i4 + 0.5D) - d1) / d7;
+                        if(d14 > -0.69999999999999996D && d12 * d12 + d14 * d14 + d13 * d13 < 1.0D)
+                        {
+                            byte byte0 = abyte0[l3];
+                            if(byte0 == Block.netherrack.blockID || byte0 == Block.dirt.blockID || byte0 == Block.grass.blockID)
+                            {
+                                abyte0[l3] = 0;
+                            }
+                        }
+                        l3--;
+                    }
 
-					if(var34 > 16) {
-						var34 = 16;
-					}
+                }
 
-					if(var53 < 1) {
-						var53 = 1;
-					}
+            }
 
-					if(var36 > 120) {
-						var36 = 120;
-					}
+            if(flag)
+            {
+                break;
+            }
+        }
 
-					if(var54 < 0) {
-						var54 = 0;
-					}
+    }
 
-					if(var38 > 16) {
-						var38 = 16;
-					}
+    protected void recursiveGenerate(World world, int i, int j, int k, int l, byte abyte0[])
+    {
+        int i1 = rand.nextInt(rand.nextInt(rand.nextInt(10) + 1) + 1);
+        if(rand.nextInt(5) != 0)
+        {
+            i1 = 0;
+        }
+        for(int j1 = 0; j1 < i1; j1++)
+        {
+            double d = i * 16 + rand.nextInt(16);
+            double d1 = rand.nextInt(world.field_35472_c);
+            double d2 = j * 16 + rand.nextInt(16);
+            int k1 = 1;
+            if(rand.nextInt(4) == 0)
+            {
+                generateLargeCaveNode(k, l, abyte0, d, d1, d2);
+                k1 += rand.nextInt(4);
+            }
+            for(int l1 = 0; l1 < k1; l1++)
+            {
+                float f = rand.nextFloat() * 3.141593F * 2.0F;
+                float f1 = ((rand.nextFloat() - 0.5F) * 2.0F) / 8F;
+                float f2 = rand.nextFloat() * 2.0F + rand.nextFloat();
+                generateCaveNode(k, l, abyte0, d, d1, d2, f2 * 2.0F, f, f1, 0, 0, 0.5D);
+            }
 
-					boolean var55 = false;
+        }
 
-					int var40;
-					int var43;
-					for(var40 = var52; !var55 && var40 < var34; ++var40) {
-						for(int var41 = var54; !var55 && var41 < var38; ++var41) {
-							for(int var42 = var36 + 1; !var55 && var42 >= var53 - 1; --var42) {
-								var43 = (var40 * 16 + var41) * 128 + var42;
-								if(var42 >= 0 && var42 < 128) {
-									if(var3[var43] == Block.lavaStill.blockID || var3[var43] == Block.lavaMoving.blockID) {
-										var55 = true;
-									}
-
-									if(var42 != var53 - 1 && var40 != var52 && var40 != var34 - 1 && var41 != var54 && var41 != var38 - 1) {
-										var42 = var53;
-									}
-								}
-							}
-						}
-					}
-
-					if(!var55) {
-						for(var40 = var52; var40 < var34; ++var40) {
-							double var56 = ((double)(var40 + var1 * 16) + 0.5D - var4) / var27;
-
-							for(var43 = var54; var43 < var38; ++var43) {
-								double var44 = ((double)(var43 + var2 * 16) + 0.5D - var8) / var27;
-								int var46 = (var40 * 16 + var43) * 128 + var36;
-
-								for(int var47 = var36 - 1; var47 >= var53; --var47) {
-									double var48 = ((double)var47 + 0.5D - var6) / var29;
-									if(var48 > -0.7D && var56 * var56 + var48 * var48 + var44 * var44 < 1.0D) {
-										byte var50 = var3[var46];
-										if(var50 == Block.bloodStone.blockID || var50 == Block.dirt.blockID || var50 == Block.grass.blockID) {
-											var3[var46] = 0;
-										}
-									}
-
-									--var46;
-								}
-							}
-						}
-
-						if(var51) {
-							break;
-						}
-					}
-				}
-			}
-		}
-
-	}
-
-	protected void func_868_a(World var1, int var2, int var3, int var4, int var5, byte[] var6) {
-		int var7 = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(10) + 1) + 1);
-		if(this.rand.nextInt(5) != 0) {
-			var7 = 0;
-		}
-
-		for(int var8 = 0; var8 < var7; ++var8) {
-			double var9 = (double)(var2 * 16 + this.rand.nextInt(16));
-			double var11 = (double)this.rand.nextInt(128);
-			double var13 = (double)(var3 * 16 + this.rand.nextInt(16));
-			int var15 = 1;
-			if(this.rand.nextInt(4) == 0) {
-				this.func_4129_a(var4, var5, var6, var9, var11, var13);
-				var15 += this.rand.nextInt(4);
-			}
-
-			for(int var16 = 0; var16 < var15; ++var16) {
-				float var17 = this.rand.nextFloat() * (float)Math.PI * 2.0F;
-				float var18 = (this.rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
-				float var19 = this.rand.nextFloat() * 2.0F + this.rand.nextFloat();
-				this.func_4128_a(var4, var5, var6, var9, var11, var13, var19 * 2.0F, var17, var18, 0, 0, 0.5D);
-			}
-		}
-
-	}
+    }
 }

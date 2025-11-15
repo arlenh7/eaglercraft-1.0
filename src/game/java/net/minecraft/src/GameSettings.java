@@ -1,278 +1,619 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
-import net.lax1dude.eaglercraft.internal.vfs2.VFile2;
+import java.io.*;
 import net.minecraft.client.Minecraft;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
-public class GameSettings {
-	private static final String[] field_20105_z = new String[]{"options.renderDistance.far", "options.renderDistance.normal", "options.renderDistance.short", "options.renderDistance.tiny"};
-	private static final String[] field_20106_A = new String[]{"options.difficulty.peaceful", "options.difficulty.easy", "options.difficulty.normal", "options.difficulty.hard"};
-	public float musicVolume = 1.0F;
-	public float soundVolume = 1.0F;
-	public float mouseSensitivity = 0.5F;
-	public boolean invertMouse = false;
-	public int renderDistance = 0;
-	public boolean viewBobbing = true;
-	public boolean anaglyph = false;
-	public boolean limitFramerate = false;
-	public boolean fancyGraphics = true;
-	public String skin = "Default";
-	public KeyBinding ofKeyBindZoom = new KeyBinding("Zoom", Keyboard.KEY_C);
-	public KeyBinding keyBindScreenshot = new KeyBinding("Screenshot", Keyboard.KEY_F2);
-	public KeyBinding keyBindForward = new KeyBinding("key.forward", 17);
-	public KeyBinding keyBindLeft = new KeyBinding("key.left", 30);
-	public KeyBinding keyBindBack = new KeyBinding("key.back", 31);
-	public KeyBinding keyBindRight = new KeyBinding("key.right", 32);
-	public KeyBinding keyBindJump = new KeyBinding("key.jump", 57);
-	public KeyBinding keyBindInventory = new KeyBinding("key.inventory", 23);
-	public KeyBinding keyBindDrop = new KeyBinding("key.drop", 16);
-	public KeyBinding keyBindChat = new KeyBinding("key.chat", 20);
-	public KeyBinding keyBindSneak = new KeyBinding("key.sneak", 42);
-	public KeyBinding[] keyBindings = new KeyBinding[]{this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.ofKeyBindZoom, this.keyBindScreenshot};
-	protected Minecraft mc;
-	private VFile2 optionsFile;
-	public int difficulty = 2;
-	public boolean thirdPersonView = false;
-	public String lastServer = "";
-	
-	private Logger LOGGER = LogManager.getLogger();
+// Referenced classes of package net.minecraft.src:
+//            KeyBinding, StringTranslate, StatCollector, EnumOptions, 
+//            SoundManager, RenderGlobal, RenderEngine, EnumOptionsMappingHelper
 
-	public GameSettings(Minecraft var1, VFile2 var2) {
-		this.mc = var1;
-		this.optionsFile = new VFile2(var2, "options.txt");
-		this.loadOptions();
-	}
+public class GameSettings
+{
 
-	public GameSettings() {
-	}
+    private static final String RENDER_DISTANCES[] = {
+        "options.renderDistance.far", "options.renderDistance.normal", "options.renderDistance.short", "options.renderDistance.tiny"
+    };
+    private static final String DIFFICULTIES[] = {
+        "options.difficulty.peaceful", "options.difficulty.easy", "options.difficulty.normal", "options.difficulty.hard"
+    };
+    private static final String GUISCALES[] = {
+        "options.guiScale.auto", "options.guiScale.small", "options.guiScale.normal", "options.guiScale.large"
+    };
+    private static final String field_41086_T[] = {
+        "options.particles.all", "options.particles.decreased", "options.particles.minimal"
+    };
+    private static final String LIMIT_FRAMERATES[] = {
+        "performance.max", "performance.balanced", "performance.powersaver"
+    };
+    public float musicVolume;
+    public float soundVolume;
+    public float mouseSensitivity;
+    public boolean invertMouse;
+    public int renderDistance;
+    public boolean viewBobbing;
+    public boolean anaglyph;
+    public boolean advancedOpengl;
+    public int limitFramerate;
+    public boolean fancyGraphics;
+    public boolean ambientOcclusion;
+    public boolean clouds;
+    public String skin;
+    public KeyBinding keyBindForward;
+    public KeyBinding keyBindLeft;
+    public KeyBinding keyBindBack;
+    public KeyBinding keyBindRight;
+    public KeyBinding keyBindJump;
+    public KeyBinding keyBindInventory;
+    public KeyBinding keyBindDrop;
+    public KeyBinding keyBindChat;
+    public KeyBinding keyBindSneak;
+    public KeyBinding keyBindAttack;
+    public KeyBinding keyBindUseItem;
+    public KeyBinding keyBindPlayerList;
+    public KeyBinding keyBindPickBlock;
+    public KeyBinding keyBindings[];
+    protected Minecraft mc;
+    private File optionsFile;
+    public int difficulty;
+    public boolean hideGUI;
+    public int thirdPersonView;
+    public boolean showDebugInfo;
+    public String lastServer;
+    public boolean noclip;
+    public boolean smoothCamera;
+    public boolean debugCamEnable;
+    public float noclipRate;
+    public float debugCamRate;
+    public float fovSetting;
+    public float gammaSetting;
+    public int guiScale;
+    public int field_41087_P;
 
-	public String func_20102_a(int var1) {
-		StringTranslate var2 = StringTranslate.func_20162_a();
-		return var2.func_20163_a(this.keyBindings[var1].keyDescription);
-	}
+    public GameSettings(Minecraft minecraft, File file)
+    {
+        musicVolume = 1.0F;
+        soundVolume = 1.0F;
+        mouseSensitivity = 0.5F;
+        invertMouse = false;
+        renderDistance = 0;
+        viewBobbing = true;
+        anaglyph = false;
+        advancedOpengl = false;
+        limitFramerate = 1;
+        fancyGraphics = true;
+        ambientOcclusion = true;
+        clouds = true;
+        skin = "Default";
+        keyBindForward = new KeyBinding("key.forward", 17);
+        keyBindLeft = new KeyBinding("key.left", 30);
+        keyBindBack = new KeyBinding("key.back", 31);
+        keyBindRight = new KeyBinding("key.right", 32);
+        keyBindJump = new KeyBinding("key.jump", 57);
+        keyBindInventory = new KeyBinding("key.inventory", 18);
+        keyBindDrop = new KeyBinding("key.drop", 16);
+        keyBindChat = new KeyBinding("key.chat", 20);
+        keyBindSneak = new KeyBinding("key.sneak", 42);
+        keyBindAttack = new KeyBinding("key.attack", -100);
+        keyBindUseItem = new KeyBinding("key.use", -99);
+        keyBindPlayerList = new KeyBinding("key.playerlist", 15);
+        keyBindPickBlock = new KeyBinding("key.pickItem", -98);
+        keyBindings = (new KeyBinding[] {
+            keyBindAttack, keyBindUseItem, keyBindForward, keyBindLeft, keyBindBack, keyBindRight, keyBindJump, keyBindSneak, keyBindDrop, keyBindInventory, 
+            keyBindChat, keyBindPlayerList, keyBindPickBlock
+        });
+        difficulty = 2;
+        hideGUI = false;
+        thirdPersonView = 0;
+        showDebugInfo = false;
+        lastServer = "";
+        noclip = false;
+        smoothCamera = false;
+        debugCamEnable = false;
+        noclipRate = 1.0F;
+        debugCamRate = 1.0F;
+        fovSetting = 0.0F;
+        gammaSetting = 0.0F;
+        guiScale = 0;
+        field_41087_P = 0;
+        mc = minecraft;
+        optionsFile = new File(file, "options.txt");
+        loadOptions();
+    }
 
-	public String getOptionDisplayString(int var1) {
-		return Keyboard.getKeyName(this.keyBindings[var1].keyCode);
-	}
+    public GameSettings()
+    {
+        musicVolume = 1.0F;
+        soundVolume = 1.0F;
+        mouseSensitivity = 0.5F;
+        invertMouse = false;
+        renderDistance = 0;
+        viewBobbing = true;
+        anaglyph = false;
+        advancedOpengl = false;
+        limitFramerate = 1;
+        fancyGraphics = true;
+        ambientOcclusion = true;
+        clouds = true;
+        skin = "Default";
+        keyBindForward = new KeyBinding("key.forward", 17);
+        keyBindLeft = new KeyBinding("key.left", 30);
+        keyBindBack = new KeyBinding("key.back", 31);
+        keyBindRight = new KeyBinding("key.right", 32);
+        keyBindJump = new KeyBinding("key.jump", 57);
+        keyBindInventory = new KeyBinding("key.inventory", 18);
+        keyBindDrop = new KeyBinding("key.drop", 16);
+        keyBindChat = new KeyBinding("key.chat", 20);
+        keyBindSneak = new KeyBinding("key.sneak", 42);
+        keyBindAttack = new KeyBinding("key.attack", -100);
+        keyBindUseItem = new KeyBinding("key.use", -99);
+        keyBindPlayerList = new KeyBinding("key.playerlist", 15);
+        keyBindPickBlock = new KeyBinding("key.pickItem", -98);
+        keyBindings = (new KeyBinding[] {
+            keyBindAttack, keyBindUseItem, keyBindForward, keyBindLeft, keyBindBack, keyBindRight, keyBindJump, keyBindSneak, keyBindDrop, keyBindInventory, 
+            keyBindChat, keyBindPlayerList, keyBindPickBlock
+        });
+        difficulty = 2;
+        hideGUI = false;
+        thirdPersonView = 0;
+        showDebugInfo = false;
+        lastServer = "";
+        noclip = false;
+        smoothCamera = false;
+        debugCamEnable = false;
+        noclipRate = 1.0F;
+        debugCamRate = 1.0F;
+        fovSetting = 0.0F;
+        gammaSetting = 0.0F;
+        guiScale = 0;
+        field_41087_P = 0;
+    }
 
-	public void setKeyBinding(int var1, int var2) {
-		this.keyBindings[var1].keyCode = var2;
-		this.saveOptions();
-	}
+    public String getKeyBindingDescription(int i)
+    {
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        return stringtranslate.translateKey(keyBindings[i].keyDescription);
+    }
 
-	public void setOptionFloatValue(EnumOptions var1, float var2) {
-		if(var1 == EnumOptions.MUSIC) {
-			this.musicVolume = var2;
-			this.mc.sndManager.onSoundOptionsChanged();
-		}
+    public String getOptionDisplayString(int i)
+    {
+        int j = keyBindings[i].keyCode;
+        return func_41085_c(j);
+    }
 
-		if(var1 == EnumOptions.SOUND) {
-			this.soundVolume = var2;
-			this.mc.sndManager.onSoundOptionsChanged();
-		}
+    public static String func_41085_c(int i)
+    {
+        if(i < 0)
+        {
+            return StatCollector.translateToLocalFormatted("key.mouseButton", new Object[] {
+                Integer.valueOf(i + 101)
+            });
+        } else
+        {
+            return Keyboard.getKeyName(i);
+        }
+    }
 
-		if(var1 == EnumOptions.SENSITIVITY) {
-			this.mouseSensitivity = var2;
-		}
+    public void setKeyBinding(int i, int j)
+    {
+        keyBindings[i].keyCode = j;
+        saveOptions();
+    }
 
-	}
+    public void setOptionFloatValue(EnumOptions enumoptions, float f)
+    {
+        if(enumoptions == EnumOptions.MUSIC)
+        {
+            musicVolume = f;
+            mc.sndManager.onSoundOptionsChanged();
+        }
+        if(enumoptions == EnumOptions.SOUND)
+        {
+            soundVolume = f;
+            mc.sndManager.onSoundOptionsChanged();
+        }
+        if(enumoptions == EnumOptions.SENSITIVITY)
+        {
+            mouseSensitivity = f;
+        }
+        if(enumoptions == EnumOptions.FOV)
+        {
+            fovSetting = f;
+        }
+        if(enumoptions == EnumOptions.GAMMA)
+        {
+            gammaSetting = f;
+        }
+    }
 
-	public void setOptionValue(EnumOptions var1, int var2) {
-		if(var1 == EnumOptions.INVERT_MOUSE) {
-			this.invertMouse = !this.invertMouse;
-		}
+    public void setOptionValue(EnumOptions enumoptions, int i)
+    {
+        if(enumoptions == EnumOptions.INVERT_MOUSE)
+        {
+            invertMouse = !invertMouse;
+        }
+        if(enumoptions == EnumOptions.RENDER_DISTANCE)
+        {
+            renderDistance = renderDistance + i & 3;
+        }
+        if(enumoptions == EnumOptions.GUI_SCALE)
+        {
+            guiScale = guiScale + i & 3;
+        }
+        if(enumoptions == EnumOptions.PARTICLES)
+        {
+            field_41087_P = (field_41087_P + i) % 3;
+        }
+        if(enumoptions == EnumOptions.VIEW_BOBBING)
+        {
+            viewBobbing = !viewBobbing;
+        }
+        if(enumoptions == EnumOptions.RENDER_CLOUDS)
+        {
+            clouds = !clouds;
+        }
+        if(enumoptions == EnumOptions.ADVANCED_OPENGL)
+        {
+            advancedOpengl = !advancedOpengl;
+            mc.renderGlobal.loadRenderers();
+        }
+        if(enumoptions == EnumOptions.ANAGLYPH)
+        {
+            anaglyph = !anaglyph;
+            mc.renderEngine.refreshTextures();
+        }
+        if(enumoptions == EnumOptions.FRAMERATE_LIMIT)
+        {
+            limitFramerate = (limitFramerate + i + 3) % 3;
+        }
+        if(enumoptions == EnumOptions.DIFFICULTY)
+        {
+            difficulty = difficulty + i & 3;
+        }
+        if(enumoptions == EnumOptions.GRAPHICS)
+        {
+            fancyGraphics = !fancyGraphics;
+            mc.renderGlobal.loadRenderers();
+        }
+        if(enumoptions == EnumOptions.AMBIENT_OCCLUSION)
+        {
+            ambientOcclusion = !ambientOcclusion;
+            mc.renderGlobal.loadRenderers();
+        }
+        saveOptions();
+    }
 
-		if(var1 == EnumOptions.RENDER_DISTANCE) {
-			this.renderDistance = this.renderDistance + var2 & 3;
-		}
+    public float getOptionFloatValue(EnumOptions enumoptions)
+    {
+        if(enumoptions == EnumOptions.FOV)
+        {
+            return fovSetting;
+        }
+        if(enumoptions == EnumOptions.GAMMA)
+        {
+            return gammaSetting;
+        }
+        if(enumoptions == EnumOptions.MUSIC)
+        {
+            return musicVolume;
+        }
+        if(enumoptions == EnumOptions.SOUND)
+        {
+            return soundVolume;
+        }
+        if(enumoptions == EnumOptions.SENSITIVITY)
+        {
+            return mouseSensitivity;
+        } else
+        {
+            return 0.0F;
+        }
+    }
 
-		if(var1 == EnumOptions.VIEW_BOBBING) {
-			this.viewBobbing = !this.viewBobbing;
-		}
+    public boolean getOptionOrdinalValue(EnumOptions enumoptions)
+    {
+        switch(EnumOptionsMappingHelper.enumOptionsMappingHelperArray[enumoptions.ordinal()])
+        {
+        case 1: // '\001'
+            return invertMouse;
 
-		if(var1 == EnumOptions.ANAGLYPH) {
-			this.anaglyph = !this.anaglyph;
-			this.mc.renderEngine.refreshTextures();
-		}
+        case 2: // '\002'
+            return viewBobbing;
 
-		if(var1 == EnumOptions.LIMIT_FRAMERATE) {
-			this.limitFramerate = !this.limitFramerate;
-		}
+        case 3: // '\003'
+            return anaglyph;
 
-		if(var1 == EnumOptions.DIFFICULTY) {
-			this.difficulty = this.difficulty + var2 & 3;
-		}
+        case 4: // '\004'
+            return advancedOpengl;
 
-		if(var1 == EnumOptions.GRAPHICS) {
-			this.fancyGraphics = !this.fancyGraphics;
-			this.mc.renderGlobal.loadRenderers();
-		}
+        case 5: // '\005'
+            return ambientOcclusion;
 
-		this.saveOptions();
-	}
+        case 6: // '\006'
+            return clouds;
+        }
+        return false;
+    }
 
-	public float func_20104_a(EnumOptions var1) {
-		return var1 == EnumOptions.MUSIC ? this.musicVolume : (var1 == EnumOptions.SOUND ? this.soundVolume : (var1 == EnumOptions.SENSITIVITY ? this.mouseSensitivity : 0.0F));
-	}
+    public String getKeyBinding(EnumOptions enumoptions)
+    {
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        String s = (new StringBuilder()).append(stringtranslate.translateKey(enumoptions.getEnumString())).append(": ").toString();
+        if(enumoptions.getEnumFloat())
+        {
+            float f = getOptionFloatValue(enumoptions);
+            if(enumoptions == EnumOptions.SENSITIVITY)
+            {
+                if(f == 0.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.sensitivity.min")).toString();
+                }
+                if(f == 1.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.sensitivity.max")).toString();
+                } else
+                {
+                    return (new StringBuilder()).append(s).append((int)(f * 200F)).append("%").toString();
+                }
+            }
+            if(enumoptions == EnumOptions.FOV)
+            {
+                if(f == 0.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.fov.min")).toString();
+                }
+                if(f == 1.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.fov.max")).toString();
+                } else
+                {
+                    return (new StringBuilder()).append(s).append((int)(70F + f * 40F)).toString();
+                }
+            }
+            if(enumoptions == EnumOptions.GAMMA)
+            {
+                if(f == 0.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.gamma.min")).toString();
+                }
+                if(f == 1.0F)
+                {
+                    return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.gamma.max")).toString();
+                } else
+                {
+                    return (new StringBuilder()).append(s).append("+").append((int)(f * 100F)).append("%").toString();
+                }
+            }
+            if(f == 0.0F)
+            {
+                return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.off")).toString();
+            } else
+            {
+                return (new StringBuilder()).append(s).append((int)(f * 100F)).append("%").toString();
+            }
+        }
+        if(enumoptions.getEnumBoolean())
+        {
+            boolean flag = getOptionOrdinalValue(enumoptions);
+            if(flag)
+            {
+                return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.on")).toString();
+            } else
+            {
+                return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.off")).toString();
+            }
+        }
+        if(enumoptions == EnumOptions.RENDER_DISTANCE)
+        {
+            return (new StringBuilder()).append(s).append(stringtranslate.translateKey(RENDER_DISTANCES[renderDistance])).toString();
+        }
+        if(enumoptions == EnumOptions.DIFFICULTY)
+        {
+            return (new StringBuilder()).append(s).append(stringtranslate.translateKey(DIFFICULTIES[difficulty])).toString();
+        }
+        if(enumoptions == EnumOptions.GUI_SCALE)
+        {
+            return (new StringBuilder()).append(s).append(stringtranslate.translateKey(GUISCALES[guiScale])).toString();
+        }
+        if(enumoptions == EnumOptions.PARTICLES)
+        {
+            return (new StringBuilder()).append(s).append(stringtranslate.translateKey(field_41086_T[field_41087_P])).toString();
+        }
+        if(enumoptions == EnumOptions.FRAMERATE_LIMIT)
+        {
+            return (new StringBuilder()).append(s).append(StatCollector.translateToLocal(LIMIT_FRAMERATES[limitFramerate])).toString();
+        }
+        if(enumoptions == EnumOptions.GRAPHICS)
+        {
+            if(fancyGraphics)
+            {
+                return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.graphics.fancy")).toString();
+            } else
+            {
+                return (new StringBuilder()).append(s).append(stringtranslate.translateKey("options.graphics.fast")).toString();
+            }
+        } else
+        {
+            return s;
+        }
+    }
 
-	public boolean func_20103_b(EnumOptions var1) {
-		switch(EnumOptionsMappingHelper.field_20155_a[var1.ordinal()]) {
-		case 1:
-			return this.invertMouse;
-		case 2:
-			return this.viewBobbing;
-		case 3:
-			return this.anaglyph;
-		case 4:
-			return this.limitFramerate;
-		default:
-			return false;
-		}
-	}
+    public void loadOptions()
+    {
+        try
+        {
+            if(!optionsFile.exists())
+            {
+                return;
+            }
+            BufferedReader bufferedreader = new BufferedReader(new FileReader(optionsFile));
+            for(String s = ""; (s = bufferedreader.readLine()) != null;)
+            {
+                try
+                {
+                    String as[] = s.split(":");
+                    if(as[0].equals("music"))
+                    {
+                        musicVolume = parseFloat(as[1]);
+                    }
+                    if(as[0].equals("sound"))
+                    {
+                        soundVolume = parseFloat(as[1]);
+                    }
+                    if(as[0].equals("mouseSensitivity"))
+                    {
+                        mouseSensitivity = parseFloat(as[1]);
+                    }
+                    if(as[0].equals("fov"))
+                    {
+                        fovSetting = parseFloat(as[1]);
+                    }
+                    if(as[0].equals("gamma"))
+                    {
+                        gammaSetting = parseFloat(as[1]);
+                    }
+                    if(as[0].equals("invertYMouse"))
+                    {
+                        invertMouse = as[1].equals("true");
+                    }
+                    if(as[0].equals("viewDistance"))
+                    {
+                        renderDistance = Integer.parseInt(as[1]);
+                    }
+                    if(as[0].equals("guiScale"))
+                    {
+                        guiScale = Integer.parseInt(as[1]);
+                    }
+                    if(as[0].equals("particles"))
+                    {
+                        field_41087_P = Integer.parseInt(as[1]);
+                    }
+                    if(as[0].equals("bobView"))
+                    {
+                        viewBobbing = as[1].equals("true");
+                    }
+                    if(as[0].equals("anaglyph3d"))
+                    {
+                        anaglyph = as[1].equals("true");
+                    }
+                    if(as[0].equals("advancedOpengl"))
+                    {
+                        advancedOpengl = as[1].equals("true");
+                    }
+                    if(as[0].equals("fpsLimit"))
+                    {
+                        limitFramerate = Integer.parseInt(as[1]);
+                    }
+                    if(as[0].equals("difficulty"))
+                    {
+                        difficulty = Integer.parseInt(as[1]);
+                    }
+                    if(as[0].equals("fancyGraphics"))
+                    {
+                        fancyGraphics = as[1].equals("true");
+                    }
+                    if(as[0].equals("ao"))
+                    {
+                        ambientOcclusion = as[1].equals("true");
+                    }
+                    if(as[0].equals("clouds"))
+                    {
+                        clouds = as[1].equals("true");
+                    }
+                    if(as[0].equals("skin"))
+                    {
+                        skin = as[1];
+                    }
+                    if(as[0].equals("lastServer") && as.length >= 2)
+                    {
+                        lastServer = as[1];
+                    }
+                    int i = 0;
+                    while(i < keyBindings.length) 
+                    {
+                        if(as[0].equals((new StringBuilder()).append("key_").append(keyBindings[i].keyDescription).toString()))
+                        {
+                            keyBindings[i].keyCode = Integer.parseInt(as[1]);
+                        }
+                        i++;
+                    }
+                }
+                catch(Exception exception1)
+                {
+                    System.out.println((new StringBuilder()).append("Skipping bad option: ").append(s).toString());
+                }
+            }
 
-	public String getKeyBinding(EnumOptions var1) {
-		StringTranslate var2 = StringTranslate.func_20162_a();
-		String var3 = var2.func_20163_a(var1.func_20138_d()) + ": ";
-		if(var1.func_20136_a()) {
-			float var5 = this.func_20104_a(var1);
-			return var1 == EnumOptions.SENSITIVITY ? (var5 == 0.0F ? var3 + var2.func_20163_a("options.sensitivity.min") : (var5 == 1.0F ? var3 + var2.func_20163_a("options.sensitivity.max") : var3 + (int)(var5 * 200.0F) + "%")) : (var5 == 0.0F ? var3 + var2.func_20163_a("options.off") : var3 + (int)(var5 * 100.0F) + "%");
-		} else if(var1.func_20140_b()) {
-			boolean var4 = this.func_20103_b(var1);
-			return var4 ? var3 + var2.func_20163_a("options.on") : var3 + var2.func_20163_a("options.off");
-		} else {
-			return var1 == EnumOptions.RENDER_DISTANCE ? var3 + var2.func_20163_a(field_20105_z[this.renderDistance]) : (var1 == EnumOptions.DIFFICULTY ? var3 + var2.func_20163_a(field_20106_A[this.difficulty]) : (var1 == EnumOptions.GRAPHICS ? (this.fancyGraphics ? var3 + var2.func_20163_a("options.graphics.fancy") : var3 + var2.func_20163_a("options.graphics.fast")) : var3));
-		}
-	}
+            KeyBinding.resetKeyBindingArrayAndHash();
+            bufferedreader.close();
+        }
+        catch(Exception exception)
+        {
+            System.out.println("Failed to load options");
+            exception.printStackTrace();
+        }
+    }
 
-	public void loadOptions() {
-		try {
-			if(!this.optionsFile.exists()) {
-				return;
-			}
+    private float parseFloat(String s)
+    {
+        if(s.equals("true"))
+        {
+            return 1.0F;
+        }
+        if(s.equals("false"))
+        {
+            return 0.0F;
+        } else
+        {
+            return Float.parseFloat(s);
+        }
+    }
 
-			BufferedReader var1 = new BufferedReader(new InputStreamReader(this.optionsFile.getInputStream()));
-			String var2 = "";
+    public void saveOptions()
+    {
+        try
+        {
+            PrintWriter printwriter = new PrintWriter(new FileWriter(optionsFile));
+            printwriter.println((new StringBuilder()).append("music:").append(musicVolume).toString());
+            printwriter.println((new StringBuilder()).append("sound:").append(soundVolume).toString());
+            printwriter.println((new StringBuilder()).append("invertYMouse:").append(invertMouse).toString());
+            printwriter.println((new StringBuilder()).append("mouseSensitivity:").append(mouseSensitivity).toString());
+            printwriter.println((new StringBuilder()).append("fov:").append(fovSetting).toString());
+            printwriter.println((new StringBuilder()).append("gamma:").append(gammaSetting).toString());
+            printwriter.println((new StringBuilder()).append("viewDistance:").append(renderDistance).toString());
+            printwriter.println((new StringBuilder()).append("guiScale:").append(guiScale).toString());
+            printwriter.println((new StringBuilder()).append("particles:").append(field_41087_P).toString());
+            printwriter.println((new StringBuilder()).append("bobView:").append(viewBobbing).toString());
+            printwriter.println((new StringBuilder()).append("anaglyph3d:").append(anaglyph).toString());
+            printwriter.println((new StringBuilder()).append("advancedOpengl:").append(advancedOpengl).toString());
+            printwriter.println((new StringBuilder()).append("fpsLimit:").append(limitFramerate).toString());
+            printwriter.println((new StringBuilder()).append("difficulty:").append(difficulty).toString());
+            printwriter.println((new StringBuilder()).append("fancyGraphics:").append(fancyGraphics).toString());
+            printwriter.println((new StringBuilder()).append("ao:").append(ambientOcclusion).toString());
+            printwriter.println((new StringBuilder()).append("clouds:").append(clouds).toString());
+            printwriter.println((new StringBuilder()).append("skin:").append(skin).toString());
+            printwriter.println((new StringBuilder()).append("lastServer:").append(lastServer).toString());
+            for(int i = 0; i < keyBindings.length; i++)
+            {
+                printwriter.println((new StringBuilder()).append("key_").append(keyBindings[i].keyDescription).append(":").append(keyBindings[i].keyCode).toString());
+            }
 
-			int line = 0;
-			while(true) {
-				var2 = var1.readLine();
-				line++;
-				if(var2 == null) {
-					var1.close();
-					break;
-				}
+            printwriter.close();
+        }
+        catch(Exception exception)
+        {
+            System.out.println("Failed to save options");
+            exception.printStackTrace();
+        }
+    }
 
-				String[] var3 = var2.split(":");
-				if(var3.length >= 2) {
-					if(var3[0].equals("music")) {
-						this.musicVolume = this.parseFloat(var3[1]);
-					}
+    public boolean shouldRenderClouds()
+    {
+        return renderDistance < 2 && clouds;
+    }
 
-					if(var3[0].equals("sound")) {
-						this.soundVolume = this.parseFloat(var3[1]);
-					}
-
-					if(var3[0].equals("mouseSensitivity")) {
-						this.mouseSensitivity = this.parseFloat(var3[1]);
-					}
-
-					if(var3[0].equals("invertYMouse")) {
-						this.invertMouse = var3[1].equals("true");
-					}
-
-					if(var3[0].equals("viewDistance")) {
-						this.renderDistance = Integer.parseInt(var3[1]);
-					}
-
-					if(var3[0].equals("bobView")) {
-						this.viewBobbing = var3[1].equals("true");
-					}
-
-					if(var3[0].equals("anaglyph3d")) {
-						this.anaglyph = var3[1].equals("true");
-					}
-
-					if(var3[0].equals("limitFramerate")) {
-						this.limitFramerate = var3[1].equals("true");
-					}
-
-					if(var3[0].equals("difficulty")) {
-						this.difficulty = Integer.parseInt(var3[1]);
-					}
-
-					if(var3[0].equals("fancyGraphics")) {
-						this.fancyGraphics = var3[1].equals("true");
-					}
-
-					if(var3[0].equals("skin")) {
-						this.skin = var3[1];
-					}
-
-					if(var3[0].equals("lastServer")) {
-						this.lastServer = var3[1];
-					}
-
-					for(int var4 = 0; var4 < this.keyBindings.length; ++var4) {
-						if(var3[0].equals("key_" + this.keyBindings[var4].keyDescription)) {
-							this.keyBindings[var4].keyCode = Integer.parseInt(var3[1]);
-						}
-					}
-				} else {
-					if(var3.length >= 1) {
-						LOGGER.warn("Skipping bad option {} on line #{}", var3[0], line);
-					} else {
-						LOGGER.warn("Failed to parse '{}' one line #{}", var2, line);
-					}
-				}
-			}
-		} catch (Exception var5) {
-			LOGGER.error("Failed to load options");
-			LOGGER.error(var5);
-		}
-
-	}
-
-	private float parseFloat(String var1) {
-		return var1.equals("true") ? 1.0F : (var1.equals("false") ? 0.0F : Float.parseFloat(var1));
-	}
-
-	public void saveOptions() {
-		try {
-			PrintWriter var1 = new PrintWriter(new OutputStreamWriter(this.optionsFile.getOutputStream()));
-			var1.println("music:" + this.musicVolume);
-			var1.println("sound:" + this.soundVolume);
-			var1.println("invertYMouse:" + this.invertMouse);
-			var1.println("mouseSensitivity:" + this.mouseSensitivity);
-			var1.println("viewDistance:" + this.renderDistance);
-			var1.println("bobView:" + this.viewBobbing);
-			var1.println("anaglyph3d:" + this.anaglyph);
-			var1.println("limitFramerate:" + this.limitFramerate);
-			var1.println("difficulty:" + this.difficulty);
-			var1.println("fancyGraphics:" + this.fancyGraphics);
-			var1.println("skin:" + this.skin);
-			var1.println("lastServer:" + this.lastServer);
-
-			for(int var2 = 0; var2 < this.keyBindings.length; ++var2) {
-				var1.println("key_" + this.keyBindings[var2].keyDescription + ":" + this.keyBindings[var2].keyCode);
-			}
-
-			var1.close();
-		} catch (Exception var3) {
-			LOGGER.error("Failed to save options");
-			LOGGER.error(var3);
-		}
-
-	}
-	
-	public int shouldRenderClouds() {
-		return this.renderDistance <= 1 ? (this.fancyGraphics ? 2 : 1) : 0;
-	}
 }

@@ -1,32 +1,47 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet255KickDisconnect extends Packet {
-	public String reason;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet255KickDisconnect() {
-	}
+public class Packet255KickDisconnect extends Packet
+{
 
-	public Packet255KickDisconnect(String var1) {
-		this.reason = var1;
-	}
+    public String reason;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.reason = var1.readUTF();
-	}
+    public Packet255KickDisconnect()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeUTF(this.reason);
-	}
+    public Packet255KickDisconnect(String s)
+    {
+        reason = s;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleKickDisconnect(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        reason = readString(datainputstream, 100);
+    }
 
-	public int getPacketSize() {
-		return this.reason.length();
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        writeString(reason, dataoutputstream);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleKickDisconnect(this);
+    }
+
+    public int getPacketSize()
+    {
+        return reason.length();
+    }
 }

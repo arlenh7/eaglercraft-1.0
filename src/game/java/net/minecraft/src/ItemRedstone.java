@@ -1,44 +1,64 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemRedstone extends Item {
-	public ItemRedstone(int var1) {
-		super(var1);
-	}
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 == 0) {
-			--var5;
-		}
+// Referenced classes of package net.minecraft.src:
+//            Item, World, Block, EntityPlayer, 
+//            ItemStack
 
-		if(var7 == 1) {
-			++var5;
-		}
+public class ItemRedstone extends Item
+{
 
-		if(var7 == 2) {
-			--var6;
-		}
+    public ItemRedstone(int i)
+    {
+        super(i);
+    }
 
-		if(var7 == 3) {
-			++var6;
-		}
-
-		if(var7 == 4) {
-			--var4;
-		}
-
-		if(var7 == 5) {
-			++var4;
-		}
-
-		if(!var3.func_20084_d(var4, var5, var6)) {
-			return false;
-		} else {
-			if(Block.redstoneWire.canPlaceBlockAt(var3, var4, var5, var6)) {
-				--var1.stackSize;
-				var3.setBlockWithNotify(var4, var5, var6, Block.redstoneWire.blockID);
-			}
-
-			return true;
-		}
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(world.getBlockId(i, j, k) != Block.snow.blockID)
+        {
+            if(l == 0)
+            {
+                j--;
+            }
+            if(l == 1)
+            {
+                j++;
+            }
+            if(l == 2)
+            {
+                k--;
+            }
+            if(l == 3)
+            {
+                k++;
+            }
+            if(l == 4)
+            {
+                i--;
+            }
+            if(l == 5)
+            {
+                i++;
+            }
+            if(!world.isAirBlock(i, j, k))
+            {
+                return false;
+            }
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        if(Block.redstoneWire.canPlaceBlockAt(world, i, j, k))
+        {
+            itemstack.stackSize--;
+            world.setBlockWithNotify(i, j, k, Block.redstoneWire.blockID);
+        }
+        return true;
+    }
 }

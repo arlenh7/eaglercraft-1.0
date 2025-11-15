@@ -1,189 +1,179 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityItem extends Entity {
-	public ItemStack item;
-	public int age = 0;
-	public int delayBeforeCanPickup;
-	private int health = 5;
-	public float field_804_d = (float)(Math.random() * Math.PI * 2.0D);
+import java.util.Random;
 
-	public EntityItem(World var1, double var2, double var4, double var6, ItemStack var8) {
-		super(var1);
-		this.setSize(0.25F, 0.25F);
-		this.yOffset = this.height / 2.0F;
-		this.setPosition(var2, var4, var6);
-		this.item = var8;
-		this.rotationYaw = (float)(Math.random() * 360.0D);
-		this.motionX = (double)((float)(Math.random() * (double)0.2F - (double)0.1F));
-		this.motionY = (double)0.2F;
-		this.motionZ = (double)((float)(Math.random() * (double)0.2F - (double)0.1F));
-		this.entityWalks = false;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Entity, MathHelper, World, Material, 
+//            AxisAlignedBB, Block, DamageSource, NBTTagCompound, 
+//            ItemStack, EntityPlayer, InventoryPlayer, AchievementList, 
+//            Item
 
-	public EntityItem(World var1) {
-		super(var1);
-		this.setSize(0.25F, 0.25F);
-		this.yOffset = this.height / 2.0F;
-	}
+public class EntityItem extends Entity
+{
 
-	public void onUpdate() {
-		super.onUpdate();
-		if(this.delayBeforeCanPickup > 0) {
-			--this.delayBeforeCanPickup;
-		}
+    public ItemStack item;
+    private int field_803_e;
+    public int age;
+    public int delayBeforeCanPickup;
+    private int health;
+    public float field_804_d;
 
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.motionY -= (double)0.04F;
-		if(this.worldObj.getBlockMaterial(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) == Material.lava) {
-			this.motionY = (double)0.2F;
-			this.motionX = (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
-			this.motionZ = (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
-			this.worldObj.playSoundAtEntity(this, "random.fizz", 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
-		}
+    public EntityItem(World world, double d, double d1, double d2, 
+            ItemStack itemstack)
+    {
+        super(world);
+        age = 0;
+        health = 5;
+        field_804_d = (float)(Math.random() * 3.1415926535897931D * 2D);
+        setSize(0.25F, 0.25F);
+        yOffset = height / 2.0F;
+        setPosition(d, d1, d2);
+        item = itemstack;
+        rotationYaw = (float)(Math.random() * 360D);
+        motionX = (float)(Math.random() * 0.20000000298023224D - 0.10000000149011612D);
+        motionY = 0.20000000298023224D;
+        motionZ = (float)(Math.random() * 0.20000000298023224D - 0.10000000149011612D);
+    }
 
-		this.func_466_g(this.posX, this.posY, this.posZ);
-		this.handleWaterMovement();
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		float var1 = 0.98F;
-		if(this.onGround) {
-			var1 = 0.1F * 0.1F * 58.8F;
-			int var2 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.boundingBox.minY) - 1, MathHelper.floor_double(this.posZ));
-			if(var2 > 0) {
-				var1 = Block.blocksList[var2].slipperiness * 0.98F;
-			}
-		}
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
 
-		this.motionX *= (double)var1;
-		this.motionY *= (double)0.98F;
-		this.motionZ *= (double)var1;
-		if(this.onGround) {
-			this.motionY *= -0.5D;
-		}
+    public EntityItem(World world)
+    {
+        super(world);
+        age = 0;
+        health = 5;
+        field_804_d = (float)(Math.random() * 3.1415926535897931D * 2D);
+        setSize(0.25F, 0.25F);
+        yOffset = height / 2.0F;
+    }
 
-		++this.age;
-		if(this.age >= 6000) {
-			this.setEntityDead();
-		}
+    protected void entityInit()
+    {
+    }
 
-	}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        if(delayBeforeCanPickup > 0)
+        {
+            delayBeforeCanPickup--;
+        }
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        motionY -= 0.039999999105930328D;
+        if(worldObj.getBlockMaterial(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)) == Material.lava)
+        {
+            motionY = 0.20000000298023224D;
+            motionX = (rand.nextFloat() - rand.nextFloat()) * 0.2F;
+            motionZ = (rand.nextFloat() - rand.nextFloat()) * 0.2F;
+            worldObj.playSoundAtEntity(this, "random.fizz", 0.4F, 2.0F + rand.nextFloat() * 0.4F);
+        }
+        pushOutOfBlocks(posX, (boundingBox.minY + boundingBox.maxY) / 2D, posZ);
+        moveEntity(motionX, motionY, motionZ);
+        float f = 0.98F;
+        if(onGround)
+        {
+            f = 0.5880001F;
+            int i = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
+            if(i > 0)
+            {
+                f = Block.blocksList[i].slipperiness * 0.98F;
+            }
+        }
+        motionX *= f;
+        motionY *= 0.98000001907348633D;
+        motionZ *= f;
+        if(onGround)
+        {
+            motionY *= -0.5D;
+        }
+        field_803_e++;
+        age++;
+        if(age >= 6000)
+        {
+            setEntityDead();
+        }
+    }
 
-	public boolean handleWaterMovement() {
-		return this.worldObj.func_682_a(this.boundingBox, Material.water, this);
-	}
+    public boolean handleWaterMovement()
+    {
+        return worldObj.handleMaterialAcceleration(boundingBox, Material.water, this);
+    }
 
-	private boolean func_466_g(double var1, double var3, double var5) {
-		int var7 = MathHelper.floor_double(var1);
-		int var8 = MathHelper.floor_double(var3);
-		int var9 = MathHelper.floor_double(var5);
-		double var10 = var1 - (double)var7;
-		double var12 = var3 - (double)var8;
-		double var14 = var5 - (double)var9;
-		if(Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9)]) {
-			boolean var16 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7 - 1, var8, var9)];
-			boolean var17 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7 + 1, var8, var9)];
-			boolean var18 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8 - 1, var9)];
-			boolean var19 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8 + 1, var9)];
-			boolean var20 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9 - 1)];
-			boolean var21 = !Block.opaqueCubeLookup[this.worldObj.getBlockId(var7, var8, var9 + 1)];
-			byte var22 = -1;
-			double var23 = 9999.0D;
-			if(var16 && var10 < var23) {
-				var23 = var10;
-				var22 = 0;
-			}
+    protected void dealFireDamage(int i)
+    {
+        attackEntityFrom(DamageSource.inFire, i);
+    }
 
-			if(var17 && 1.0D - var10 < var23) {
-				var23 = 1.0D - var10;
-				var22 = 1;
-			}
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        setBeenAttacked();
+        health -= i;
+        if(health <= 0)
+        {
+            setEntityDead();
+        }
+        return false;
+    }
 
-			if(var18 && var12 < var23) {
-				var23 = var12;
-				var22 = 2;
-			}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setShort("Health", (byte)health);
+        nbttagcompound.setShort("Age", (short)age);
+        nbttagcompound.setCompoundTag("Item", item.writeToNBT(new NBTTagCompound()));
+    }
 
-			if(var19 && 1.0D - var12 < var23) {
-				var23 = 1.0D - var12;
-				var22 = 3;
-			}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        health = nbttagcompound.getShort("Health") & 0xff;
+        age = nbttagcompound.getShort("Age");
+        NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Item");
+        item = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+        if(item == null)
+        {
+            setEntityDead();
+        }
+    }
 
-			if(var20 && var14 < var23) {
-				var23 = var14;
-				var22 = 4;
-			}
-
-			if(var21 && 1.0D - var14 < var23) {
-				var23 = 1.0D - var14;
-				var22 = 5;
-			}
-
-			float var25 = this.rand.nextFloat() * 0.2F + 0.1F;
-			if(var22 == 0) {
-				this.motionX = (double)(-var25);
-			}
-
-			if(var22 == 1) {
-				this.motionX = (double)var25;
-			}
-
-			if(var22 == 2) {
-				this.motionY = (double)(-var25);
-			}
-
-			if(var22 == 3) {
-				this.motionY = (double)var25;
-			}
-
-			if(var22 == 4) {
-				this.motionZ = (double)(-var25);
-			}
-
-			if(var22 == 5) {
-				this.motionZ = (double)var25;
-			}
-		}
-
-		return false;
-	}
-
-	protected void dealFireDamage(int var1) {
-		this.attackEntityFrom((Entity)null, var1);
-	}
-
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		this.setBeenAttacked();
-		this.health -= var2;
-		if(this.health <= 0) {
-			this.setEntityDead();
-		}
-
-		return false;
-	}
-
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		var1.setShort("Health", (short)((byte)this.health));
-		var1.setShort("Age", (short)this.age);
-		var1.setCompoundTag("Item", this.item.writeToNBT(new NBTTagCompound()));
-	}
-
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		this.health = var1.getShort("Health") & 255;
-		this.age = var1.getShort("Age");
-		NBTTagCompound var2 = var1.getCompoundTag("Item");
-		this.item = new ItemStack(var2);
-	}
-
-	public void onCollideWithPlayer(EntityPlayer var1) {
-		if(!this.worldObj.multiplayerWorld) {
-			int var2 = this.item.stackSize;
-			if(this.delayBeforeCanPickup == 0 && var1.inventory.addItemStackToInventory(this.item)) {
-				this.worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-				var1.onItemPickup(this, var2);
-				this.setEntityDead();
-			}
-
-		}
-	}
+    public void onCollideWithPlayer(EntityPlayer entityplayer)
+    {
+        if(worldObj.multiplayerWorld)
+        {
+            return;
+        }
+        int i = item.stackSize;
+        if(delayBeforeCanPickup == 0 && entityplayer.inventory.addItemStackToInventory(item))
+        {
+            if(item.itemID == Block.wood.blockID)
+            {
+                entityplayer.triggerAchievement(AchievementList.mineWood);
+            }
+            if(item.itemID == Item.leather.shiftedIndex)
+            {
+                entityplayer.triggerAchievement(AchievementList.killCow);
+            }
+            if(item.itemID == Item.diamond.shiftedIndex)
+            {
+                entityplayer.triggerAchievement(AchievementList.diamonds);
+            }
+            if(item.itemID == Item.blazeRod.shiftedIndex)
+            {
+                entityplayer.triggerAchievement(AchievementList.blazeRod);
+            }
+            worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            entityplayer.onItemPickup(this, i);
+            if(item.stackSize <= 0)
+            {
+                setEntityDead();
+            }
+        }
+    }
 }

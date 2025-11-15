@@ -1,32 +1,47 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet16BlockItemSwitch extends Packet {
-	public int id;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet16BlockItemSwitch() {
-	}
+public class Packet16BlockItemSwitch extends Packet
+{
 
-	public Packet16BlockItemSwitch(int var1) {
-		this.id = var1;
-	}
+    public int id;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.id = var1.readShort();
-	}
+    public Packet16BlockItemSwitch()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeShort(this.id);
-	}
+    public Packet16BlockItemSwitch(int i)
+    {
+        id = i;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleBlockItemSwitch(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        id = datainputstream.readShort();
+    }
 
-	public int getPacketSize() {
-		return 2;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeShort(id);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleBlockItemSwitch(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 2;
+    }
 }

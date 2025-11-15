@@ -1,19 +1,37 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public interface IBlockAccess {
-	int getBlockId(int var1, int var2, int var3);
 
-	TileEntity getBlockTileEntity(int var1, int var2, int var3);
-	
-	int func_35451_b(int var1, int var2, int var3, int var4);
+// Referenced classes of package net.minecraft.src:
+//            TileEntity, Material, WorldChunkManager
 
-	float getLightBrightness(int var1, int var2, int var3);
+public interface IBlockAccess
+{
 
-	int getBlockMetadata(int var1, int var2, int var3);
+    public abstract int getBlockId(int i, int j, int k);
 
-	Material getBlockMaterial(int var1, int var2, int var3);
+    public abstract TileEntity getBlockTileEntity(int i, int j, int k);
 
-	boolean isBlockOpaqueCube(int var1, int var2, int var3);
+    public abstract int getLightBrightnessForSkyBlocks(int i, int j, int k, int l);
 
-	WorldChunkManager func_4075_a();
+    public abstract float getBrightness(int i, int j, int k, int l);
+
+    public abstract float getLightBrightness(int i, int j, int k);
+
+    public abstract int getBlockMetadata(int i, int j, int k);
+
+    public abstract Material getBlockMaterial(int i, int j, int k);
+
+    public abstract boolean isBlockOpaqueCube(int i, int j, int k);
+
+    public abstract boolean isBlockNormalCube(int i, int j, int k);
+
+    public abstract boolean isAirBlock(int i, int j, int k);
+
+    public abstract WorldChunkManager getWorldChunkManager();
+
+    public abstract int func_35452_b();
 }

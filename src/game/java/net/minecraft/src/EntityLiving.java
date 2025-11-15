@@ -1,830 +1,1400 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.util.List;
+import java.util.*;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            Entity, DataWatcher, Vec3D, World, 
+//            Profiler, DamageSource, Material, Potion, 
+//            EntityXPOrb, MathHelper, EntityPlayer, EntityWolf, 
+//            PotionEffect, EnchantmentHelper, Block, StepSound, 
+//            AxisAlignedBB, NBTTagCompound, NBTTagList, ItemStack, 
+//            PotionHelper, EnumCreatureAttribute, Item, MovingObjectPosition
 
-public class EntityLiving extends Entity {
-	public int field_9366_o = 20;
-	public float field_9365_p;
-	public float field_9364_q;
-	public float field_9363_r;
-	public float renderYawOffset = 0.0F;
-	public float prevRenderYawOffset = 0.0F;
-	protected float field_9362_u;
-	protected float field_9361_v;
-	protected float field_9360_w;
-	protected float field_9359_x;
-	protected boolean field_9358_y = true;
-	private static final TextureLocation charTex = new TextureLocation("/mob/char.png");
-	protected TextureLocation texture = charTex;
-	protected boolean unusedEntityLivingBoolean = true;
-	protected float field_9353_B = 0.0F;
-	protected String field_9351_C = null;
-	protected float field_9349_D = 1.0F;
-	protected int field_9347_E = 0;
-	protected float field_9345_F = 0.0F;
-	public boolean field_9343_G = false;
-	public float prevSwingProgress;
-	public float swingProgress;
-	public int health = 10;
-	public int prevHealth;
-	private int a;
-	public int hurtTime;
-	public int maxHurtTime;
-	public float attackedAtYaw = 0.0F;
-	public int deathTime = 0;
-	public int attackTime = 0;
-	public float field_9329_Q;
-	public float field_9328_R;
-	protected boolean field_9327_S = false;
-	public int field_9326_T = -1;
-	public float field_9325_U = (float)(Math.random() * (double)0.9F + (double)0.1F);
-	public float field_705_Q;
-	public float field_704_R;
-	public float field_703_S;
-	protected int field_9324_Y;
-	protected double field_9323_Z;
-	protected double field_9356_aa;
-	protected double field_9354_ab;
-	protected double field_9352_ac;
-	protected double field_9350_ad;
-	float field_9348_ae = 0.0F;
-	protected int field_9346_af = 0;
-	protected int field_9344_ag = 0;
-	protected float moveStrafing;
-	protected float moveForward;
-	protected float randomYawVelocity;
-	protected boolean isJumping = false;
-	protected float defaultPitch = 0.0F;
-	protected float moveSpeed = 0.7F;
-	private Entity b;
-	private int c = 0;
+public abstract class EntityLiving extends Entity
+{
 
-	public EntityLiving(World var1) {
-		super(var1);
-		this.preventEntitySpawning = true;
-		this.field_9363_r = (float)(Math.random() + 1.0D) * 0.01F;
-		this.setPosition(this.posX, this.posY, this.posZ);
-		this.field_9365_p = (float)Math.random() * 12398.0F;
-		this.rotationYaw = (float)(Math.random() * (double)((float)Math.PI) * 2.0D);
-		this.field_9364_q = 1.0F;
-		this.stepHeight = 0.5F;
-	}
+    public int heartsHalvesLife;
+    public float field_9365_p;
+    public float field_9363_r;
+    public float renderYawOffset;
+    public float prevRenderYawOffset;
+    protected float field_9362_u;
+    protected float field_9361_v;
+    protected float field_9360_w;
+    protected float field_9359_x;
+    protected boolean field_9358_y;
+    protected String texture;
+    protected boolean field_9355_A;
+    protected float field_9353_B;
+    protected String entityType;
+    protected float field_9349_D;
+    protected int scoreValue;
+    protected float field_9345_F;
+    public boolean isMultiplayerEntity;
+    public float landMovementFactor;
+    public float jumpMovementFactor;
+    public float prevSwingProgress;
+    public float swingProgress;
+    protected int health;
+    public int prevHealth;
+    protected int field_40129_bA;
+    private int livingSoundTime;
+    public int hurtTime;
+    public int maxHurtTime;
+    public float attackedAtYaw;
+    public int deathTime;
+    public int attackTime;
+    public float prevCameraPitch;
+    public float cameraPitch;
+    protected boolean unused_flag;
+    protected int field_35171_bJ;
+    public int field_9326_T;
+    public float field_9325_U;
+    public float field_705_Q;
+    public float field_704_R;
+    public float field_703_S;
+    protected EntityPlayer field_34904_b;
+    protected int field_34905_c;
+    public int field_35172_bP;
+    public int field_35173_bQ;
+    protected HashMap activePotionsMap;
+    private boolean field_39001_b;
+    private int field_39002_c;
+    protected int newPosRotationIncrements;
+    protected double newPosX;
+    protected double newPosY;
+    protected double newPosZ;
+    protected double newRotationYaw;
+    protected double newRotationPitch;
+    float field_9348_ae;
+    protected int naturalArmorRating;
+    protected int entityAge;
+    protected float moveStrafing;
+    protected float moveForward;
+    protected float randomYawVelocity;
+    protected boolean isJumping;
+    protected float defaultPitch;
+    protected float moveSpeed;
+    private int field_39003_d;
+    private Entity currentTarget;
+    protected int numTicksToChaseTarget;
 
-	public boolean canEntityBeSeen(Entity var1) {
-		return this.worldObj.rayTraceBlocks(Vec3D.createVector(this.posX, this.posY + (double)this.func_373_s(), this.posZ), Vec3D.createVector(var1.posX, var1.posY + (double)var1.func_373_s(), var1.posZ)) == null;
-	}
+    public EntityLiving(World world)
+    {
+        super(world);
+        heartsHalvesLife = 20;
+        renderYawOffset = 0.0F;
+        prevRenderYawOffset = 0.0F;
+        field_9358_y = true;
+        texture = "/mob/char.png";
+        field_9355_A = true;
+        field_9353_B = 0.0F;
+        entityType = null;
+        field_9349_D = 1.0F;
+        scoreValue = 0;
+        field_9345_F = 0.0F;
+        isMultiplayerEntity = false;
+        landMovementFactor = 0.1F;
+        jumpMovementFactor = 0.02F;
+        attackedAtYaw = 0.0F;
+        deathTime = 0;
+        attackTime = 0;
+        unused_flag = false;
+        field_9326_T = -1;
+        field_9325_U = (float)(Math.random() * 0.89999997615814209D + 0.10000000149011612D);
+        field_34904_b = null;
+        field_34905_c = 0;
+        field_35172_bP = 0;
+        field_35173_bQ = 0;
+        activePotionsMap = new HashMap();
+        field_39001_b = true;
+        field_9348_ae = 0.0F;
+        naturalArmorRating = 0;
+        entityAge = 0;
+        isJumping = false;
+        defaultPitch = 0.0F;
+        moveSpeed = 0.7F;
+        field_39003_d = 0;
+        numTicksToChaseTarget = 0;
+        health = getMaxHealth();
+        preventEntitySpawning = true;
+        field_9363_r = (float)(Math.random() + 1.0D) * 0.01F;
+        setPosition(posX, posY, posZ);
+        field_9365_p = (float)Math.random() * 12398F;
+        rotationYaw = (float)(Math.random() * 3.1415927410125732D * 2D);
+        stepHeight = 0.5F;
+    }
 
-	public TextureLocation getEntityTexture() {
-		return this.texture;
-	}
+    protected void entityInit()
+    {
+        dataWatcher.addObject(8, Integer.valueOf(field_39002_c));
+    }
 
-	public boolean canBeCollidedWith() {
-		return !this.isDead;
-	}
+    public boolean canEntityBeSeen(Entity entity)
+    {
+        return worldObj.rayTraceBlocks(Vec3D.createVector(posX, posY + (double)getEyeHeight(), posZ), Vec3D.createVector(entity.posX, entity.posY + (double)entity.getEyeHeight(), entity.posZ)) == null;
+    }
 
-	public boolean canBePushed() {
-		return !this.isDead;
-	}
+    public String getEntityTexture()
+    {
+        return texture;
+    }
 
-	public float func_373_s() {
-		return this.height * 0.85F;
-	}
+    public boolean canBeCollidedWith()
+    {
+        return !isDead;
+    }
 
-	public int func_421_b() {
-		return 80;
-	}
+    public boolean canBePushed()
+    {
+        return !isDead;
+    }
 
-	public void func_391_y() {
-		this.prevSwingProgress = this.swingProgress;
-		super.func_391_y();
-		if(this.rand.nextInt(1000) < this.a++) {
-			this.a = -this.func_421_b();
-			String var1 = this.getLivingSound();
-			if(var1 != null) {
-				this.worldObj.playSoundAtEntity(this, var1, this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-			}
-		}
+    public float getEyeHeight()
+    {
+        return height * 0.85F;
+    }
 
-		if(this.isEntityAlive() && this.func_345_I()) {
-			this.attackEntityFrom((Entity)null, 1);
-		}
+    public int getTalkInterval()
+    {
+        return 80;
+    }
 
-		if(this.isImmuneToFire || this.worldObj.multiplayerWorld) {
-			this.fire = 0;
-		}
+    public void playLivingSound()
+    {
+        String s = getLivingSound();
+        if(s != null)
+        {
+            worldObj.playSoundAtEntity(this, s, getSoundVolume(), func_40123_ac());
+        }
+    }
 
-		int var8;
-		if(this.isEntityAlive() && this.isInsideOfMaterial(Material.water)) {
-			--this.air;
-			if(this.air == -20) {
-				this.air = 0;
+    public void onEntityUpdate()
+    {
+        prevSwingProgress = swingProgress;
+        super.onEntityUpdate();
+        Profiler.startSection("mobBaseTick");
+        if(rand.nextInt(1000) < livingSoundTime++)
+        {
+            livingSoundTime = -getTalkInterval();
+            playLivingSound();
+        }
+        if(isEntityAlive() && isEntityInsideOpaqueBlock())
+        {
+            if(!attackEntityFrom(DamageSource.inWall, 1));
+        }
+        if(func_40047_D() || worldObj.multiplayerWorld)
+        {
+            func_40045_B();
+        }
+        if(isEntityAlive() && isInsideOfMaterial(Material.water) && !canBreatheUnderwater() && !activePotionsMap.containsKey(Integer.valueOf(Potion.potionWaterBreathing.id)))
+        {
+            func_41003_g(func_40116_f(func_41001_Z()));
+            if(func_41001_Z() == -20)
+            {
+                func_41003_g(0);
+                for(int i = 0; i < 8; i++)
+                {
+                    float f = rand.nextFloat() - rand.nextFloat();
+                    float f1 = rand.nextFloat() - rand.nextFloat();
+                    float f2 = rand.nextFloat() - rand.nextFloat();
+                    worldObj.spawnParticle("bubble", posX + (double)f, posY + (double)f1, posZ + (double)f2, motionX, motionY, motionZ);
+                }
 
-				for(var8 = 0; var8 < 8; ++var8) {
-					float var2 = this.rand.nextFloat() - this.rand.nextFloat();
-					float var3 = this.rand.nextFloat() - this.rand.nextFloat();
-					float var4 = this.rand.nextFloat() - this.rand.nextFloat();
-					this.worldObj.spawnParticle("bubble", this.posX + (double)var2, this.posY + (double)var3, this.posZ + (double)var4, this.motionX, this.motionY, this.motionZ);
-				}
+                attackEntityFrom(DamageSource.drown, 2);
+            }
+            func_40045_B();
+        } else
+        {
+            func_41003_g(300);
+        }
+        prevCameraPitch = cameraPitch;
+        if(attackTime > 0)
+        {
+            attackTime--;
+        }
+        if(hurtTime > 0)
+        {
+            hurtTime--;
+        }
+        if(heartsLife > 0)
+        {
+            heartsLife--;
+        }
+        if(health <= 0)
+        {
+            func_40120_m_();
+        }
+        if(field_34905_c > 0)
+        {
+            field_34905_c--;
+        } else
+        {
+            field_34904_b = null;
+        }
+        updatePotionEffects();
+        field_9359_x = field_9360_w;
+        prevRenderYawOffset = renderYawOffset;
+        prevRotationYaw = rotationYaw;
+        prevRotationPitch = rotationPitch;
+        Profiler.endSection();
+    }
 
-				this.attackEntityFrom((Entity)null, 2);
-			}
+    protected void func_40120_m_()
+    {
+        deathTime++;
+        if(deathTime == 20)
+        {
+            if(!worldObj.multiplayerWorld && (field_34905_c > 0 || func_35163_av()) && !func_40127_l())
+            {
+                for(int i = func_36001_a(field_34904_b); i > 0;)
+                {
+                    int k = EntityXPOrb.getXPSplit(i);
+                    i -= k;
+                    worldObj.entityJoinedWorld(new EntityXPOrb(worldObj, posX, posY, posZ, k));
+                }
 
-			this.fire = 0;
-		} else {
-			this.air = this.maxAir;
-		}
+            }
+            onEntityDeath();
+            setEntityDead();
+            for(int j = 0; j < 20; j++)
+            {
+                double d = rand.nextGaussian() * 0.02D;
+                double d1 = rand.nextGaussian() * 0.02D;
+                double d2 = rand.nextGaussian() * 0.02D;
+                worldObj.spawnParticle("explode", (posX + (double)(rand.nextFloat() * width * 2.0F)) - (double)width, posY + (double)(rand.nextFloat() * height), (posZ + (double)(rand.nextFloat() * width * 2.0F)) - (double)width, d, d1, d2);
+            }
 
-		this.field_9329_Q = this.field_9328_R;
-		if(this.attackTime > 0) {
-			--this.attackTime;
-		}
+        }
+    }
 
-		if(this.hurtTime > 0) {
-			--this.hurtTime;
-		}
+    protected int func_40116_f(int i)
+    {
+        return i - 1;
+    }
 
-		if(this.field_9306_bj > 0) {
-			--this.field_9306_bj;
-		}
+    protected int func_36001_a(EntityPlayer entityplayer)
+    {
+        return field_35171_bJ;
+    }
 
-		if(this.health <= 0) {
-			++this.deathTime;
-			if(this.deathTime > 20) {
-				this.func_6392_F();
-				this.setEntityDead();
+    protected boolean func_35163_av()
+    {
+        return false;
+    }
 
-				for(var8 = 0; var8 < 20; ++var8) {
-					double var9 = this.rand.nextGaussian() * 0.02D;
-					double var10 = this.rand.nextGaussian() * 0.02D;
-					double var6 = this.rand.nextGaussian() * 0.02D;
-					this.worldObj.spawnParticle("explode", this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, var9, var10, var6);
-				}
-			}
-		}
+    public void spawnExplosionParticle()
+    {
+        for(int i = 0; i < 20; i++)
+        {
+            double d = rand.nextGaussian() * 0.02D;
+            double d1 = rand.nextGaussian() * 0.02D;
+            double d2 = rand.nextGaussian() * 0.02D;
+            double d3 = 10D;
+            worldObj.spawnParticle("explode", (posX + (double)(rand.nextFloat() * width * 2.0F)) - (double)width - d * d3, (posY + (double)(rand.nextFloat() * height)) - d1 * d3, (posZ + (double)(rand.nextFloat() * width * 2.0F)) - (double)width - d2 * d3, d, d1, d2);
+        }
 
-		this.field_9359_x = this.field_9360_w;
-		this.prevRenderYawOffset = this.renderYawOffset;
-		this.prevRotationYaw = this.rotationYaw;
-		this.prevRotationPitch = this.rotationPitch;
-	}
+    }
 
-	public void spawnExplosionParticle() {
-		for(int var1 = 0; var1 < 20; ++var1) {
-			double var2 = this.rand.nextGaussian() * 0.02D;
-			double var4 = this.rand.nextGaussian() * 0.02D;
-			double var6 = this.rand.nextGaussian() * 0.02D;
-			double var8 = 10.0D;
-			this.worldObj.spawnParticle("explode", this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - var2 * var8, this.posY + (double)(this.rand.nextFloat() * this.height) - var4 * var8, this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width - var6 * var8, var2, var4, var6);
-		}
+    public void updateRidden()
+    {
+        super.updateRidden();
+        field_9362_u = field_9361_v;
+        field_9361_v = 0.0F;
+        fallDistance = 0.0F;
+    }
 
-	}
+    public void setPositionAndRotation2(double d, double d1, double d2, float f, 
+            float f1, int i)
+    {
+        yOffset = 0.0F;
+        newPosX = d;
+        newPosY = d1;
+        newPosZ = d2;
+        newRotationYaw = f;
+        newRotationPitch = f1;
+        newPosRotationIncrements = i;
+    }
 
-	public void func_350_p() {
-		super.func_350_p();
-		this.field_9362_u = this.field_9361_v;
-		this.field_9361_v = 0.0F;
-	}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        if(field_35172_bP > 0)
+        {
+            if(field_35173_bQ <= 0)
+            {
+                field_35173_bQ = 60;
+            }
+            field_35173_bQ--;
+            if(field_35173_bQ <= 0)
+            {
+                field_35172_bP--;
+            }
+        }
+        onLivingUpdate();
+        double d = posX - prevPosX;
+        double d1 = posZ - prevPosZ;
+        float f = MathHelper.sqrt_double(d * d + d1 * d1);
+        float f1 = renderYawOffset;
+        float f2 = 0.0F;
+        field_9362_u = field_9361_v;
+        float f3 = 0.0F;
+        if(f > 0.05F)
+        {
+            f3 = 1.0F;
+            f2 = f * 3F;
+            f1 = ((float)Math.atan2(d1, d) * 180F) / 3.141593F - 90F;
+        }
+        if(swingProgress > 0.0F)
+        {
+            f1 = rotationYaw;
+        }
+        if(!onGround)
+        {
+            f3 = 0.0F;
+        }
+        field_9361_v = field_9361_v + (f3 - field_9361_v) * 0.3F;
+        float f4;
+        for(f4 = f1 - renderYawOffset; f4 < -180F; f4 += 360F) { }
+        for(; f4 >= 180F; f4 -= 360F) { }
+        renderYawOffset += f4 * 0.3F;
+        float f5;
+        for(f5 = rotationYaw - renderYawOffset; f5 < -180F; f5 += 360F) { }
+        for(; f5 >= 180F; f5 -= 360F) { }
+        boolean flag = f5 < -90F || f5 >= 90F;
+        if(f5 < -75F)
+        {
+            f5 = -75F;
+        }
+        if(f5 >= 75F)
+        {
+            f5 = 75F;
+        }
+        renderYawOffset = rotationYaw - f5;
+        if(f5 * f5 > 2500F)
+        {
+            renderYawOffset += f5 * 0.2F;
+        }
+        if(flag)
+        {
+            f2 *= -1F;
+        }
+        for(; rotationYaw - prevRotationYaw < -180F; prevRotationYaw -= 360F) { }
+        for(; rotationYaw - prevRotationYaw >= 180F; prevRotationYaw += 360F) { }
+        for(; renderYawOffset - prevRenderYawOffset < -180F; prevRenderYawOffset -= 360F) { }
+        for(; renderYawOffset - prevRenderYawOffset >= 180F; prevRenderYawOffset += 360F) { }
+        for(; rotationPitch - prevRotationPitch < -180F; prevRotationPitch -= 360F) { }
+        for(; rotationPitch - prevRotationPitch >= 180F; prevRotationPitch += 360F) { }
+        field_9360_w += f2;
+    }
 
-	public void setPositionAndRotation2(double var1, double var3, double var5, float var7, float var8, int var9) {
-		this.yOffset = 0.0F;
-		this.field_9323_Z = var1;
-		this.field_9356_aa = var3;
-		this.field_9354_ab = var5;
-		this.field_9352_ac = (double)var7;
-		this.field_9350_ad = (double)var8;
-		this.field_9324_Y = var9;
-	}
-	
-	private boolean canSkipUpdate() {
-        if (this.hurtTime > 0) {
+    protected void setSize(float f, float f1)
+    {
+        super.setSize(f, f1);
+    }
+
+    public void heal(int i)
+    {
+        if(health <= 0)
+        {
+            return;
+        }
+        health += i;
+        if(health > getMaxHealth())
+        {
+            health = getMaxHealth();
+        }
+        heartsLife = heartsHalvesLife / 2;
+    }
+
+    public abstract int getMaxHealth();
+
+    public int getEntityHealth()
+    {
+        return health;
+    }
+
+    public void setEntityHealth(int i)
+    {
+        health = i;
+        if(i > getMaxHealth())
+        {
+            i = getMaxHealth();
+        }
+    }
+
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        if(worldObj.multiplayerWorld)
+        {
             return false;
-        } else if (this.ticksExisted < 20) {
+        }
+        entityAge = 0;
+        if(health <= 0)
+        {
             return false;
-        } else {
-            World world = this.worldObj;
+        }
+        if(damagesource.func_40543_k() && isPotionActive(Potion.potionFireReistance))
+        {
+            return false;
+        }
+        field_704_R = 1.5F;
+        boolean flag = true;
+        if((float)heartsLife > (float)heartsHalvesLife / 2.0F)
+        {
+            if(i <= naturalArmorRating)
+            {
+                return false;
+            }
+            damageEntity(damagesource, i - naturalArmorRating);
+            naturalArmorRating = i;
+            flag = false;
+        } else
+        {
+            naturalArmorRating = i;
+            prevHealth = health;
+            heartsLife = heartsHalvesLife;
+            damageEntity(damagesource, i);
+            hurtTime = maxHurtTime = 10;
+        }
+        attackedAtYaw = 0.0F;
+        Entity entity = damagesource.getEntity();
+        if(entity != null)
+        {
+            if(entity instanceof EntityPlayer)
+            {
+                field_34905_c = 60;
+                field_34904_b = (EntityPlayer)entity;
+            } else
+            if(entity instanceof EntityWolf)
+            {
+                EntityWolf entitywolf = (EntityWolf)entity;
+                if(entitywolf.isWolfTamed())
+                {
+                    field_34905_c = 60;
+                    field_34904_b = null;
+                }
+            }
+        }
+        if(flag)
+        {
+            worldObj.setEntityState(this, (byte)2);
+            setBeenAttacked();
+            if(entity != null)
+            {
+                double d = entity.posX - posX;
+                double d1;
+                for(d1 = entity.posZ - posZ; d * d + d1 * d1 < 0.0001D; d1 = (Math.random() - Math.random()) * 0.01D)
+                {
+                    d = (Math.random() - Math.random()) * 0.01D;
+                }
 
-            if (world == null) {
-                return false;
-            } else if (world.playerEntities.size() != 1) {
-                return false;
-            } else {
-                Entity entity = (Entity)world.playerEntities.get(0);
-                double d0 = Math.max(Math.abs(this.posX - entity.posX) - 16.0D, 0.0D);
-                double d1 = Math.max(Math.abs(this.posZ - entity.posZ) - 16.0D, 0.0D);
-                double d2 = d0 * d0 + d1 * d1;
-                return !this.isInRangeToRenderDist(d2);
+                attackedAtYaw = (float)((Math.atan2(d1, d) * 180D) / 3.1415927410125732D) - rotationYaw;
+                knockBack(entity, i, d, d1);
+            } else
+            {
+                attackedAtYaw = (int)(Math.random() * 2D) * 180;
+            }
+        }
+        if(health <= 0)
+        {
+            if(flag)
+            {
+                worldObj.playSoundAtEntity(this, getDeathSound(), getSoundVolume(), func_40123_ac());
+            }
+            onDeath(damagesource);
+        } else
+        if(flag)
+        {
+            worldObj.playSoundAtEntity(this, getHurtSound(), getSoundVolume(), func_40123_ac());
+        }
+        return true;
+    }
+
+    private float func_40123_ac()
+    {
+        if(func_40127_l())
+        {
+            return (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.5F;
+        } else
+        {
+            return (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F;
+        }
+    }
+
+    public void performHurtAnimation()
+    {
+        hurtTime = maxHurtTime = 10;
+        attackedAtYaw = 0.0F;
+    }
+
+    protected int func_40119_ar()
+    {
+        return 0;
+    }
+
+    protected void func_40125_g(int i)
+    {
+    }
+
+    protected int func_40115_d(DamageSource damagesource, int i)
+    {
+        if(!damagesource.unblockable())
+        {
+            int j = 25 - func_40119_ar();
+            int k = i * j + field_40129_bA;
+            func_40125_g(i);
+            i = k / 25;
+            field_40129_bA = k % 25;
+        }
+        return i;
+    }
+
+    protected int func_40128_b(DamageSource damagesource, int i)
+    {
+        if(isPotionActive(Potion.potionResistance))
+        {
+            int j = (getActivePotionEffect(Potion.potionResistance).getAmplifier() + 1) * 5;
+            int k = 25 - j;
+            int l = i * k + field_40129_bA;
+            i = l / 25;
+            field_40129_bA = l % 25;
+        }
+        return i;
+    }
+
+    protected void damageEntity(DamageSource damagesource, int i)
+    {
+        i = func_40115_d(damagesource, i);
+        i = func_40128_b(damagesource, i);
+        health -= i;
+    }
+
+    protected float getSoundVolume()
+    {
+        return 1.0F;
+    }
+
+    protected String getLivingSound()
+    {
+        return null;
+    }
+
+    protected String getHurtSound()
+    {
+        return "damage.hurtflesh";
+    }
+
+    protected String getDeathSound()
+    {
+        return "damage.hurtflesh";
+    }
+
+    public void knockBack(Entity entity, int i, double d, double d1)
+    {
+        isAirBorne = true;
+        float f = MathHelper.sqrt_double(d * d + d1 * d1);
+        float f1 = 0.4F;
+        motionX /= 2D;
+        motionY /= 2D;
+        motionZ /= 2D;
+        motionX -= (d / (double)f) * (double)f1;
+        motionY += 0.40000000596046448D;
+        motionZ -= (d1 / (double)f) * (double)f1;
+        if(motionY > 0.40000000596046448D)
+        {
+            motionY = 0.40000000596046448D;
+        }
+    }
+
+    public void onDeath(DamageSource damagesource)
+    {
+        Entity entity = damagesource.getEntity();
+        if(scoreValue >= 0 && entity != null)
+        {
+            entity.addToPlayerScore(this, scoreValue);
+        }
+        if(entity != null)
+        {
+            entity.onKillEntity(this);
+        }
+        unused_flag = true;
+        if(!worldObj.multiplayerWorld)
+        {
+            int i = 0;
+            if(entity instanceof EntityPlayer)
+            {
+                i = EnchantmentHelper.getLootingModifier(((EntityPlayer)entity).inventory);
+            }
+            if(!func_40127_l())
+            {
+                dropFewItems(field_34905_c > 0, i);
+            }
+        }
+        worldObj.setEntityState(this, (byte)3);
+    }
+
+    protected void dropFewItems(boolean flag, int i)
+    {
+        int j = getDropItemId();
+        if(j > 0)
+        {
+            int k = rand.nextInt(3);
+            if(i > 0)
+            {
+                k += rand.nextInt(i + 1);
+            }
+            for(int l = 0; l < k; l++)
+            {
+                dropItem(j, 1);
+            }
+
+        }
+    }
+
+    protected int getDropItemId()
+    {
+        return 0;
+    }
+
+    protected void fall(float f)
+    {
+        super.fall(f);
+        int i = (int)Math.ceil(f - 3F);
+        if(i > 0)
+        {
+            if(i > 4)
+            {
+                worldObj.playSoundAtEntity(this, "damage.fallbig", 1.0F, 1.0F);
+            } else
+            {
+                worldObj.playSoundAtEntity(this, "damage.fallsmall", 1.0F, 1.0F);
+            }
+            attackEntityFrom(DamageSource.fall, i);
+            int j = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(posY - 0.20000000298023224D - (double)yOffset), MathHelper.floor_double(posZ));
+            if(j > 0)
+            {
+                StepSound stepsound = Block.blocksList[j].stepSound;
+                worldObj.playSoundAtEntity(this, stepsound.stepSoundDir2(), stepsound.getVolume() * 0.5F, stepsound.getPitch() * 0.75F);
             }
         }
     }
-	
-	private void onUpdateMinimal() {
-		++this.field_9344_ag;
-
-		if (this instanceof EntityMobs) {
-			float f = this.getEntityBrightness(1.0F);
-
-			if (f > 0.5F) {
-				this.field_9344_ag += 2;
-			}
-		}
-
-		this.onLivingUpdate();
-	}
-
-	public void onUpdate() {
-		if(this.canSkipUpdate()) {
-			this.onUpdateMinimal();
-		} else {
-			super.onUpdate();
-			this.onLivingUpdate();
-		}
-		double var1 = this.posX - this.prevPosX;
-		double var3 = this.posZ - this.prevPosZ;
-		float var5 = MathHelper.sqrt_double(var1 * var1 + var3 * var3);
-		float var6 = this.renderYawOffset;
-		float var7 = 0.0F;
-		this.field_9362_u = this.field_9361_v;
-		float var8 = 0.0F;
-		if(var5 > 0.05F) {
-			var8 = 1.0F;
-			var7 = var5 * 3.0F;
-			var6 = (float)Math.atan2(var3, var1) * 180.0F / (float)Math.PI - 90.0F;
-		}
-
-		if(this.swingProgress > 0.0F) {
-			var6 = this.rotationYaw;
-		}
-
-		if(!this.onGround) {
-			var8 = 0.0F;
-		}
-
-		this.field_9361_v += (var8 - this.field_9361_v) * 0.3F;
-
-		float var9;
-		for(var9 = var6 - this.renderYawOffset; var9 < -180.0F; var9 += 360.0F) {
-		}
-
-		while(var9 >= 180.0F) {
-			var9 -= 360.0F;
-		}
-
-		this.renderYawOffset += var9 * 0.3F;
-
-		float var10;
-		for(var10 = this.rotationYaw - this.renderYawOffset; var10 < -180.0F; var10 += 360.0F) {
-		}
-
-		while(var10 >= 180.0F) {
-			var10 -= 360.0F;
-		}
-
-		boolean var11 = var10 < -90.0F || var10 >= 90.0F;
-		if(var10 < -75.0F) {
-			var10 = -75.0F;
-		}
-
-		if(var10 >= 75.0F) {
-			var10 = 75.0F;
-		}
-
-		this.renderYawOffset = this.rotationYaw - var10;
-		if(var10 * var10 > 2500.0F) {
-			this.renderYawOffset += var10 * 0.2F;
-		}
-
-		if(var11) {
-			var7 *= -1.0F;
-		}
-
-		while(this.rotationYaw - this.prevRotationYaw < -180.0F) {
-			this.prevRotationYaw -= 360.0F;
-		}
-
-		while(this.rotationYaw - this.prevRotationYaw >= 180.0F) {
-			this.prevRotationYaw += 360.0F;
-		}
-
-		while(this.renderYawOffset - this.prevRenderYawOffset < -180.0F) {
-			this.prevRenderYawOffset -= 360.0F;
-		}
-
-		while(this.renderYawOffset - this.prevRenderYawOffset >= 180.0F) {
-			this.prevRenderYawOffset += 360.0F;
-		}
-
-		while(this.rotationPitch - this.prevRotationPitch < -180.0F) {
-			this.prevRotationPitch -= 360.0F;
-		}
-
-		while(this.rotationPitch - this.prevRotationPitch >= 180.0F) {
-			this.prevRotationPitch += 360.0F;
-		}
-
-		this.field_9360_w += var7;
-	}
-
-	protected void setSize(float var1, float var2) {
-		super.setSize(var1, var2);
-	}
-
-	public void heal(int var1) {
-		if(this.health > 0) {
-			this.health += var1;
-			if(this.health > 20) {
-				this.health = 20;
-			}
-
-			this.field_9306_bj = this.field_9366_o / 2;
-		}
-	}
-
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		if(this.worldObj.multiplayerWorld) {
-			return false;
-		} else {
-			this.field_9344_ag = 0;
-			if(this.health <= 0) {
-				return false;
-			} else {
-				this.field_704_R = 1.5F;
-				boolean var3 = true;
-				if((float)this.field_9306_bj > (float)this.field_9366_o / 2.0F) {
-					if(var2 <= this.field_9346_af) {
-						return false;
-					}
-
-					this.damageEntity(var2 - this.field_9346_af);
-					this.field_9346_af = var2;
-					var3 = false;
-				} else {
-					this.field_9346_af = var2;
-					this.prevHealth = this.health;
-					this.field_9306_bj = this.field_9366_o;
-					this.damageEntity(var2);
-					this.hurtTime = this.maxHurtTime = 10;
-				}
-
-				this.attackedAtYaw = 0.0F;
-				if(var3) {
-					this.worldObj.func_9425_a(this, (byte)2);
-					this.setBeenAttacked();
-					if(var1 != null) {
-						double var4 = var1.posX - this.posX;
-
-						double var6;
-						for(var6 = var1.posZ - this.posZ; var4 * var4 + var6 * var6 < 1.0E-4D; var6 = (Math.random() - Math.random()) * 0.01D) {
-							var4 = (Math.random() - Math.random()) * 0.01D;
-						}
-
-						this.attackedAtYaw = (float)(Math.atan2(var6, var4) * 180.0D / (double)((float)Math.PI)) - this.rotationYaw;
-						this.func_434_a(var1, var2, var4, var6);
-					} else {
-						this.attackedAtYaw = (float)((int)(Math.random() * 2.0D) * 180);
-					}
-				}
-
-				if(this.health <= 0) {
-					if(var3) {
-						this.worldObj.playSoundAtEntity(this, this.getDeathSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-					}
-
-					this.onDeath(var1);
-				} else if(var3) {
-					this.worldObj.playSoundAtEntity(this, this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-				}
-
-				return true;
-			}
-		}
-	}
-
-	public void performHurtAnimation() {
-		this.hurtTime = this.maxHurtTime = 10;
-		this.attackedAtYaw = 0.0F;
-	}
-
-	protected void damageEntity(int var1) {
-		this.health -= var1;
-	}
-
-	protected float getSoundVolume() {
-		return 1.0F;
-	}
-
-	protected String getLivingSound() {
-		return null;
-	}
-
-	protected String getHurtSound() {
-		return "random.hurt";
-	}
-
-	protected String getDeathSound() {
-		return "random.hurt";
-	}
-
-	public void func_434_a(Entity var1, int var2, double var3, double var5) {
-		float var7 = MathHelper.sqrt_double(var3 * var3 + var5 * var5);
-		float var8 = 0.4F;
-		this.motionX /= 2.0D;
-		this.motionY /= 2.0D;
-		this.motionZ /= 2.0D;
-		this.motionX -= var3 / (double)var7 * (double)var8;
-		this.motionY += (double)0.4F;
-		this.motionZ -= var5 / (double)var7 * (double)var8;
-		if(this.motionY > (double)0.4F) {
-			this.motionY = (double)0.4F;
-		}
-
-	}
-
-	public void onDeath(Entity var1) {
-		if(this.field_9347_E > 0 && var1 != null) {
-			var1.addToPlayerScore(this, this.field_9347_E);
-		}
-
-		this.field_9327_S = true;
-		if(!this.worldObj.multiplayerWorld) {
-			int var2 = this.getDropItemId();
-			if(var2 > 0) {
-				int var3 = this.rand.nextInt(3);
-
-				for(int var4 = 0; var4 < var3; ++var4) {
-					this.dropItem(var2, 1);
-				}
-			}
-		}
-
-		this.worldObj.func_9425_a(this, (byte)3);
-	}
-
-	protected int getDropItemId() {
-		return 0;
-	}
-
-	protected void fall(float var1) {
-		int var2 = (int)Math.ceil((double)(var1 - 3.0F));
-		if(var2 > 0) {
-			this.attackEntityFrom((Entity)null, var2);
-			int var3 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY - (double)0.2F - (double)this.yOffset), MathHelper.floor_double(this.posZ));
-			if(var3 > 0) {
-				StepSound var4 = Block.blocksList[var3].stepSound;
-				this.worldObj.playSoundAtEntity(this, var4.func_1145_d(), var4.func_1147_b() * 0.5F, var4.func_1144_c() * (12.0F / 16.0F));
-			}
-		}
-
-	}
-
-	public void moveEntityWithHeading(float var1, float var2) {
-		double var3;
-		if(this.handleWaterMovement()) {
-			var3 = this.posY;
-			this.func_351_a(var1, var2, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)0.8F;
-			this.motionY *= (double)0.8F;
-			this.motionZ *= (double)0.8F;
-			this.motionY -= 0.02D;
-			if(this.isCollidedHorizontally && this.isOffsetPositionInLiquid(this.motionX, this.motionY + (double)0.6F - this.posY + var3, this.motionZ)) {
-				this.motionY = (double)0.3F;
-			}
-		} else if(this.handleLavaMovement()) {
-			var3 = this.posY;
-			this.func_351_a(var1, var2, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.5D;
-			this.motionY *= 0.5D;
-			this.motionZ *= 0.5D;
-			this.motionY -= 0.02D;
-			if(this.isCollidedHorizontally && this.isOffsetPositionInLiquid(this.motionX, this.motionY + (double)0.6F - this.posY + var3, this.motionZ)) {
-				this.motionY = (double)0.3F;
-			}
-		} else {
-			float var8 = 0.91F;
-			if(this.onGround) {
-				var8 = 546.0F * 0.1F * 0.1F * 0.1F;
-				int var4 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.boundingBox.minY) - 1, MathHelper.floor_double(this.posZ));
-				if(var4 > 0) {
-					var8 = Block.blocksList[var4].slipperiness * 0.91F;
-				}
-			}
-
-			float var9 = 0.16277136F / (var8 * var8 * var8);
-			this.func_351_a(var1, var2, this.onGround ? 0.1F * var9 : 0.02F);
-			var8 = 0.91F;
-			if(this.onGround) {
-				var8 = 546.0F * 0.1F * 0.1F * 0.1F;
-				int var5 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.boundingBox.minY) - 1, MathHelper.floor_double(this.posZ));
-				if(var5 > 0) {
-					var8 = Block.blocksList[var5].slipperiness * 0.91F;
-				}
-			}
-
-			if(this.isOnLadder()) {
-				this.fallDistance = 0.0F;
-				if(this.motionY < -0.15D) {
-					this.motionY = -0.15D;
-				}
-			}
-
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			if(this.isCollidedHorizontally && this.isOnLadder()) {
-				this.motionY = 0.2D;
-			}
-
-			this.motionY -= 0.08D;
-			this.motionY *= (double)0.98F;
-			this.motionX *= (double)var8;
-			this.motionZ *= (double)var8;
-		}
-
-		this.field_705_Q = this.field_704_R;
-		var3 = this.posX - this.prevPosX;
-		double var10 = this.posZ - this.prevPosZ;
-		float var7 = MathHelper.sqrt_double(var3 * var3 + var10 * var10) * 4.0F;
-		if(var7 > 1.0F) {
-			var7 = 1.0F;
-		}
-
-		this.field_704_R += (var7 - this.field_704_R) * 0.4F;
-		this.field_703_S += this.field_704_R;
-	}
-
-	public boolean isOnLadder() {
-		int var1 = MathHelper.floor_double(this.posX);
-		int var2 = MathHelper.floor_double(this.boundingBox.minY);
-		int var3 = MathHelper.floor_double(this.posZ);
-		return this.worldObj.getBlockId(var1, var2, var3) == Block.ladder.blockID || this.worldObj.getBlockId(var1, var2 + 1, var3) == Block.ladder.blockID;
-	}
-
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		var1.setShort("Health", (short)this.health);
-		var1.setShort("HurtTime", (short)this.hurtTime);
-		var1.setShort("DeathTime", (short)this.deathTime);
-		var1.setShort("AttackTime", (short)this.attackTime);
-	}
-
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		this.health = var1.getShort("Health");
-		if(!var1.hasKey("Health")) {
-			this.health = 10;
-		}
-
-		this.hurtTime = var1.getShort("HurtTime");
-		this.deathTime = var1.getShort("DeathTime");
-		this.attackTime = var1.getShort("AttackTime");
-	}
-
-	public boolean isEntityAlive() {
-		return !this.isDead && this.health > 0;
-	}
-
-	public void onLivingUpdate() {
-		if(this.field_9324_Y > 0) {
-			double var1 = this.posX + (this.field_9323_Z - this.posX) / (double)this.field_9324_Y;
-			double var3 = this.posY + (this.field_9356_aa - this.posY) / (double)this.field_9324_Y;
-			double var5 = this.posZ + (this.field_9354_ab - this.posZ) / (double)this.field_9324_Y;
-
-			double var7;
-			for(var7 = this.field_9352_ac - (double)this.rotationYaw; var7 < -180.0D; var7 += 360.0D) {
-			}
-
-			while(var7 >= 180.0D) {
-				var7 -= 360.0D;
-			}
-
-			this.rotationYaw = (float)((double)this.rotationYaw + var7 / (double)this.field_9324_Y);
-			this.rotationPitch = (float)((double)this.rotationPitch + (this.field_9350_ad - (double)this.rotationPitch) / (double)this.field_9324_Y);
-			--this.field_9324_Y;
-			this.setPosition(var1, var3, var5);
-			this.setRotation(this.rotationYaw, this.rotationPitch);
-		}
-
-		if(this.health <= 0) {
-			this.isJumping = false;
-			this.moveStrafing = 0.0F;
-			this.moveForward = 0.0F;
-			this.randomYawVelocity = 0.0F;
-		} else if(!this.field_9343_G) {
-			this.updatePlayerActionState();
-		}
-
-		boolean var9 = this.handleWaterMovement();
-		boolean var2 = this.handleLavaMovement();
-		if(this.isJumping) {
-			if(var9) {
-				this.motionY += (double)0.04F;
-			} else if(var2) {
-				this.motionY += (double)0.04F;
-			} else if(this.onGround) {
-				this.func_424_C();
-			}
-		}
-
-		this.moveStrafing *= 0.98F;
-		this.moveForward *= 0.98F;
-		this.randomYawVelocity *= 0.9F;
-		this.moveEntityWithHeading(this.moveStrafing, this.moveForward);
-		List<Entity> var10 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand((double)0.2F, 0.0D, (double)0.2F));
-		if(var10 != null && var10.size() > 0) {
-			for(int var4 = 0; var4 < var10.size(); ++var4) {
-				Entity var11 = (Entity)var10.get(var4);
-				if(var11.canBePushed()) {
-					var11.applyEntityCollision(this);
-				}
-			}
-		}
-
-	}
-
-	protected void func_424_C() {
-		this.motionY = (double)0.42F;
-	}
-
-	protected void updatePlayerActionState() {
-		++this.field_9344_ag;
-		EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, -1.0D);
-		if(var1 != null) {
-			double var2 = var1.posX - this.posX;
-			double var4 = var1.posY - this.posY;
-			double var6 = var1.posZ - this.posZ;
-			double var8 = var2 * var2 + var4 * var4 + var6 * var6;
-			if(var8 > 16384.0D) {
-				this.setEntityDead();
-			}
-
-			if(this.field_9344_ag > 600 && this.rand.nextInt(800) == 0) {
-				if(var8 < 1024.0D) {
-					this.field_9344_ag = 0;
-				} else {
-					this.setEntityDead();
-				}
-			}
-		}
-
-		this.moveStrafing = 0.0F;
-		this.moveForward = 0.0F;
-		float var10 = 8.0F;
-		if(this.rand.nextFloat() < 0.02F) {
-			var1 = this.worldObj.getClosestPlayerToEntity(this, (double)var10);
-			if(var1 != null) {
-				this.b = var1;
-				this.c = 10 + this.rand.nextInt(20);
-			} else {
-				this.randomYawVelocity = (this.rand.nextFloat() - 0.5F) * 20.0F;
-			}
-		}
-
-		if(this.b != null) {
-			this.faceEntity(this.b, 10.0F);
-			if(this.c-- <= 0 || this.b.isDead || this.b.getDistanceSqToEntity(this) > (double)(var10 * var10)) {
-				this.b = null;
-			}
-		} else {
-			if(this.rand.nextFloat() < 0.05F) {
-				this.randomYawVelocity = (this.rand.nextFloat() - 0.5F) * 20.0F;
-			}
-
-			this.rotationYaw += this.randomYawVelocity;
-			this.rotationPitch = this.defaultPitch;
-		}
-
-		boolean var3 = this.handleWaterMovement();
-		boolean var11 = this.handleLavaMovement();
-		if(var3 || var11) {
-			this.isJumping = this.rand.nextFloat() < 0.8F;
-		}
-
-	}
-
-	public void faceEntity(Entity var1, float var2) {
-		double var3 = var1.posX - this.posX;
-		double var7 = var1.posZ - this.posZ;
-		double var5;
-		if(var1 instanceof EntityLiving) {
-			EntityLiving var9 = (EntityLiving)var1;
-			var5 = var9.posY + (double)var9.func_373_s() - (this.posY + (double)this.func_373_s());
-		} else {
-			var5 = (var1.boundingBox.minY + var1.boundingBox.maxY) / 2.0D - (this.posY + (double)this.func_373_s());
-		}
-
-		double var13 = (double)MathHelper.sqrt_double(var3 * var3 + var7 * var7);
-		float var11 = (float)(Math.atan2(var7, var3) * 180.0D / (double)((float)Math.PI)) - 90.0F;
-		float var12 = (float)(Math.atan2(var5, var13) * 180.0D / (double)((float)Math.PI));
-		this.rotationPitch = -this.updateRotation(this.rotationPitch, var12, var2);
-		this.rotationYaw = this.updateRotation(this.rotationYaw, var11, var2);
-	}
-
-	private float updateRotation(float var1, float var2, float var3) {
-		float var4;
-		for(var4 = var2 - var1; var4 < -180.0F; var4 += 360.0F) {
-		}
-
-		while(var4 >= 180.0F) {
-			var4 -= 360.0F;
-		}
-
-		if(var4 > var3) {
-			var4 = var3;
-		}
-
-		if(var4 < -var3) {
-			var4 = -var3;
-		}
-
-		return var1 + var4;
-	}
-
-	public void func_6392_F() {
-	}
-
-	public boolean getCanSpawnHere() {
-		return this.worldObj.checkIfAABBIsClear(this.boundingBox) && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() == 0 && !this.worldObj.getIsAnyLiquid(this.boundingBox);
-	}
-
-	protected void func_4034_G() {
-		this.attackEntityFrom((Entity)null, 4);
-	}
-
-	public float getSwingProgress(float var1) {
-		float var2 = this.swingProgress - this.prevSwingProgress;
-		if(var2 < 0.0F) {
-			++var2;
-		}
-
-		return this.prevSwingProgress + var2 * var1;
-	}
-
-	public Vec3D getPosition(float var1) {
-		if(var1 == 1.0F) {
-			return Vec3D.createVector(this.posX, this.posY, this.posZ);
-		} else {
-			double var2 = this.prevPosX + (this.posX - this.prevPosX) * (double)var1;
-			double var4 = this.prevPosY + (this.posY - this.prevPosY) * (double)var1;
-			double var6 = this.prevPosZ + (this.posZ - this.prevPosZ) * (double)var1;
-			return Vec3D.createVector(var2, var4, var6);
-		}
-	}
-
-	public Vec3D func_4037_H() {
-		return this.getLook(1.0F);
-	}
-
-	public Vec3D getLook(float var1) {
-		float var2;
-		float var3;
-		float var4;
-		float var5;
-		if(var1 == 1.0F) {
-			var2 = MathHelper.cos(-this.rotationYaw * ((float)Math.PI / 180.0F) - (float)Math.PI);
-			var3 = MathHelper.sin(-this.rotationYaw * ((float)Math.PI / 180.0F) - (float)Math.PI);
-			var4 = -MathHelper.cos(-this.rotationPitch * ((float)Math.PI / 180.0F));
-			var5 = MathHelper.sin(-this.rotationPitch * ((float)Math.PI / 180.0F));
-			return Vec3D.createVector((double)(var3 * var4), (double)var5, (double)(var2 * var4));
-		} else {
-			var2 = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * var1;
-			var3 = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * var1;
-			var4 = MathHelper.cos(-var3 * ((float)Math.PI / 180.0F) - (float)Math.PI);
-			var5 = MathHelper.sin(-var3 * ((float)Math.PI / 180.0F) - (float)Math.PI);
-			float var6 = -MathHelper.cos(-var2 * ((float)Math.PI / 180.0F));
-			float var7 = MathHelper.sin(-var2 * ((float)Math.PI / 180.0F));
-			return Vec3D.createVector((double)(var5 * var6), (double)var7, (double)(var4 * var6));
-		}
-	}
-
-	public MovingObjectPosition rayTrace(double var1, float var3) {
-		Vec3D var4 = this.getPosition(var3);
-		Vec3D var5 = this.getLook(var3);
-		Vec3D var6 = var4.addVector(var5.xCoord * var1, var5.yCoord * var1, var5.zCoord * var1);
-		return this.worldObj.rayTraceBlocks(var4, var6);
-	}
-
-	public int getMaxSpawnedInChunk() {
-		return 4;
-	}
-
-	public ItemStack getHeldItem() {
-		return null;
-	}
-
-	public void func_9282_a(byte var1) {
-		if(var1 == 2) {
-			this.field_704_R = 1.5F;
-			this.field_9306_bj = this.field_9366_o;
-			this.hurtTime = this.maxHurtTime = 10;
-			this.attackedAtYaw = 0.0F;
-			this.worldObj.playSoundAtEntity(this, this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-			this.attackEntityFrom((Entity)null, 0);
-		} else if(var1 == 3) {
-			this.worldObj.playSoundAtEntity(this, this.getDeathSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-			this.health = 0;
-			this.onDeath((Entity)null);
-		} else {
-			super.func_9282_a(var1);
-		}
-
-	}
+
+    public void moveEntityWithHeading(float f, float f1)
+    {
+        if(isInWater())
+        {
+            double d = posY;
+            moveFlying(f, f1, 0.02F);
+            moveEntity(motionX, motionY, motionZ);
+            motionX *= 0.80000001192092896D;
+            motionY *= 0.80000001192092896D;
+            motionZ *= 0.80000001192092896D;
+            motionY -= 0.02D;
+            if(isCollidedHorizontally && isOffsetPositionInLiquid(motionX, ((motionY + 0.60000002384185791D) - posY) + d, motionZ))
+            {
+                motionY = 0.30000001192092896D;
+            }
+        } else
+        if(handleLavaMovement())
+        {
+            double d1 = posY;
+            moveFlying(f, f1, 0.02F);
+            moveEntity(motionX, motionY, motionZ);
+            motionX *= 0.5D;
+            motionY *= 0.5D;
+            motionZ *= 0.5D;
+            motionY -= 0.02D;
+            if(isCollidedHorizontally && isOffsetPositionInLiquid(motionX, ((motionY + 0.60000002384185791D) - posY) + d1, motionZ))
+            {
+                motionY = 0.30000001192092896D;
+            }
+        } else
+        {
+            float f2 = 0.91F;
+            if(onGround)
+            {
+                f2 = 0.5460001F;
+                int i = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
+                if(i > 0)
+                {
+                    f2 = Block.blocksList[i].slipperiness * 0.91F;
+                }
+            }
+            float f3 = 0.1627714F / (f2 * f2 * f2);
+            float f4 = onGround ? landMovementFactor * f3 : jumpMovementFactor;
+            moveFlying(f, f1, f4);
+            f2 = 0.91F;
+            if(onGround)
+            {
+                f2 = 0.5460001F;
+                int j = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
+                if(j > 0)
+                {
+                    f2 = Block.blocksList[j].slipperiness * 0.91F;
+                }
+            }
+            if(isOnLadder())
+            {
+                float f5 = 0.15F;
+                if(motionX < (double)(-f5))
+                {
+                    motionX = -f5;
+                }
+                if(motionX > (double)f5)
+                {
+                    motionX = f5;
+                }
+                if(motionZ < (double)(-f5))
+                {
+                    motionZ = -f5;
+                }
+                if(motionZ > (double)f5)
+                {
+                    motionZ = f5;
+                }
+                fallDistance = 0.0F;
+                if(motionY < -0.14999999999999999D)
+                {
+                    motionY = -0.14999999999999999D;
+                }
+                if(isSneaking() && motionY < 0.0D)
+                {
+                    motionY = 0.0D;
+                }
+            }
+            moveEntity(motionX, motionY, motionZ);
+            if(isCollidedHorizontally && isOnLadder())
+            {
+                motionY = 0.20000000000000001D;
+            }
+            motionY -= 0.080000000000000002D;
+            motionY *= 0.98000001907348633D;
+            motionX *= f2;
+            motionZ *= f2;
+        }
+        field_705_Q = field_704_R;
+        double d2 = posX - prevPosX;
+        double d3 = posZ - prevPosZ;
+        float f6 = MathHelper.sqrt_double(d2 * d2 + d3 * d3) * 4F;
+        if(f6 > 1.0F)
+        {
+            f6 = 1.0F;
+        }
+        field_704_R += (f6 - field_704_R) * 0.4F;
+        field_703_S += field_704_R;
+    }
+
+    public boolean isOnLadder()
+    {
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_double(boundingBox.minY);
+        int k = MathHelper.floor_double(posZ);
+        return worldObj.getBlockId(i, j, k) == Block.ladder.blockID;
+    }
+
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setShort("Health", (short)health);
+        nbttagcompound.setShort("HurtTime", (short)hurtTime);
+        nbttagcompound.setShort("DeathTime", (short)deathTime);
+        nbttagcompound.setShort("AttackTime", (short)attackTime);
+        if(!activePotionsMap.isEmpty())
+        {
+            NBTTagList nbttaglist = new NBTTagList();
+            NBTTagCompound nbttagcompound1;
+            for(Iterator iterator = activePotionsMap.values().iterator(); iterator.hasNext(); nbttaglist.setTag(nbttagcompound1))
+            {
+                PotionEffect potioneffect = (PotionEffect)iterator.next();
+                nbttagcompound1 = new NBTTagCompound();
+                nbttagcompound1.setByte("Id", (byte)potioneffect.getPotionID());
+                nbttagcompound1.setByte("Amplifier", (byte)potioneffect.getAmplifier());
+                nbttagcompound1.setInteger("Duration", potioneffect.getDuration());
+            }
+
+            nbttagcompound.setTag("ActiveEffects", nbttaglist);
+        }
+    }
+
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        health = nbttagcompound.getShort("Health");
+        if(!nbttagcompound.hasKey("Health"))
+        {
+            health = getMaxHealth();
+        }
+        hurtTime = nbttagcompound.getShort("HurtTime");
+        deathTime = nbttagcompound.getShort("DeathTime");
+        attackTime = nbttagcompound.getShort("AttackTime");
+        if(nbttagcompound.hasKey("ActiveEffects"))
+        {
+            NBTTagList nbttaglist = nbttagcompound.getTagList("ActiveEffects");
+            for(int i = 0; i < nbttaglist.tagCount(); i++)
+            {
+                NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.tagAt(i);
+                byte byte0 = nbttagcompound1.getByte("Id");
+                byte byte1 = nbttagcompound1.getByte("Amplifier");
+                int j = nbttagcompound1.getInteger("Duration");
+                activePotionsMap.put(Integer.valueOf(byte0), new PotionEffect(byte0, j, byte1));
+            }
+
+        }
+    }
+
+    public boolean isEntityAlive()
+    {
+        return !isDead && health > 0;
+    }
+
+    public boolean canBreatheUnderwater()
+    {
+        return false;
+    }
+
+    public void onLivingUpdate()
+    {
+        if(field_39003_d > 0)
+        {
+            field_39003_d--;
+        }
+        if(newPosRotationIncrements > 0)
+        {
+            double d = posX + (newPosX - posX) / (double)newPosRotationIncrements;
+            double d1 = posY + (newPosY - posY) / (double)newPosRotationIncrements;
+            double d2 = posZ + (newPosZ - posZ) / (double)newPosRotationIncrements;
+            double d3;
+            for(d3 = newRotationYaw - (double)rotationYaw; d3 < -180D; d3 += 360D) { }
+            for(; d3 >= 180D; d3 -= 360D) { }
+            rotationYaw += d3 / (double)newPosRotationIncrements;
+            rotationPitch += (newRotationPitch - (double)rotationPitch) / (double)newPosRotationIncrements;
+            newPosRotationIncrements--;
+            setPosition(d, d1, d2);
+            setRotation(rotationYaw, rotationPitch);
+            List list1 = worldObj.getCollidingBoundingBoxes(this, boundingBox.contract(0.03125D, 0.0D, 0.03125D));
+            if(list1.size() > 0)
+            {
+                double d4 = 0.0D;
+                for(int j = 0; j < list1.size(); j++)
+                {
+                    AxisAlignedBB axisalignedbb = (AxisAlignedBB)list1.get(j);
+                    if(axisalignedbb.maxY > d4)
+                    {
+                        d4 = axisalignedbb.maxY;
+                    }
+                }
+
+                d1 += d4 - boundingBox.minY;
+                setPosition(d, d1, d2);
+            }
+        }
+        Profiler.startSection("ai");
+        if(isMovementBlocked())
+        {
+            isJumping = false;
+            moveStrafing = 0.0F;
+            moveForward = 0.0F;
+            randomYawVelocity = 0.0F;
+        } else
+        if(!isMultiplayerEntity)
+        {
+            updateEntityActionState();
+        }
+        Profiler.endSection();
+        boolean flag = isInWater();
+        boolean flag1 = handleLavaMovement();
+        if(isJumping)
+        {
+            if(flag)
+            {
+                motionY += 0.039999999105930328D;
+            } else
+            if(flag1)
+            {
+                motionY += 0.039999999105930328D;
+            } else
+            if(onGround && field_39003_d == 0)
+            {
+                jump();
+                field_39003_d = 10;
+            }
+        } else
+        {
+            field_39003_d = 0;
+        }
+        moveStrafing *= 0.98F;
+        moveForward *= 0.98F;
+        randomYawVelocity *= 0.9F;
+        float f = landMovementFactor;
+        landMovementFactor *= func_35166_t_();
+        moveEntityWithHeading(moveStrafing, moveForward);
+        landMovementFactor = f;
+        Profiler.startSection("push");
+        List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+        if(list != null && list.size() > 0)
+        {
+            for(int i = 0; i < list.size(); i++)
+            {
+                Entity entity = (Entity)list.get(i);
+                if(entity.canBePushed())
+                {
+                    entity.applyEntityCollision(this);
+                }
+            }
+
+        }
+        Profiler.endSection();
+    }
+
+    protected boolean isMovementBlocked()
+    {
+        return health <= 0;
+    }
+
+    public boolean func_35162_ad()
+    {
+        return false;
+    }
+
+    protected void jump()
+    {
+        motionY = 0.41999998688697815D;
+        if(isPotionActive(Potion.potionJump))
+        {
+            motionY += (float)(getActivePotionEffect(Potion.potionJump).getAmplifier() + 1) * 0.1F;
+        }
+        if(isSprinting())
+        {
+            float f = rotationYaw * 0.01745329F;
+            motionX -= MathHelper.sin(f) * 0.2F;
+            motionZ += MathHelper.cos(f) * 0.2F;
+        }
+        isAirBorne = true;
+    }
+
+    protected boolean canDespawn()
+    {
+        return true;
+    }
+
+    protected void despawnEntity()
+    {
+        EntityPlayer entityplayer = worldObj.getClosestPlayerToEntity(this, -1D);
+        if(entityplayer != null)
+        {
+            double d = ((Entity) (entityplayer)).posX - posX;
+            double d1 = ((Entity) (entityplayer)).posY - posY;
+            double d2 = ((Entity) (entityplayer)).posZ - posZ;
+            double d3 = d * d + d1 * d1 + d2 * d2;
+            if(canDespawn() && d3 > 16384D)
+            {
+                setEntityDead();
+            }
+            if(entityAge > 600 && rand.nextInt(800) == 0 && d3 > 1024D && canDespawn())
+            {
+                setEntityDead();
+            } else
+            if(d3 < 1024D)
+            {
+                entityAge = 0;
+            }
+        }
+    }
+
+    protected void updateEntityActionState()
+    {
+        entityAge++;
+        EntityPlayer entityplayer = worldObj.getClosestPlayerToEntity(this, -1D);
+        despawnEntity();
+        moveStrafing = 0.0F;
+        moveForward = 0.0F;
+        float f = 8F;
+        if(rand.nextFloat() < 0.02F)
+        {
+            EntityPlayer entityplayer1 = worldObj.getClosestPlayerToEntity(this, f);
+            if(entityplayer1 != null)
+            {
+                currentTarget = entityplayer1;
+                numTicksToChaseTarget = 10 + rand.nextInt(20);
+            } else
+            {
+                randomYawVelocity = (rand.nextFloat() - 0.5F) * 20F;
+            }
+        }
+        if(currentTarget != null)
+        {
+            faceEntity(currentTarget, 10F, getVerticalFaceSpeed());
+            if(numTicksToChaseTarget-- <= 0 || currentTarget.isDead || currentTarget.getDistanceSqToEntity(this) > (double)(f * f))
+            {
+                currentTarget = null;
+            }
+        } else
+        {
+            if(rand.nextFloat() < 0.05F)
+            {
+                randomYawVelocity = (rand.nextFloat() - 0.5F) * 20F;
+            }
+            rotationYaw += randomYawVelocity;
+            rotationPitch = defaultPitch;
+        }
+        boolean flag = isInWater();
+        boolean flag1 = handleLavaMovement();
+        if(flag || flag1)
+        {
+            isJumping = rand.nextFloat() < 0.8F;
+        }
+    }
+
+    protected int getVerticalFaceSpeed()
+    {
+        return 40;
+    }
+
+    public void faceEntity(Entity entity, float f, float f1)
+    {
+        double d = entity.posX - posX;
+        double d2 = entity.posZ - posZ;
+        double d1;
+        if(entity instanceof EntityLiving)
+        {
+            EntityLiving entityliving = (EntityLiving)entity;
+            d1 = (posY + (double)getEyeHeight()) - (entityliving.posY + (double)entityliving.getEyeHeight());
+        } else
+        {
+            d1 = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2D - (posY + (double)getEyeHeight());
+        }
+        double d3 = MathHelper.sqrt_double(d * d + d2 * d2);
+        float f2 = (float)((Math.atan2(d2, d) * 180D) / 3.1415927410125732D) - 90F;
+        float f3 = (float)(-((Math.atan2(d1, d3) * 180D) / 3.1415927410125732D));
+        rotationPitch = -updateRotation(rotationPitch, f3, f1);
+        rotationYaw = updateRotation(rotationYaw, f2, f);
+    }
+
+    public boolean hasCurrentTarget()
+    {
+        return currentTarget != null;
+    }
+
+    public Entity getCurrentTarget()
+    {
+        return currentTarget;
+    }
+
+    private float updateRotation(float f, float f1, float f2)
+    {
+        float f3;
+        for(f3 = f1 - f; f3 < -180F; f3 += 360F) { }
+        for(; f3 >= 180F; f3 -= 360F) { }
+        if(f3 > f2)
+        {
+            f3 = f2;
+        }
+        if(f3 < -f2)
+        {
+            f3 = -f2;
+        }
+        return f + f3;
+    }
+
+    public void onEntityDeath()
+    {
+    }
+
+    public boolean getCanSpawnHere()
+    {
+        return worldObj.checkIfAABBIsClear(boundingBox) && worldObj.getCollidingBoundingBoxes(this, boundingBox).size() == 0 && !worldObj.getIsAnyLiquid(boundingBox);
+    }
+
+    protected void kill()
+    {
+        attackEntityFrom(DamageSource.outOfWorld, 4);
+    }
+
+    public float getSwingProgress(float f)
+    {
+        float f1 = swingProgress - prevSwingProgress;
+        if(f1 < 0.0F)
+        {
+            f1++;
+        }
+        return prevSwingProgress + f1 * f;
+    }
+
+    public Vec3D getPosition(float f)
+    {
+        if(f == 1.0F)
+        {
+            return Vec3D.createVector(posX, posY, posZ);
+        } else
+        {
+            double d = prevPosX + (posX - prevPosX) * (double)f;
+            double d1 = prevPosY + (posY - prevPosY) * (double)f;
+            double d2 = prevPosZ + (posZ - prevPosZ) * (double)f;
+            return Vec3D.createVector(d, d1, d2);
+        }
+    }
+
+    public Vec3D getLookVec()
+    {
+        return getLook(1.0F);
+    }
+
+    public Vec3D getLook(float f)
+    {
+        if(f == 1.0F)
+        {
+            float f1 = MathHelper.cos(-rotationYaw * 0.01745329F - 3.141593F);
+            float f3 = MathHelper.sin(-rotationYaw * 0.01745329F - 3.141593F);
+            float f5 = -MathHelper.cos(-rotationPitch * 0.01745329F);
+            float f7 = MathHelper.sin(-rotationPitch * 0.01745329F);
+            return Vec3D.createVector(f3 * f5, f7, f1 * f5);
+        } else
+        {
+            float f2 = prevRotationPitch + (rotationPitch - prevRotationPitch) * f;
+            float f4 = prevRotationYaw + (rotationYaw - prevRotationYaw) * f;
+            float f6 = MathHelper.cos(-f4 * 0.01745329F - 3.141593F);
+            float f8 = MathHelper.sin(-f4 * 0.01745329F - 3.141593F);
+            float f9 = -MathHelper.cos(-f2 * 0.01745329F);
+            float f10 = MathHelper.sin(-f2 * 0.01745329F);
+            return Vec3D.createVector(f8 * f9, f10, f6 * f9);
+        }
+    }
+
+    public float func_35159_aC()
+    {
+        return 1.0F;
+    }
+
+    public MovingObjectPosition rayTrace(double d, float f)
+    {
+        Vec3D vec3d = getPosition(f);
+        Vec3D vec3d1 = getLook(f);
+        Vec3D vec3d2 = vec3d.addVector(vec3d1.xCoord * d, vec3d1.yCoord * d, vec3d1.zCoord * d);
+        return worldObj.rayTraceBlocks(vec3d, vec3d2);
+    }
+
+    public int getMaxSpawnedInChunk()
+    {
+        return 4;
+    }
+
+    public ItemStack getHeldItem()
+    {
+        return null;
+    }
+
+    public void handleHealthUpdate(byte byte0)
+    {
+        if(byte0 == 2)
+        {
+            field_704_R = 1.5F;
+            heartsLife = heartsHalvesLife;
+            hurtTime = maxHurtTime = 10;
+            attackedAtYaw = 0.0F;
+            worldObj.playSoundAtEntity(this, getHurtSound(), getSoundVolume(), (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F);
+            attackEntityFrom(DamageSource.generic, 0);
+        } else
+        if(byte0 == 3)
+        {
+            worldObj.playSoundAtEntity(this, getDeathSound(), getSoundVolume(), (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F);
+            health = 0;
+            onDeath(DamageSource.generic);
+        } else
+        {
+            super.handleHealthUpdate(byte0);
+        }
+    }
+
+    public boolean isPlayerSleeping()
+    {
+        return false;
+    }
+
+    public int getItemIcon(ItemStack itemstack, int i)
+    {
+        return itemstack.getIconIndex();
+    }
+
+    protected void updatePotionEffects()
+    {
+        Iterator iterator = activePotionsMap.keySet().iterator();
+        do
+        {
+            if(!iterator.hasNext())
+            {
+                break;
+            }
+            Integer integer = (Integer)iterator.next();
+            PotionEffect potioneffect = (PotionEffect)activePotionsMap.get(integer);
+            if(!potioneffect.onUpdate(this) && !worldObj.multiplayerWorld)
+            {
+                iterator.remove();
+                onFinishedPotionEffect(potioneffect);
+            }
+        } while(true);
+        if(field_39001_b)
+        {
+            if(!worldObj.multiplayerWorld)
+            {
+                if(!activePotionsMap.isEmpty())
+                {
+                    int i = PotionHelper.func_40354_a(activePotionsMap.values());
+                    dataWatcher.updateObject(8, Integer.valueOf(i));
+                } else
+                {
+                    dataWatcher.updateObject(8, Integer.valueOf(0));
+                }
+            }
+            field_39001_b = false;
+        }
+        if(rand.nextBoolean())
+        {
+            int j = dataWatcher.getWatchableObjectInt(8);
+            if(j > 0)
+            {
+                double d = (double)(j >> 16 & 0xff) / 255D;
+                double d1 = (double)(j >> 8 & 0xff) / 255D;
+                double d2 = (double)(j >> 0 & 0xff) / 255D;
+                worldObj.spawnParticle("mobSpell", posX + (rand.nextDouble() - 0.5D) * (double)width, (posY + rand.nextDouble() * (double)height) - (double)yOffset, posZ + (rand.nextDouble() - 0.5D) * (double)width, d, d1, d2);
+            }
+        }
+    }
+
+    public void func_40112_aN()
+    {
+        Iterator iterator = activePotionsMap.keySet().iterator();
+        do
+        {
+            if(!iterator.hasNext())
+            {
+                break;
+            }
+            Integer integer = (Integer)iterator.next();
+            PotionEffect potioneffect = (PotionEffect)activePotionsMap.get(integer);
+            if(!worldObj.multiplayerWorld)
+            {
+                iterator.remove();
+                onFinishedPotionEffect(potioneffect);
+            }
+        } while(true);
+    }
+
+    public Collection func_40118_aO()
+    {
+        return activePotionsMap.values();
+    }
+
+    public boolean isPotionActive(Potion potion)
+    {
+        return activePotionsMap.containsKey(Integer.valueOf(potion.id));
+    }
+
+    public PotionEffect getActivePotionEffect(Potion potion)
+    {
+        return (PotionEffect)activePotionsMap.get(Integer.valueOf(potion.id));
+    }
+
+    public void addPotionEffect(PotionEffect potioneffect)
+    {
+        if(!func_40126_a(potioneffect))
+        {
+            return;
+        }
+        if(activePotionsMap.containsKey(Integer.valueOf(potioneffect.getPotionID())))
+        {
+            ((PotionEffect)activePotionsMap.get(Integer.valueOf(potioneffect.getPotionID()))).combine(potioneffect);
+            onChangedPotionEffect((PotionEffect)activePotionsMap.get(Integer.valueOf(potioneffect.getPotionID())));
+        } else
+        {
+            activePotionsMap.put(Integer.valueOf(potioneffect.getPotionID()), potioneffect);
+            onNewPotionEffect(potioneffect);
+        }
+    }
+
+    public boolean func_40126_a(PotionEffect potioneffect)
+    {
+        if(func_40124_t() == EnumCreatureAttribute.UNDEAD)
+        {
+            int i = potioneffect.getPotionID();
+            if(i == Potion.potionRegeneration.id || i == Potion.potionPoison.id)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean func_40122_aP()
+    {
+        return func_40124_t() == EnumCreatureAttribute.UNDEAD;
+    }
+
+    public void removePotionEffect(int i)
+    {
+        activePotionsMap.remove(Integer.valueOf(i));
+    }
+
+    protected void onNewPotionEffect(PotionEffect potioneffect)
+    {
+        field_39001_b = true;
+    }
+
+    protected void onChangedPotionEffect(PotionEffect potioneffect)
+    {
+        field_39001_b = true;
+    }
+
+    protected void onFinishedPotionEffect(PotionEffect potioneffect)
+    {
+        field_39001_b = true;
+    }
+
+    protected float func_35166_t_()
+    {
+        float f = 1.0F;
+        if(isPotionActive(Potion.potionSpeed))
+        {
+            f *= 1.0F + 0.2F * (float)(getActivePotionEffect(Potion.potionSpeed).getAmplifier() + 1);
+        }
+        if(isPotionActive(Potion.potionSlowdown))
+        {
+            f *= 1.0F - 0.15F * (float)(getActivePotionEffect(Potion.potionSlowdown).getAmplifier() + 1);
+        }
+        return f;
+    }
+
+    public void func_40113_j(double d, double d1, double d2)
+    {
+        setLocationAndAngles(d, d1, d2, rotationYaw, rotationPitch);
+    }
+
+    public boolean func_40127_l()
+    {
+        return false;
+    }
+
+    public EnumCreatureAttribute func_40124_t()
+    {
+        return EnumCreatureAttribute.UNDEFINED;
+    }
+
+    public void func_41005_b(ItemStack itemstack)
+    {
+        worldObj.playSoundAtEntity(this, "random.break", 0.8F, 0.8F + worldObj.rand.nextFloat() * 0.4F);
+        for(int i = 0; i < 5; i++)
+        {
+            Vec3D vec3d = Vec3D.createVector(((double)rand.nextFloat() - 0.5D) * 0.10000000000000001D, Math.random() * 0.10000000000000001D + 0.10000000000000001D, 0.0D);
+            vec3d.rotateAroundX((-rotationPitch * 3.141593F) / 180F);
+            vec3d.rotateAroundY((-rotationYaw * 3.141593F) / 180F);
+            Vec3D vec3d1 = Vec3D.createVector(((double)rand.nextFloat() - 0.5D) * 0.29999999999999999D, (double)(-rand.nextFloat()) * 0.59999999999999998D - 0.29999999999999999D, 0.59999999999999998D);
+            vec3d1.rotateAroundX((-rotationPitch * 3.141593F) / 180F);
+            vec3d1.rotateAroundY((-rotationYaw * 3.141593F) / 180F);
+            vec3d1 = vec3d1.addVector(posX, posY + (double)getEyeHeight(), posZ);
+            worldObj.spawnParticle((new StringBuilder()).append("iconcrack_").append(itemstack.getItem().shiftedIndex).toString(), vec3d1.xCoord, vec3d1.yCoord, vec3d1.zCoord, vec3d.xCoord, vec3d.yCoord + 0.050000000000000003D, vec3d.zCoord);
+        }
+
+    }
 }

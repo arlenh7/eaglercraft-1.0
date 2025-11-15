@@ -1,44 +1,62 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemFlintAndSteel extends Item {
-	public ItemFlintAndSteel(int var1) {
-		super(var1);
-		this.maxStackSize = 1;
-		this.maxDamage = 64;
-	}
+import java.util.Random;
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 == 0) {
-			--var5;
-		}
+// Referenced classes of package net.minecraft.src:
+//            Item, EntityPlayer, World, Block, 
+//            BlockFire, ItemStack
 
-		if(var7 == 1) {
-			++var5;
-		}
+public class ItemFlintAndSteel extends Item
+{
 
-		if(var7 == 2) {
-			--var6;
-		}
+    public ItemFlintAndSteel(int i)
+    {
+        super(i);
+        maxStackSize = 1;
+        setMaxDamage(64);
+    }
 
-		if(var7 == 3) {
-			++var6;
-		}
-
-		if(var7 == 4) {
-			--var4;
-		}
-
-		if(var7 == 5) {
-			++var4;
-		}
-
-		int var8 = var3.getBlockId(var4, var5, var6);
-		if(var8 == 0) {
-			var3.playSoundEffect((double)var4 + 0.5D, (double)var5 + 0.5D, (double)var6 + 0.5D, "fire.ignite", 1.0F, itemRand.nextFloat() * 0.4F + 0.8F);
-			var3.setBlockWithNotify(var4, var5, var6, Block.fire.blockID);
-		}
-
-		var1.damageItem(1);
-		return true;
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(l == 0)
+        {
+            j--;
+        }
+        if(l == 1)
+        {
+            j++;
+        }
+        if(l == 2)
+        {
+            k--;
+        }
+        if(l == 3)
+        {
+            k++;
+        }
+        if(l == 4)
+        {
+            i--;
+        }
+        if(l == 5)
+        {
+            i++;
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 == 0)
+        {
+            world.playSoundEffect((double)i + 0.5D, (double)j + 0.5D, (double)k + 0.5D, "fire.ignite", 1.0F, itemRand.nextFloat() * 0.4F + 0.8F);
+            world.setBlockWithNotify(i, j, k, Block.fire.blockID);
+        }
+        itemstack.damageItem(1, entityplayer);
+        return true;
+    }
 }

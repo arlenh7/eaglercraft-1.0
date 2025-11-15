@@ -1,32 +1,89 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockSapling extends BlockFlower {
-	protected BlockSapling(int var1, int var2) {
-		super(var1, var2);
-		float var3 = 0.4F;
-		this.setBlockBounds(0.5F - var3, 0.0F, 0.5F - var3, 0.5F + var3, var3 * 2.0F, 0.5F + var3);
-	}
+// Referenced classes of package net.minecraft.src:
+//            BlockFlower, World, WorldGenTaiga2, WorldGenForest, 
+//            WorldGenTrees, WorldGenBigTree, WorldGenerator
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		super.updateTick(var1, var2, var3, var4, var5);
-		if(var1.getBlockLightValue(var2, var3 + 1, var4) >= 9 && var5.nextInt(5) == 0) {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			if(var6 < 15) {
-				var1.setBlockMetadataWithNotify(var2, var3, var4, var6 + 1);
-			} else {
-				var1.setBlock(var2, var3, var4, 0);
-				Object var7 = new WorldGenTrees();
-				if(var5.nextInt(10) == 0) {
-					var7 = new WorldGenBigTree();
-				}
+public class BlockSapling extends BlockFlower
+{
 
-				if(!((WorldGenerator)var7).generate(var1, var5, var2, var3, var4)) {
-					var1.setBlock(var2, var3, var4, this.blockID);
-				}
-			}
-		}
+    protected BlockSapling(int i, int j)
+    {
+        super(i, j);
+        float f = 0.4F;
+        setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
+    }
 
-	}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        super.updateTick(world, i, j, k, random);
+        if(world.getBlockLightValue(i, j + 1, k) >= 9 && random.nextInt(7) == 0)
+        {
+            int l = world.getBlockMetadata(i, j, k);
+            if((l & 8) == 0)
+            {
+                world.setBlockMetadataWithNotify(i, j, k, l | 8);
+            } else
+            {
+                growTree(world, i, j, k, random);
+            }
+        }
+    }
+
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        j &= 3;
+        if(j == 1)
+        {
+            return 63;
+        }
+        if(j == 2)
+        {
+            return 79;
+        } else
+        {
+            return super.getBlockTextureFromSideAndMetadata(i, j);
+        }
+    }
+
+    public void growTree(World world, int i, int j, int k, Random random)
+    {
+        int l = world.getBlockMetadata(i, j, k) & 3;
+        world.setBlock(i, j, k, 0);
+        Object obj = null;
+        if(l == 1)
+        {
+            obj = new WorldGenTaiga2(true);
+        } else
+        if(l == 2)
+        {
+            obj = new WorldGenForest(true);
+        } else
+        {
+            obj = new WorldGenTrees(true);
+            if(random.nextInt(10) == 0)
+            {
+                obj = new WorldGenBigTree(true);
+            }
+        }
+        if(!((WorldGenerator) (obj)).generate(world, random, i, j, k))
+        {
+            world.setBlockAndMetadata(i, j, k, blockID, l);
+        }
+    }
+
+    protected int damageDropped(int i)
+    {
+        return i & 3;
+    }
 }

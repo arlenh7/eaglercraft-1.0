@@ -1,9 +1,16 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public interface IProgressUpdate {
-	void func_594_b(String var1);
 
-	void displayLoadingString(String var1);
+public interface IProgressUpdate
+{
 
-	void setLoadingProgress(int var1);
+    public abstract void displaySavingString(String s);
+
+    public abstract void displayLoadingString(String s);
+
+    public abstract void setLoadingProgress(int i);
 }

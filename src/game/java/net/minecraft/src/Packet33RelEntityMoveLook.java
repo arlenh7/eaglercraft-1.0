@@ -1,33 +1,46 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet33RelEntityMoveLook extends Packet30Entity {
-	public Packet33RelEntityMoveLook() {
-		this.rotating = true;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Packet30Entity
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		super.readPacketData(var1);
-		this.xPosition = var1.readByte();
-		this.yPosition = var1.readByte();
-		this.zPosition = var1.readByte();
-		this.yaw = var1.readByte();
-		this.pitch = var1.readByte();
-	}
+public class Packet33RelEntityMoveLook extends Packet30Entity
+{
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		super.writePacketData(var1);
-		var1.writeByte(this.xPosition);
-		var1.writeByte(this.yPosition);
-		var1.writeByte(this.zPosition);
-		var1.writeByte(this.yaw);
-		var1.writeByte(this.pitch);
-	}
+    public Packet33RelEntityMoveLook()
+    {
+        rotating = true;
+    }
 
-	public int getPacketSize() {
-		return 9;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        super.readPacketData(datainputstream);
+        xPosition = datainputstream.readByte();
+        yPosition = datainputstream.readByte();
+        zPosition = datainputstream.readByte();
+        yaw = datainputstream.readByte();
+        pitch = datainputstream.readByte();
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        super.writePacketData(dataoutputstream);
+        dataoutputstream.writeByte(xPosition);
+        dataoutputstream.writeByte(yPosition);
+        dataoutputstream.writeByte(zPosition);
+        dataoutputstream.writeByte(yaw);
+        dataoutputstream.writeByte(pitch);
+    }
+
+    public int getPacketSize()
+    {
+        return 9;
+    }
 }

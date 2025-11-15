@@ -1,15 +1,33 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class MaterialLogic extends Material {
-	public boolean func_878_a() {
-		return false;
-	}
 
-	public boolean getCanBlockGrass() {
-		return false;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Material, MapColor
 
-	public boolean getIsSolid() {
-		return false;
-	}
+public class MaterialLogic extends Material
+{
+
+    public MaterialLogic(MapColor mapcolor)
+    {
+        super(mapcolor);
+    }
+
+    public boolean isSolid()
+    {
+        return false;
+    }
+
+    public boolean getCanBlockGrass()
+    {
+        return false;
+    }
+
+    public boolean getIsSolid()
+    {
+        return false;
+    }
 }

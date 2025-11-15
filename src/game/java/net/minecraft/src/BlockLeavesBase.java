@@ -1,19 +1,38 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockLeavesBase extends Block {
-	protected boolean graphicsLevel;
 
-	protected BlockLeavesBase(int var1, int var2, Material var3, boolean var4) {
-		super(var1, var2, var3);
-		this.graphicsLevel = var4;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, IBlockAccess, Material
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+public class BlockLeavesBase extends Block
+{
 
-	public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockId(var2, var3, var4);
-		return !this.graphicsLevel && var6 == this.blockID ? false : super.shouldSideBeRendered(var1, var2, var3, var4, var5);
-	}
+    protected boolean graphicsLevel;
+
+    protected BlockLeavesBase(int i, int j, Material material, boolean flag)
+    {
+        super(i, j, material);
+        graphicsLevel = flag;
+    }
+
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        int i1 = iblockaccess.getBlockId(i, j, k);
+        if(!graphicsLevel && i1 == blockID)
+        {
+            return false;
+        } else
+        {
+            return super.shouldSideBeRendered(iblockaccess, i, j, k, l);
+        }
+    }
 }

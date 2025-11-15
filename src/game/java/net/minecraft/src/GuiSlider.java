@@ -1,66 +1,87 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-public class GuiSlider extends GuiButton {
-	public float sliderValue = 1.0F;
-	public boolean dragging = false;
-	private EnumOptions idFloat = null;
+// Referenced classes of package net.minecraft.src:
+//            GuiButton, GameSettings, EnumOptions
 
-	public GuiSlider(int var1, int var2, int var3, EnumOptions var4, String var5, float var6) {
-		super(var1, var2, var3, 150, 20, var5);
-		this.idFloat = var4;
-		this.sliderValue = var6;
-	}
+public class GuiSlider extends GuiButton
+{
 
-	protected int getHoverState(boolean var1) {
-		return 0;
-	}
+    public float sliderValue;
+    public boolean dragging;
+    private EnumOptions idFloat;
 
-	protected void mouseDragged(Minecraft var1, int var2, int var3) {
-		if(this.enabled2) {
-			if(this.dragging) {
-				this.sliderValue = (float)(var2 - (this.xPosition + 4)) / (float)(this.width - 8);
-				if(this.sliderValue < 0.0F) {
-					this.sliderValue = 0.0F;
-				}
+    public GuiSlider(int i, int j, int k, EnumOptions enumoptions, String s, float f)
+    {
+        super(i, j, k, 150, 20, s);
+        sliderValue = 1.0F;
+        dragging = false;
+        idFloat = null;
+        idFloat = enumoptions;
+        sliderValue = f;
+    }
 
-				if(this.sliderValue > 1.0F) {
-					this.sliderValue = 1.0F;
-				}
+    protected int getHoverState(boolean flag)
+    {
+        return 0;
+    }
 
-				var1.gameSettings.setOptionFloatValue(this.idFloat, this.sliderValue);
-				this.displayString = var1.gameSettings.getKeyBinding(this.idFloat);
-			}
+    protected void mouseDragged(Minecraft minecraft, int i, int j)
+    {
+        if(!drawButton)
+        {
+            return;
+        }
+        if(dragging)
+        {
+            sliderValue = (float)(i - (xPosition + 4)) / (float)(width - 8);
+            if(sliderValue < 0.0F)
+            {
+                sliderValue = 0.0F;
+            }
+            if(sliderValue > 1.0F)
+            {
+                sliderValue = 1.0F;
+            }
+            minecraft.gameSettings.setOptionFloatValue(idFloat, sliderValue);
+            displayString = minecraft.gameSettings.getKeyBinding(idFloat);
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        drawTexturedModalRect(xPosition + (int)(sliderValue * (float)(width - 8)), yPosition, 0, 66, 4, 20);
+        drawTexturedModalRect(xPosition + (int)(sliderValue * (float)(width - 8)) + 4, yPosition, 196, 66, 4, 20);
+    }
 
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)), this.yPosition, 0, 66, 4, 20);
-			this.drawTexturedModalRect(this.xPosition + (int)(this.sliderValue * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
-		}
-	}
+    public boolean mousePressed(Minecraft minecraft, int i, int j)
+    {
+        if(super.mousePressed(minecraft, i, j))
+        {
+            sliderValue = (float)(i - (xPosition + 4)) / (float)(width - 8);
+            if(sliderValue < 0.0F)
+            {
+                sliderValue = 0.0F;
+            }
+            if(sliderValue > 1.0F)
+            {
+                sliderValue = 1.0F;
+            }
+            minecraft.gameSettings.setOptionFloatValue(idFloat, sliderValue);
+            displayString = minecraft.gameSettings.getKeyBinding(idFloat);
+            dragging = true;
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-	public boolean mousePressed(Minecraft var1, int var2, int var3) {
-		if(super.mousePressed(var1, var2, var3)) {
-			this.sliderValue = (float)(var2 - (this.xPosition + 4)) / (float)(this.width - 8);
-			if(this.sliderValue < 0.0F) {
-				this.sliderValue = 0.0F;
-			}
-
-			if(this.sliderValue > 1.0F) {
-				this.sliderValue = 1.0F;
-			}
-
-			var1.gameSettings.setOptionFloatValue(this.idFloat, this.sliderValue);
-			this.displayString = var1.gameSettings.getKeyBinding(this.idFloat);
-			this.dragging = true;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public void mouseReleased(int var1, int var2) {
-		this.dragging = false;
-	}
+    public void mouseReleased(int i, int j)
+    {
+        dragging = false;
+    }
 }

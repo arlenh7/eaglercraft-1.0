@@ -1,28 +1,47 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import org.lwjgl.opengl.GL11;
 
-public class TextureFX {
-	public byte[] field_1127_a = new byte[1024];
-	public int field_1126_b;
-	public boolean field_1131_c = false;
-	public int field_1130_d = 0;
-	public int field_1129_e = 1;
-	public int field_1128_f = 0;
+// Referenced classes of package net.minecraft.src:
+//            RenderEngine
 
-	public TextureFX(int var1) {
-		this.field_1126_b = var1;
-	}
+public class TextureFX
+{
 
-	public void func_783_a() {
-	}
+    public byte imageData[];
+    public int iconIndex;
+    public boolean anaglyphEnabled;
+    public int textureId;
+    public int tileSize;
+    public int tileImage;
 
-	public void func_782_a(RenderEngine var1) {
-		if(this.field_1128_f == 0) {
-			TextureLocation.terrain.bindTexture();
-		} else if(this.field_1128_f == 1) {
-			TextureLocation.items.bindTexture();
-		}
+    public TextureFX(int i)
+    {
+        imageData = new byte[1024 /*GL_FRONT_LEFT*/];
+        anaglyphEnabled = false;
+        textureId = 0;
+        tileSize = 1;
+        tileImage = 0;
+        iconIndex = i;
+    }
 
-	}
+    public void onTick()
+    {
+    }
+
+    public void bindImage(RenderEngine renderengine)
+    {
+        if(tileImage == 0)
+        {
+            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, renderengine.getTexture("/terrain.png"));
+        } else
+        if(tileImage == 1)
+        {
+            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, renderengine.getTexture("/gui/items.png"));
+        }
+    }
 }

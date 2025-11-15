@@ -1,53 +1,69 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class NoiseGeneratorOctaves extends NoiseGenerator {
-	private NoiseGeneratorPerlin[] generatorCollection;
-	private int field_1191_b;
+// Referenced classes of package net.minecraft.src:
+//            NoiseGenerator, NoiseGeneratorPerlin, MathHelper
 
-	public NoiseGeneratorOctaves(Random var1, int var2) {
-		this.field_1191_b = var2;
-		this.generatorCollection = new NoiseGeneratorPerlin[var2];
+public class NoiseGeneratorOctaves extends NoiseGenerator
+{
 
-		for(int var3 = 0; var3 < var2; ++var3) {
-			this.generatorCollection[var3] = new NoiseGeneratorPerlin(var1);
-		}
+    private NoiseGeneratorPerlin generatorCollection[];
+    private int octaves;
 
-	}
+    public NoiseGeneratorOctaves(Random random, int i)
+    {
+        octaves = i;
+        generatorCollection = new NoiseGeneratorPerlin[i];
+        for(int j = 0; j < i; j++)
+        {
+            generatorCollection[j] = new NoiseGeneratorPerlin(random);
+        }
 
-	public double func_806_a(double var1, double var3) {
-		double var5 = 0.0D;
-		double var7 = 1.0D;
+    }
 
-		for(int var9 = 0; var9 < this.field_1191_b; ++var9) {
-			var5 += this.generatorCollection[var9].func_801_a(var1 * var7, var3 * var7) / var7;
-			var7 /= 2.0D;
-		}
+    public double[] generateNoiseOctaves(double ad[], int i, int j, int k, int l, int i1, int j1, 
+            double d, double d1, double d2)
+    {
+        if(ad == null)
+        {
+            ad = new double[l * i1 * j1];
+        } else
+        {
+            for(int k1 = 0; k1 < ad.length; k1++)
+            {
+                ad[k1] = 0.0D;
+            }
 
-		return var5;
-	}
+        }
+        double d3 = 1.0D;
+        for(int l1 = 0; l1 < octaves; l1++)
+        {
+            double d4 = (double)i * d3 * d;
+            double d5 = (double)j * d3 * d1;
+            double d6 = (double)k * d3 * d2;
+            long l2 = MathHelper.floor_double_long(d4);
+            long l3 = MathHelper.floor_double_long(d6);
+            d4 -= l2;
+            d6 -= l3;
+            l2 %= 0x1000000L;
+            l3 %= 0x1000000L;
+            d4 += l2;
+            d6 += l3;
+            generatorCollection[l1].func_805_a(ad, d4, d5, d6, l, i1, j1, d * d3, d1 * d3, d2 * d3, d3);
+            d3 /= 2D;
+        }
 
-	public double[] func_807_a(double[] var1, double var2, double var4, double var6, int var8, int var9, int var10, double var11, double var13, double var15) {
-		if(var1 == null) {
-			var1 = new double[var8 * var9 * var10];
-		} else {
-			for(int var17 = 0; var17 < var1.length; ++var17) {
-				var1[var17] = 0.0D;
-			}
-		}
+        return ad;
+    }
 
-		double var20 = 1.0D;
-
-		for(int var19 = 0; var19 < this.field_1191_b; ++var19) {
-			this.generatorCollection[var19].func_805_a(var1, var2, var4, var6, var8, var9, var10, var11 * var20, var13 * var20, var15 * var20, var20);
-			var20 /= 2.0D;
-		}
-
-		return var1;
-	}
-
-	public double[] func_4109_a(double[] var1, int var2, int var3, int var4, int var5, double var6, double var8, double var10) {
-		return this.func_807_a(var1, (double)var2, 10.0D, (double)var3, var4, 1, var5, var6, 1.0D, var8);
-	}
+    public double[] func_4109_a(double ad[], int i, int j, int k, int l, double d, 
+            double d1, double d2)
+    {
+        return generateNoiseOctaves(ad, i, 10, j, k, 1, l, d, 1.0D, d1);
+    }
 }

@@ -1,133 +1,255 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import java.util.Random;
 
-public class EntitySlime extends EntityLiving implements IMobs {
-	public float field_768_a;
-	public float field_767_b;
-	private int field_769_d = 0;
-	public int field_770_c = 1;
-	
-	private static final TextureLocation slime = new TextureLocation("/mob/slime.png");
+// Referenced classes of package net.minecraft.src:
+//            EntityLiving, IMob, DataWatcher, NBTTagCompound, 
+//            World, MathHelper, AxisAlignedBB, DamageSource, 
+//            EntityPlayer, Item, Chunk
 
-	public EntitySlime(World var1) {
-		super(var1);
-		this.texture = slime;
-		this.field_770_c = 1 << this.rand.nextInt(3);
-		this.yOffset = 0.0F;
-		this.field_769_d = this.rand.nextInt(20) + 10;
-		this.func_441_c(this.field_770_c);
-	}
+public class EntitySlime extends EntityLiving
+    implements IMob
+{
 
-	public void func_441_c(int var1) {
-		this.field_770_c = var1;
-		this.setSize(0.6F * (float)var1, 0.6F * (float)var1);
-		this.health = var1 * var1;
-		this.setPosition(this.posX, this.posY, this.posZ);
-	}
+    public float field_40139_a;
+    public float field_768_a;
+    public float field_767_b;
+    private int slimeJumpDelay;
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-		var1.setInteger("Size", this.field_770_c - 1);
-	}
+    public EntitySlime(World world)
+    {
+        super(world);
+        slimeJumpDelay = 0;
+        texture = "/mob/slime.png";
+        int i = 1 << rand.nextInt(3);
+        yOffset = 0.0F;
+        slimeJumpDelay = rand.nextInt(20) + 10;
+        setSlimeSize(i);
+        field_35171_bJ = i;
+    }
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-		this.field_770_c = var1.getInteger("Size") + 1;
-	}
+    protected void entityInit()
+    {
+        super.entityInit();
+        dataWatcher.addObject(16, new Byte((byte)1));
+    }
 
-	public void onUpdate() {
-		this.field_767_b = this.field_768_a;
-		boolean var1 = this.onGround;
-		super.onUpdate();
-		if(this.onGround && !var1) {
-			for(int var2 = 0; var2 < this.field_770_c * 8; ++var2) {
-				float var3 = this.rand.nextFloat() * (float)Math.PI * 2.0F;
-				float var4 = this.rand.nextFloat() * 0.5F + 0.5F;
-				float var5 = MathHelper.sin(var3) * (float)this.field_770_c * 0.5F * var4;
-				float var6 = MathHelper.cos(var3) * (float)this.field_770_c * 0.5F * var4;
-				this.worldObj.spawnParticle("slime", this.posX + (double)var5, this.boundingBox.minY, this.posZ + (double)var6, 0.0D, 0.0D, 0.0D);
-			}
+    public void setSlimeSize(int i)
+    {
+        dataWatcher.updateObject(16, new Byte((byte)i));
+        setSize(0.6F * (float)i, 0.6F * (float)i);
+        setPosition(posX, posY, posZ);
+        setEntityHealth(getMaxHealth());
+    }
 
-			if(this.field_770_c > 2) {
-				this.worldObj.playSoundAtEntity(this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) / 0.8F);
-			}
+    public int getMaxHealth()
+    {
+        int i = getSlimeSize();
+        return i * i;
+    }
 
-			this.field_768_a = -0.5F;
-		}
+    public int getSlimeSize()
+    {
+        return dataWatcher.getWatchableObjectByte(16);
+    }
 
-		this.field_768_a *= 0.6F;
-	}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+        nbttagcompound.setInteger("Size", getSlimeSize() - 1);
+    }
 
-	protected void updatePlayerActionState() {
-		EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, 16.0D);
-		if(var1 != null) {
-			this.faceEntity(var1, 10.0F);
-		}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+        setSlimeSize(nbttagcompound.getInteger("Size") + 1);
+    }
 
-		if(this.onGround && this.field_769_d-- <= 0) {
-			this.field_769_d = this.rand.nextInt(20) + 10;
-			if(var1 != null) {
-				this.field_769_d /= 3;
-			}
+    protected String func_40135_ac()
+    {
+        return "slime";
+    }
 
-			this.isJumping = true;
-			if(this.field_770_c > 1) {
-				this.worldObj.playSoundAtEntity(this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 0.8F);
-			}
+    protected String func_40138_aj()
+    {
+        return "mob.slime";
+    }
 
-			this.field_768_a = 1.0F;
-			this.moveStrafing = 1.0F - this.rand.nextFloat() * 2.0F;
-			this.moveForward = (float)(1 * this.field_770_c);
-		} else {
-			this.isJumping = false;
-			if(this.onGround) {
-				this.moveStrafing = this.moveForward = 0.0F;
-			}
-		}
+    public void onUpdate()
+    {
+        if(!worldObj.multiplayerWorld && worldObj.difficultySetting == 0 && getSlimeSize() > 0)
+        {
+            isDead = true;
+        }
+        field_768_a = field_768_a + (field_40139_a - field_768_a) * 0.5F;
+        field_767_b = field_768_a;
+        boolean flag = onGround;
+        super.onUpdate();
+        if(onGround && !flag)
+        {
+            int i = getSlimeSize();
+            for(int j = 0; j < i * 8; j++)
+            {
+                float f = rand.nextFloat() * 3.141593F * 2.0F;
+                float f1 = rand.nextFloat() * 0.5F + 0.5F;
+                float f2 = MathHelper.sin(f) * (float)i * 0.5F * f1;
+                float f3 = MathHelper.cos(f) * (float)i * 0.5F * f1;
+                worldObj.spawnParticle(func_40135_ac(), posX + (double)f2, boundingBox.minY, posZ + (double)f3, 0.0D, 0.0D, 0.0D);
+            }
 
-	}
+            if(func_40134_ak())
+            {
+                worldObj.playSoundAtEntity(this, func_40138_aj(), getSoundVolume(), ((rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F) / 0.8F);
+            }
+            field_40139_a = -0.5F;
+        }
+        func_40136_ag();
+    }
 
-	public void setEntityDead() {
-		if(this.field_770_c > 1 && this.health == 0) {
-			for(int var1 = 0; var1 < 4; ++var1) {
-				float var2 = ((float)(var1 % 2) - 0.5F) * (float)this.field_770_c / 4.0F;
-				float var3 = ((float)(var1 / 2) - 0.5F) * (float)this.field_770_c / 4.0F;
-				EntitySlime var4 = new EntitySlime(this.worldObj);
-				var4.func_441_c(this.field_770_c / 2);
-				var4.setLocationAndAngles(this.posX + (double)var2, this.posY + 0.5D, this.posZ + (double)var3, this.rand.nextFloat() * 360.0F, 0.0F);
-				this.worldObj.entityJoinedWorld(var4);
-			}
-		}
+    protected void updateEntityActionState()
+    {
+        despawnEntity();
+        EntityPlayer entityplayer = worldObj.getClosestVulnerablePlayerToEntity(this, 16D);
+        if(entityplayer != null)
+        {
+            faceEntity(entityplayer, 10F, 20F);
+        }
+        if(onGround && slimeJumpDelay-- <= 0)
+        {
+            slimeJumpDelay = func_40131_af();
+            if(entityplayer != null)
+            {
+                slimeJumpDelay /= 3;
+            }
+            isJumping = true;
+            if(func_40133_ao())
+            {
+                worldObj.playSoundAtEntity(this, func_40138_aj(), getSoundVolume(), ((rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F) * 0.8F);
+            }
+            field_40139_a = 1.0F;
+            moveStrafing = 1.0F - rand.nextFloat() * 2.0F;
+            moveForward = 1 * getSlimeSize();
+        } else
+        {
+            isJumping = false;
+            if(onGround)
+            {
+                moveStrafing = moveForward = 0.0F;
+            }
+        }
+    }
 
-		super.setEntityDead();
-	}
+    protected void func_40136_ag()
+    {
+        field_40139_a = field_40139_a * 0.6F;
+    }
 
-	public void onCollideWithPlayer(EntityPlayer var1) {
-		if(this.field_770_c > 1 && this.canEntityBeSeen(var1) && (double)this.getDistanceToEntity(var1) < 0.6D * (double)this.field_770_c && var1.attackEntityFrom(this, this.field_770_c)) {
-			this.worldObj.playSoundAtEntity(this, "mob.slimeattack", 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-		}
+    protected int func_40131_af()
+    {
+        return rand.nextInt(20) + 10;
+    }
 
-	}
+    protected EntitySlime func_40132_ae()
+    {
+        return new EntitySlime(worldObj);
+    }
 
-	protected String getHurtSound() {
-		return "mob.slime";
-	}
+    public void setEntityDead()
+    {
+        int i = getSlimeSize();
+        if(!worldObj.multiplayerWorld && i > 1 && getEntityHealth() <= 0)
+        {
+            int j = 2 + rand.nextInt(3);
+            for(int k = 0; k < j; k++)
+            {
+                float f = (((float)(k % 2) - 0.5F) * (float)i) / 4F;
+                float f1 = (((float)(k / 2) - 0.5F) * (float)i) / 4F;
+                EntitySlime entityslime = func_40132_ae();
+                entityslime.setSlimeSize(i / 2);
+                entityslime.setLocationAndAngles(posX + (double)f, posY + 0.5D, posZ + (double)f1, rand.nextFloat() * 360F, 0.0F);
+                worldObj.entityJoinedWorld(entityslime);
+            }
 
-	protected String getDeathSound() {
-		return "mob.slime";
-	}
+        }
+        super.setEntityDead();
+    }
 
-	protected int getDropItemId() {
-		return this.field_770_c == 1 ? Item.slimeBall.shiftedIndex : 0;
-	}
+    public void onCollideWithPlayer(EntityPlayer entityplayer)
+    {
+        if(func_40137_ah())
+        {
+            int i = getSlimeSize();
+            if(canEntityBeSeen(entityplayer) && (double)getDistanceToEntity(entityplayer) < 0.59999999999999998D * (double)i && entityplayer.attackEntityFrom(DamageSource.causeMobDamage(this), func_40130_ai()))
+            {
+                worldObj.playSoundAtEntity(this, "mob.slimeattack", 1.0F, (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F);
+            }
+        }
+    }
 
-	public boolean getCanSpawnHere() {
-		Chunk var1 = this.worldObj.getChunkFromBlockCoords(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posZ));
-		return (this.field_770_c == 1 || this.worldObj.difficultySetting > 0) && this.rand.nextInt(10) == 0 && var1.func_997_a(987234911L).nextInt(10) == 0 && this.posY < 16.0D;
-	}
+    protected boolean func_40137_ah()
+    {
+        return getSlimeSize() > 1;
+    }
 
-	protected float getSoundVolume() {
-		return 0.6F;
-	}
+    protected int func_40130_ai()
+    {
+        return getSlimeSize();
+    }
+
+    protected String getHurtSound()
+    {
+        return "mob.slime";
+    }
+
+    protected String getDeathSound()
+    {
+        return "mob.slime";
+    }
+
+    protected int getDropItemId()
+    {
+        if(getSlimeSize() == 1)
+        {
+            return Item.slimeBall.shiftedIndex;
+        } else
+        {
+            return 0;
+        }
+    }
+
+    public boolean getCanSpawnHere()
+    {
+        Chunk chunk = worldObj.getChunkFromBlockCoords(MathHelper.floor_double(posX), MathHelper.floor_double(posZ));
+        if((getSlimeSize() == 1 || worldObj.difficultySetting > 0) && rand.nextInt(10) == 0 && chunk.getRandomWithSeed(0x3ad8025fL).nextInt(10) == 0 && posY < 40D)
+        {
+            return super.getCanSpawnHere();
+        } else
+        {
+            return false;
+        }
+    }
+
+    protected float getSoundVolume()
+    {
+        return 0.4F * (float)getSlimeSize();
+    }
+
+    protected int getVerticalFaceSpeed()
+    {
+        return 0;
+    }
+
+    protected boolean func_40133_ao()
+    {
+        return getSlimeSize() > 1;
+    }
+
+    protected boolean func_40134_ak()
+    {
+        return getSlimeSize() > 2;
+    }
 }

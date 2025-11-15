@@ -1,25 +1,42 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet4UpdateTime extends Packet {
-	public long time;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.time = var1.readLong();
-	}
+public class Packet4UpdateTime extends Packet
+{
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeLong(this.time);
-	}
+    public long time;
 
-	public void processPacket(NetHandler var1) {
-		var1.handleUpdateTime(this);
-	}
+    public Packet4UpdateTime()
+    {
+    }
 
-	public int getPacketSize() {
-		return 8;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        time = datainputstream.readLong();
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeLong(time);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleUpdateTime(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 8;
+    }
 }

@@ -1,58 +1,94 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class GuiIngameMenu extends GuiScreen {
-	private int updateCounter2 = 0;
-	private int updateCounter = 0;
+import java.util.List;
+import net.minecraft.client.Minecraft;
 
-	public void initGui() {
-		this.updateCounter2 = 0;
-		this.controlList.clear();
-		this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 48, "Save and quit to title"));
-		if(this.mc.isMultiplayerWorld()) {
-			((GuiButton)this.controlList.get(0)).displayString = "Disconnect";
-		}
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, GuiButton, StatCollector, GuiOptions, 
+//            StatList, StatFileWriter, World, GuiMainMenu, 
+//            GuiAchievements, GuiStats, MathHelper
 
-		this.controlList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24, "Back to game"));
-		this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96, "Options..."));
-	}
+public class GuiIngameMenu extends GuiScreen
+{
 
-	protected void actionPerformed(GuiButton var1) {
-		if(var1.id == 0) {
-			this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
-		}
+    private int updateCounter2;
+    private int updateCounter;
 
-		if(var1.id == 1) {
-			if(this.mc.isMultiplayerWorld()) {
-				this.mc.theWorld.sendQuittingDisconnectingPacket();
-			}
+    public GuiIngameMenu()
+    {
+        updateCounter2 = 0;
+        updateCounter = 0;
+    }
 
-			this.mc.func_6261_a((World)null);
-			this.mc.displayGuiScreen(new GuiMainMenu());
-		}
+    public void initGui()
+    {
+        updateCounter2 = 0;
+        controlList.clear();
+        byte byte0 = -16;
+        controlList.add(new GuiButton(1, width / 2 - 100, height / 4 + 120 + byte0, "Save and quit to title"));
+        if(mc.isMultiplayerWorld())
+        {
+            ((GuiButton)controlList.get(0)).displayString = "Disconnect";
+        }
+        controlList.add(new GuiButton(4, width / 2 - 100, height / 4 + 24 + byte0, "Back to game"));
+        controlList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + byte0, "Options..."));
+        controlList.add(new GuiButton(5, width / 2 - 100, height / 4 + 48 + byte0, 98, 20, StatCollector.translateToLocal("gui.achievements")));
+        controlList.add(new GuiButton(6, width / 2 + 2, height / 4 + 48 + byte0, 98, 20, StatCollector.translateToLocal("gui.stats")));
+    }
 
-		if(var1.id == 4) {
-			this.mc.displayGuiScreen((GuiScreen)null);
-			this.mc.func_6259_e();
-		}
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        if(guibutton.id == 0)
+        {
+            mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
+        }
+        if(guibutton.id == 1)
+        {
+            mc.statFileWriter.readStat(StatList.leaveGameStat, 1);
+            if(mc.isMultiplayerWorld())
+            {
+                mc.theWorld.sendQuittingDisconnectingPacket();
+            }
+            mc.changeWorld1(null);
+            mc.displayGuiScreen(new GuiMainMenu());
+        }
+        if(guibutton.id == 4)
+        {
+            mc.displayGuiScreen(null);
+            mc.setIngameFocus();
+        }
+        if(guibutton.id == 5)
+        {
+            mc.displayGuiScreen(new GuiAchievements(mc.statFileWriter));
+        }
+        if(guibutton.id == 6)
+        {
+            mc.displayGuiScreen(new GuiStats(this, mc.statFileWriter));
+        }
+    }
 
-	}
+    public void updateScreen()
+    {
+        super.updateScreen();
+        updateCounter++;
+    }
 
-	public void updateScreen() {
-		super.updateScreen();
-		++this.updateCounter;
-	}
-
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawDefaultBackground();
-		boolean var4 = !this.mc.theWorld.func_650_a(this.updateCounter2++);
-		if(var4 || this.updateCounter < 20) {
-			float var5 = ((float)(this.updateCounter % 10) + var3) / 10.0F;
-			var5 = MathHelper.sin(var5 * (float)Math.PI * 2.0F) * 0.2F + 0.8F;
-			int var6 = (int)(255.0F * var5);
-			this.drawString(this.fontRenderer, "Saving level..", 8, this.height - 16, var6 << 16 | var6 << 8 | var6);
-		}
-
-		this.drawCenteredString(this.fontRenderer, "Game menu", this.width / 2, 40, 16777215);
-		super.drawScreen(var1, var2, var3);
-	}
+    public void drawScreen(int i, int j, float f)
+    {
+        drawDefaultBackground();
+        boolean flag = !mc.theWorld.func_650_a(updateCounter2++);
+        if(flag || updateCounter < 20)
+        {
+            float f1 = ((float)(updateCounter % 10) + f) / 10F;
+            f1 = MathHelper.sin(f1 * 3.141593F * 2.0F) * 0.2F + 0.8F;
+            int k = (int)(255F * f1);
+            drawString(fontRenderer, "Saving level..", 8, height - 16, k << 16 | k << 8 | k);
+        }
+        drawCenteredString(fontRenderer, "Game menu", width / 2, 40, 0xffffff);
+        super.drawScreen(i, j, f);
+    }
 }

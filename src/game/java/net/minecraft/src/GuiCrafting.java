@@ -1,30 +1,42 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            GuiContainer, ContainerWorkbench, FontRenderer, RenderEngine, 
+//            InventoryPlayer, World
 
-public class GuiCrafting extends GuiContainer {
-	public GuiCrafting(InventoryPlayer var1, World var2, int var3, int var4, int var5) {
-		super(new CraftingInventoryWorkbenchCB(var1, var2, var3, var4, var5));
-	}
+public class GuiCrafting extends GuiContainer
+{
 
-	public void onGuiClosed() {
-		super.onGuiClosed();
-		this.inventorySlots.onCraftGuiClosed(this.mc.thePlayer);
-	}
+    public GuiCrafting(InventoryPlayer inventoryplayer, World world, int i, int j, int k)
+    {
+        super(new ContainerWorkbench(inventoryplayer, world, i, j, k));
+    }
 
-	protected void drawGuiContainerForegroundLayer() {
-		this.fontRenderer.drawString("Crafting", 28, 6, 4210752);
-		this.fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 2, 4210752);
-	}
+    public void onGuiClosed()
+    {
+        super.onGuiClosed();
+    }
 
-	private static final TextureLocation crafting = new TextureLocation("/gui/crafting.png");
-	protected void drawGuiContainerBackgroundLayer(float var1) {
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		crafting.bindTexture();
-		int var3 = (this.width - this.xSize) / 2;
-		int var4 = (this.height - this.ySize) / 2;
-		this.drawTexturedModalRect(var3, var4, 0, 0, this.xSize, this.ySize);
-	}
+    protected void drawGuiContainerForegroundLayer()
+    {
+        fontRenderer.drawString("Crafting", 28, 6, 0x404040);
+        fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
+    }
+
+    protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
+    {
+        int k = mc.renderEngine.getTexture("/gui/crafting.png");
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(k);
+        int l = (width - xSize) / 2;
+        int i1 = (height - ySize) / 2;
+        drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+    }
 }

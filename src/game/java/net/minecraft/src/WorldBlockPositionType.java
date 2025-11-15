@@ -1,21 +1,33 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-class WorldBlockPositionType {
-	int field_1202_a;
-	int field_1201_b;
-	int field_1207_c;
-	int field_1206_d;
-	int field_1205_e;
-	int field_1204_f;
-	final WorldClient field_1203_g;
 
-	public WorldBlockPositionType(WorldClient var1, int var2, int var3, int var4, int var5, int var6) {
-		this.field_1203_g = var1;
-		this.field_1202_a = var2;
-		this.field_1201_b = var3;
-		this.field_1207_c = var4;
-		this.field_1206_d = 80;
-		this.field_1205_e = var5;
-		this.field_1204_f = var6;
-	}
+// Referenced classes of package net.minecraft.src:
+//            WorldClient
+
+class WorldBlockPositionType
+{
+
+    int posX;
+    int posY;
+    int posZ;
+    int acceptCountdown;
+    int blockID;
+    int metadata;
+    final WorldClient worldClient; /* synthetic field */
+
+    public WorldBlockPositionType(WorldClient worldclient, int i, int j, int k, int l, int i1)
+    {
+        worldClient = worldclient;
+//        super();
+        posX = i;
+        posY = j;
+        posZ = k;
+        acceptCountdown = 80;
+        blockID = l;
+        metadata = i1;
+    }
 }

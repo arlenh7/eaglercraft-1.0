@@ -1,15 +1,35 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public interface IChunkProvider {
-	boolean chunkExists(int var1, int var2);
+import java.util.List;
 
-	Chunk provideChunk(int var1, int var2);
+// Referenced classes of package net.minecraft.src:
+//            Chunk, IProgressUpdate, EnumCreatureType, World, 
+//            ChunkPosition
 
-	void populate(IChunkProvider var1, int var2, int var3);
+public interface IChunkProvider
+{
 
-	boolean saveChunks(boolean var1, IProgressUpdate var2);
+    public abstract boolean chunkExists(int i, int j);
 
-	boolean func_532_a();
+    public abstract Chunk provideChunk(int i, int j);
 
-	boolean func_536_b();
+    public abstract Chunk loadChunk(int i, int j);
+
+    public abstract void populate(IChunkProvider ichunkprovider, int i, int j);
+
+    public abstract boolean saveChunks(boolean flag, IProgressUpdate iprogressupdate);
+
+    public abstract boolean unload100OldestChunks();
+
+    public abstract boolean canSave();
+
+    public abstract String makeString();
+
+    public abstract List func_40377_a(EnumCreatureType enumcreaturetype, int i, int j, int k);
+
+    public abstract ChunkPosition func_40376_a(World world, String s, int i, int j, int k);
 }

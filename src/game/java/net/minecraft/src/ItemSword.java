@@ -1,36 +1,80 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemSword extends Item {
-	private int weaponDamage;
 
-	public ItemSword(int var1, int var2) {
-		super(var1);
-		this.maxStackSize = 1;
-		this.maxDamage = 32 << var2;
-		if(var2 == 3) {
-			this.maxDamage *= 4;
-		}
+// Referenced classes of package net.minecraft.src:
+//            Item, EnumToolMaterial, Block, ItemStack, 
+//            EnumAction, EntityPlayer, EntityLiving, Entity, 
+//            World
 
-		this.weaponDamage = 4 + var2 * 2;
-	}
+public class ItemSword extends Item
+{
 
-	public float getStrVsBlock(ItemStack var1, Block var2) {
-		return 1.5F;
-	}
+    private int weaponDamage;
+    private final EnumToolMaterial field_40439_b;
 
-	public void hitEntity(ItemStack var1, EntityLiving var2) {
-		var1.damageItem(1);
-	}
+    public ItemSword(int i, EnumToolMaterial enumtoolmaterial)
+    {
+        super(i);
+        field_40439_b = enumtoolmaterial;
+        maxStackSize = 1;
+        setMaxDamage(enumtoolmaterial.getMaxUses());
+        weaponDamage = 4 + enumtoolmaterial.getDamageVsEntity();
+    }
 
-	public void hitBlock(ItemStack var1, int var2, int var3, int var4, int var5) {
-		var1.damageItem(2);
-	}
+    public float getStrVsBlock(ItemStack itemstack, Block block)
+    {
+        return block.blockID != Block.web.blockID ? 1.5F : 15F;
+    }
 
-	public int getDamageVsEntity(Entity var1) {
-		return this.weaponDamage;
-	}
+    public boolean hitEntity(ItemStack itemstack, EntityLiving entityliving, EntityLiving entityliving1)
+    {
+        itemstack.damageItem(1, entityliving1);
+        return true;
+    }
 
-	public boolean isFull3D() {
-		return true;
-	}
+    public boolean onBlockDestroyed(ItemStack itemstack, int i, int j, int k, int l, EntityLiving entityliving)
+    {
+        itemstack.damageItem(2, entityliving);
+        return true;
+    }
+
+    public int getDamageVsEntity(Entity entity)
+    {
+        return weaponDamage;
+    }
+
+    public boolean isFull3D()
+    {
+        return true;
+    }
+
+    public EnumAction getItemUseAction(ItemStack itemstack)
+    {
+        return EnumAction.block;
+    }
+
+    public int getMaxItemUseDuration(ItemStack itemstack)
+    {
+        return 0x11940;
+    }
+
+    public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer)
+    {
+        entityplayer.setItemInUse(itemstack, getMaxItemUseDuration(itemstack));
+        return itemstack;
+    }
+
+    public boolean canHarvestBlock(Block block)
+    {
+        return block.blockID == Block.web.blockID;
+    }
+
+    public int getItemEnchantability()
+    {
+        return field_40439_b.getEnchantability();
+    }
 }

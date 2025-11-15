@@ -1,77 +1,97 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
-import net.peyton.eagler.minecraft.FontRenderer;
-import net.peyton.eagler.minecraft.TextureLocation;
-
 import org.lwjgl.opengl.GL11;
 
-public class GuiButton extends Gui {
-	protected int width;
-	protected int height;
-	public int xPosition;
-	public int yPosition;
-	public String displayString;
-	public int id;
-	public boolean enabled;
-	public boolean enabled2;
+// Referenced classes of package net.minecraft.src:
+//            Gui, RenderEngine
 
-	public GuiButton(int var1, int var2, int var3, String var4) {
-		this(var1, var2, var3, 200, 20, var4);
-	}
+public class GuiButton extends Gui
+{
 
-	public GuiButton(int var1, int var2, int var3, int var4, int var5, String var6) {
-		this.width = 200;
-		this.height = 20;
-		this.enabled = true;
-		this.enabled2 = true;
-		this.id = var1;
-		this.xPosition = var2;
-		this.yPosition = var3;
-		this.width = var4;
-		this.height = var5;
-		this.displayString = var6;
-	}
+    protected int width;
+    protected int height;
+    public int xPosition;
+    public int yPosition;
+    public String displayString;
+    public int id;
+    public boolean enabled;
+    public boolean drawButton;
 
-	protected int getHoverState(boolean var1) {
-		byte var2 = 1;
-		if(!this.enabled) {
-			var2 = 0;
-		} else if(var1) {
-			var2 = 2;
-		}
+    public GuiButton(int i, int j, int k, String s)
+    {
+        this(i, j, k, 200, 20, s);
+    }
 
-		return var2;
-	}
+    public GuiButton(int i, int j, int k, int l, int i1, String s)
+    {
+        width = 200;
+        height = 20;
+        enabled = true;
+        drawButton = true;
+        id = i;
+        xPosition = j;
+        yPosition = k;
+        width = l;
+        height = i1;
+        displayString = s;
+    }
 
-	public void drawButton(Minecraft var1, int var2, int var3) {
-		if(this.enabled2) {
-			FontRenderer var4 = var1.fontRenderer;
-			TextureLocation.gui.bindTexture();
-			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			boolean var5 = var2 >= this.xPosition && var3 >= this.yPosition && var2 < this.xPosition + this.width && var3 < this.yPosition + this.height;
-			int var6 = this.getHoverState(var5);
-			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + var6 * 20, this.width / 2, this.height);
-			this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + var6 * 20, this.width / 2, this.height);
-			this.mouseDragged(var1, var2, var3);
-			if(!this.enabled) {
-				this.drawCenteredString(var4, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, -6250336);
-			} else if(var5) {
-				this.drawCenteredString(var4, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 16777120);
-			} else {
-				this.drawCenteredString(var4, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 14737632);
-			}
+    protected int getHoverState(boolean flag)
+    {
+        byte byte0 = 1;
+        if(!enabled)
+        {
+            byte0 = 0;
+        } else
+        if(flag)
+        {
+            byte0 = 2;
+        }
+        return byte0;
+    }
 
-		}
-	}
+    public void drawButton(Minecraft minecraft, int i, int j)
+    {
+        if(!drawButton)
+        {
+            return;
+        }
+        FontRenderer fontrenderer = minecraft.fontRenderer;
+        GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, minecraft.renderEngine.getTexture("/gui/gui.png"));
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        boolean flag = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
+        int k = getHoverState(flag);
+        drawTexturedModalRect(xPosition, yPosition, 0, 46 + k * 20, width / 2, height);
+        drawTexturedModalRect(xPosition + width / 2, yPosition, 200 - width / 2, 46 + k * 20, width / 2, height);
+        mouseDragged(minecraft, i, j);
+        if(!enabled)
+        {
+            drawCenteredString(fontrenderer, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, 0xffa0a0a0);
+        } else
+        if(flag)
+        {
+            drawCenteredString(fontrenderer, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, 0xffffa0);
+        } else
+        {
+            drawCenteredString(fontrenderer, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, 0xe0e0e0);
+        }
+    }
 
-	protected void mouseDragged(Minecraft var1, int var2, int var3) {
-	}
+    protected void mouseDragged(Minecraft minecraft, int i, int j)
+    {
+    }
 
-	public void mouseReleased(int var1, int var2) {
-	}
+    public void mouseReleased(int i, int j)
+    {
+    }
 
-	public boolean mousePressed(Minecraft var1, int var2, int var3) {
-		return this.enabled && var2 >= this.xPosition && var3 >= this.yPosition && var2 < this.xPosition + this.width && var3 < this.yPosition + this.height;
-	}
+    public boolean mousePressed(Minecraft minecraft, int i, int j)
+    {
+        return enabled && drawButton && i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
+    }
 }

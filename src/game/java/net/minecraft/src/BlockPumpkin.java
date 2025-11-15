@@ -1,45 +1,114 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockPumpkin extends Block {
-	private boolean field_4072_a;
+import java.util.Random;
 
-	protected BlockPumpkin(int var1, int var2, boolean var3) {
-		super(var1, Material.pumpkin);
-		this.blockIndexInTexture = var2;
-		this.setTickOnLoad(true);
-		this.field_4072_a = var3;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, EntitySnowman, 
+//            EntityLiving, MathHelper
 
-	public int getBlockTextureFromSideAndMetadata(int var1, int var2) {
-		if(var1 == 1) {
-			return this.blockIndexInTexture;
-		} else if(var1 == 0) {
-			return this.blockIndexInTexture;
-		} else {
-			int var3 = this.blockIndexInTexture + 1 + 16;
-			if(this.field_4072_a) {
-				++var3;
-			}
+public class BlockPumpkin extends Block
+{
 
-			return var2 == 0 && var1 == 2 ? var3 : (var2 == 1 && var1 == 5 ? var3 : (var2 == 2 && var1 == 3 ? var3 : (var2 == 3 && var1 == 4 ? var3 : this.blockIndexInTexture + 16)));
-		}
-	}
+    private boolean blockType;
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 1 ? this.blockIndexInTexture : (var1 == 0 ? this.blockIndexInTexture : (var1 == 3 ? this.blockIndexInTexture + 1 + 16 : this.blockIndexInTexture + 16));
-	}
+    protected BlockPumpkin(int i, int j, boolean flag)
+    {
+        super(i, Material.pumpkin);
+        blockIndexInTexture = j;
+        setTickOnLoad(true);
+        blockType = flag;
+    }
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		super.onBlockAdded(var1, var2, var3, var4);
-	}
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if(i == 1)
+        {
+            return blockIndexInTexture;
+        }
+        if(i == 0)
+        {
+            return blockIndexInTexture;
+        }
+        int k = blockIndexInTexture + 1 + 16;
+        if(blockType)
+        {
+            k++;
+        }
+        if(j == 2 && i == 2)
+        {
+            return k;
+        }
+        if(j == 3 && i == 5)
+        {
+            return k;
+        }
+        if(j == 0 && i == 3)
+        {
+            return k;
+        }
+        if(j == 1 && i == 4)
+        {
+            return k;
+        } else
+        {
+            return blockIndexInTexture + 16;
+        }
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockId(var2, var3, var4);
-		return (var5 == 0 || Block.blocksList[var5].blockMaterial.getIsLiquid()) && var1.isBlockOpaqueCube(var2, var3 - 1, var4);
-	}
+    public int getBlockTextureFromSide(int i)
+    {
+        if(i == 1)
+        {
+            return blockIndexInTexture;
+        }
+        if(i == 0)
+        {
+            return blockIndexInTexture;
+        }
+        if(i == 3)
+        {
+            return blockIndexInTexture + 1 + 16;
+        } else
+        {
+            return blockIndexInTexture + 16;
+        }
+    }
 
-	public void onBlockPlacedBy(World var1, int var2, int var3, int var4, EntityLiving var5) {
-		int var6 = MathHelper.floor_double((double)(var5.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var6);
-	}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+        super.onBlockAdded(world, i, j, k);
+        if(world.getBlockId(i, j - 1, k) == Block.blockSnow.blockID && world.getBlockId(i, j - 2, k) == Block.blockSnow.blockID)
+        {
+            if(!world.multiplayerWorld)
+            {
+                world.setBlockWithNotify(i, j, k, 0);
+                world.setBlockWithNotify(i, j - 1, k, 0);
+                world.setBlockWithNotify(i, j - 2, k, 0);
+                EntitySnowman entitysnowman = new EntitySnowman(world);
+                entitysnowman.setLocationAndAngles((double)i + 0.5D, (double)j - 1.95D, (double)k + 0.5D, 0.0F, 0.0F);
+                world.entityJoinedWorld(entitysnowman);
+            }
+            for(int l = 0; l < 120; l++)
+            {
+                world.spawnParticle("snowshovel", (double)i + world.rand.nextDouble(), (double)(j - 2) + world.rand.nextDouble() * 2.5D, (double)k + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
+            }
+
+        }
+    }
+
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        int l = world.getBlockId(i, j, k);
+        return (l == 0 || Block.blocksList[l].blockMaterial.getIsGroundCover()) && world.isBlockNormalCube(i, j - 1, k);
+    }
+
+    public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
+    {
+        int l = MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 2.5D) & 3;
+        world.setBlockMetadataWithNotify(i, j, k, l);
+    }
 }

@@ -1,47 +1,84 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderBiped extends RenderLiving {
-	protected ModelBiped field_4013_a;
+// Referenced classes of package net.minecraft.src:
+//            RenderLiving, EntityLiving, ModelBiped, ModelRenderer, 
+//            ItemStack, Block, RenderBlocks, Item, 
+//            RenderManager, ItemRenderer, ItemPotion
 
-	public RenderBiped(ModelBiped var1, float var2) {
-		super(var1, var2);
-		this.field_4013_a = var1;
-	}
+public class RenderBiped extends RenderLiving
+{
 
-	protected void renderEquippedItems(EntityLiving var1, float var2) {
-		ItemStack var3 = var1.getHeldItem();
-		if(var3 != null) {
-			GL11.glPushMatrix();
-			this.field_4013_a.bipedRightArm.func_926_b(1.0F / 16.0F);
-			GL11.glTranslatef(-(1.0F / 16.0F), 7.0F / 16.0F, 1.0F / 16.0F);
-			float var4;
-			if(var3.itemID < 256 && RenderBlocks.func_1219_a(Block.blocksList[var3.itemID].getRenderType())) {
-				var4 = 0.5F;
-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, -(5.0F / 16.0F));
-				var4 *= 12.0F / 16.0F;
-				GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-				GL11.glScalef(var4, -var4, var4);
-			} else if(Item.itemsList[var3.itemID].isFull3D()) {
-				var4 = 10.0F / 16.0F;
-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, 0.0F);
-				GL11.glScalef(var4, -var4, var4);
-				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-			} else {
-				var4 = 6.0F / 16.0F;
-				GL11.glTranslatef(0.25F, 3.0F / 16.0F, -(3.0F / 16.0F));
-				GL11.glScalef(var4, var4, var4);
-				GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
-				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
-			}
+    protected ModelBiped modelBipedMain;
+    protected float field_40296_d;
 
-			this.renderManager.field_4236_f.renderItem(var3);
-			GL11.glPopMatrix();
-		}
+    public RenderBiped(ModelBiped modelbiped, float f)
+    {
+        this(modelbiped, f, 1.0F);
+        modelBipedMain = modelbiped;
+    }
 
-	}
+    public RenderBiped(ModelBiped modelbiped, float f, float f1)
+    {
+        super(modelbiped, f);
+        modelBipedMain = modelbiped;
+        field_40296_d = f1;
+    }
+
+    protected void renderEquippedItems(EntityLiving entityliving, float f)
+    {
+        super.renderEquippedItems(entityliving, f);
+        ItemStack itemstack = entityliving.getHeldItem();
+        if(itemstack != null)
+        {
+            GL11.glPushMatrix();
+            modelBipedMain.bipedRightArm.postRender(0.0625F);
+            GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
+            if(itemstack.itemID < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[itemstack.itemID].getRenderType()))
+            {
+                float f1 = 0.5F;
+                GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
+                f1 *= 0.75F;
+                GL11.glRotatef(20F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(f1, -f1, f1);
+            } else
+            if(itemstack.itemID == Item.bow.shiftedIndex)
+            {
+                float f2 = 0.625F;
+                GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
+                GL11.glRotatef(-20F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(f2, -f2, f2);
+                GL11.glRotatef(-100F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+            } else
+            if(Item.itemsList[itemstack.itemID].isFull3D())
+            {
+                float f3 = 0.625F;
+                GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+                GL11.glScalef(f3, -f3, f3);
+                GL11.glRotatef(-100F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+            } else
+            {
+                float f4 = 0.375F;
+                GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+                GL11.glScalef(f4, f4, f4);
+                GL11.glRotatef(60F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(-90F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(20F, 0.0F, 0.0F, 1.0F);
+            }
+            renderManager.itemRenderer.renderItem(entityliving, itemstack, 0);
+            if(itemstack.itemID == Item.potion.shiftedIndex)
+            {
+                renderManager.itemRenderer.renderItem(entityliving, itemstack, 1);
+            }
+            GL11.glPopMatrix();
+        }
+    }
 }

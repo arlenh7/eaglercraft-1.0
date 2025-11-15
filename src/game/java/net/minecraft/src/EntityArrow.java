@@ -1,248 +1,355 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.List;
+import java.util.Random;
 
-public class EntityArrow extends Entity {
-	private int xTile = -1;
-	private int yTile = -1;
-	private int zTile = -1;
-	private int inTile = 0;
-	private boolean inGround = false;
-	public int arrowShake = 0;
-	public EntityLiving field_682_g;
-	private int field_681_h;
-	private int field_680_i = 0;
+// Referenced classes of package net.minecraft.src:
+//            Entity, EntityPlayer, EntityLiving, MathHelper, 
+//            World, Block, Vec3D, AxisAlignedBB, 
+//            MovingObjectPosition, DamageSource, NBTTagCompound, ItemStack, 
+//            Item, InventoryPlayer
 
-	public EntityArrow(World var1) {
-		super(var1);
-		this.setSize(0.5F, 0.5F);
-	}
+public class EntityArrow extends Entity
+{
 
-	public EntityArrow(World var1, double var2, double var4, double var6) {
-		super(var1);
-		this.setSize(0.5F, 0.5F);
-		this.setPosition(var2, var4, var6);
-		this.yOffset = 0.0F;
-	}
+    private int xTile;
+    private int yTile;
+    private int zTile;
+    private int inTile;
+    private int inData;
+    private boolean inGround;
+    public boolean doesArrowBelongToPlayer;
+    public int arrowShake;
+    public Entity shootingEntity;
+    private int ticksInGround;
+    private int ticksInAir;
+    public boolean arrowCritical;
 
-	public EntityArrow(World var1, EntityLiving var2) {
-		super(var1);
-		this.field_682_g = var2;
-		this.setSize(0.5F, 0.5F);
-		this.setLocationAndAngles(var2.posX, var2.posY + (double)var2.func_373_s(), var2.posZ, var2.rotationYaw, var2.rotationPitch);
-		this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
-		this.posY -= (double)0.1F;
-		this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
-		this.setPosition(this.posX, this.posY, this.posZ);
-		this.yOffset = 0.0F;
-		this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
-		this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
-		this.motionY = (double)(-MathHelper.sin(this.rotationPitch / 180.0F * (float)Math.PI));
-		this.setArrowHeading(this.motionX, this.motionY, this.motionZ, 1.5F, 1.0F);
-	}
+    public EntityArrow(World world)
+    {
+        super(world);
+        xTile = -1;
+        yTile = -1;
+        zTile = -1;
+        inTile = 0;
+        inData = 0;
+        inGround = false;
+        doesArrowBelongToPlayer = false;
+        arrowShake = 0;
+        ticksInAir = 0;
+        arrowCritical = false;
+        setSize(0.5F, 0.5F);
+    }
 
-	public void setArrowHeading(double var1, double var3, double var5, float var7, float var8) {
-		float var9 = MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5);
-		var1 /= (double)var9;
-		var3 /= (double)var9;
-		var5 /= (double)var9;
-		var1 += this.rand.nextGaussian() * (double)0.0075F * (double)var8;
-		var3 += this.rand.nextGaussian() * (double)0.0075F * (double)var8;
-		var5 += this.rand.nextGaussian() * (double)0.0075F * (double)var8;
-		var1 *= (double)var7;
-		var3 *= (double)var7;
-		var5 *= (double)var7;
-		this.motionX = var1;
-		this.motionY = var3;
-		this.motionZ = var5;
-		float var10 = MathHelper.sqrt_double(var1 * var1 + var5 * var5);
-		this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(var1, var5) * 180.0D / (double)((float)Math.PI));
-		this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(var3, (double)var10) * 180.0D / (double)((float)Math.PI));
-		this.field_681_h = 0;
-	}
+    public EntityArrow(World world, double d, double d1, double d2)
+    {
+        super(world);
+        xTile = -1;
+        yTile = -1;
+        zTile = -1;
+        inTile = 0;
+        inData = 0;
+        inGround = false;
+        doesArrowBelongToPlayer = false;
+        arrowShake = 0;
+        ticksInAir = 0;
+        arrowCritical = false;
+        setSize(0.5F, 0.5F);
+        setPosition(d, d1, d2);
+        yOffset = 0.0F;
+    }
 
-	public void setVelocity(double var1, double var3, double var5) {
-		this.motionX = var1;
-		this.motionY = var3;
-		this.motionZ = var5;
-		if(this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float var7 = MathHelper.sqrt_double(var1 * var1 + var5 * var5);
-			this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(var1, var5) * 180.0D / (double)((float)Math.PI));
-			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(var3, (double)var7) * 180.0D / (double)((float)Math.PI));
-		}
+    public EntityArrow(World world, EntityLiving entityliving, float f)
+    {
+        super(world);
+        xTile = -1;
+        yTile = -1;
+        zTile = -1;
+        inTile = 0;
+        inData = 0;
+        inGround = false;
+        doesArrowBelongToPlayer = false;
+        arrowShake = 0;
+        ticksInAir = 0;
+        arrowCritical = false;
+        shootingEntity = entityliving;
+        doesArrowBelongToPlayer = entityliving instanceof EntityPlayer;
+        setSize(0.5F, 0.5F);
+        setLocationAndAngles(entityliving.posX, entityliving.posY + (double)entityliving.getEyeHeight(), entityliving.posZ, entityliving.rotationYaw, entityliving.rotationPitch);
+        posX -= MathHelper.cos((rotationYaw / 180F) * 3.141593F) * 0.16F;
+        posY -= 0.10000000149011612D;
+        posZ -= MathHelper.sin((rotationYaw / 180F) * 3.141593F) * 0.16F;
+        setPosition(posX, posY, posZ);
+        yOffset = 0.0F;
+        motionX = -MathHelper.sin((rotationYaw / 180F) * 3.141593F) * MathHelper.cos((rotationPitch / 180F) * 3.141593F);
+        motionZ = MathHelper.cos((rotationYaw / 180F) * 3.141593F) * MathHelper.cos((rotationPitch / 180F) * 3.141593F);
+        motionY = -MathHelper.sin((rotationPitch / 180F) * 3.141593F);
+        setArrowHeading(motionX, motionY, motionZ, f * 1.5F, 1.0F);
+    }
 
-	}
+    protected void entityInit()
+    {
+    }
 
-	public void onUpdate() {
-		super.onUpdate();
-		if(this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float var1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-			this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / (double)((float)Math.PI));
-			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, (double)var1) * 180.0D / (double)((float)Math.PI));
-		}
+    public void setArrowHeading(double d, double d1, double d2, float f, 
+            float f1)
+    {
+        float f2 = MathHelper.sqrt_double(d * d + d1 * d1 + d2 * d2);
+        d /= f2;
+        d1 /= f2;
+        d2 /= f2;
+        d += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
+        d1 += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
+        d2 += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
+        d *= f;
+        d1 *= f;
+        d2 *= f;
+        motionX = d;
+        motionY = d1;
+        motionZ = d2;
+        float f3 = MathHelper.sqrt_double(d * d + d2 * d2);
+        prevRotationYaw = rotationYaw = (float)((Math.atan2(d, d2) * 180D) / 3.1415927410125732D);
+        prevRotationPitch = rotationPitch = (float)((Math.atan2(d1, f3) * 180D) / 3.1415927410125732D);
+        ticksInGround = 0;
+    }
 
-		if(this.arrowShake > 0) {
-			--this.arrowShake;
-		}
+    public void setVelocity(double d, double d1, double d2)
+    {
+        motionX = d;
+        motionY = d1;
+        motionZ = d2;
+        if(prevRotationPitch == 0.0F && prevRotationYaw == 0.0F)
+        {
+            float f = MathHelper.sqrt_double(d * d + d2 * d2);
+            prevRotationYaw = rotationYaw = (float)((Math.atan2(d, d2) * 180D) / 3.1415927410125732D);
+            prevRotationPitch = rotationPitch = (float)((Math.atan2(d1, f) * 180D) / 3.1415927410125732D);
+            prevRotationPitch = rotationPitch;
+            prevRotationYaw = rotationYaw;
+            setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
+            ticksInGround = 0;
+        }
+    }
 
-		if(this.inGround) {
-			int var15 = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
-			if(var15 == this.inTile) {
-				++this.field_681_h;
-				if(this.field_681_h == 1200) {
-					this.setEntityDead();
-				}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        if(prevRotationPitch == 0.0F && prevRotationYaw == 0.0F)
+        {
+            float f = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+            prevRotationYaw = rotationYaw = (float)((Math.atan2(motionX, motionZ) * 180D) / 3.1415927410125732D);
+            prevRotationPitch = rotationPitch = (float)((Math.atan2(motionY, f) * 180D) / 3.1415927410125732D);
+        }
+        int i = worldObj.getBlockId(xTile, yTile, zTile);
+        if(i > 0)
+        {
+            Block.blocksList[i].setBlockBoundsBasedOnState(worldObj, xTile, yTile, zTile);
+            AxisAlignedBB axisalignedbb = Block.blocksList[i].getCollisionBoundingBoxFromPool(worldObj, xTile, yTile, zTile);
+            if(axisalignedbb != null && axisalignedbb.isVecInside(Vec3D.createVector(posX, posY, posZ)))
+            {
+                inGround = true;
+            }
+        }
+        if(arrowShake > 0)
+        {
+            arrowShake--;
+        }
+        if(inGround)
+        {
+            int j = worldObj.getBlockId(xTile, yTile, zTile);
+            int k = worldObj.getBlockMetadata(xTile, yTile, zTile);
+            if(j != inTile || k != inData)
+            {
+                inGround = false;
+                motionX *= rand.nextFloat() * 0.2F;
+                motionY *= rand.nextFloat() * 0.2F;
+                motionZ *= rand.nextFloat() * 0.2F;
+                ticksInGround = 0;
+                ticksInAir = 0;
+                return;
+            }
+            ticksInGround++;
+            if(ticksInGround == 1200)
+            {
+                setEntityDead();
+            }
+            return;
+        }
+        ticksInAir++;
+        Vec3D vec3d = Vec3D.createVector(posX, posY, posZ);
+        Vec3D vec3d1 = Vec3D.createVector(posX + motionX, posY + motionY, posZ + motionZ);
+        MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks_do_do(vec3d, vec3d1, false, true);
+        vec3d = Vec3D.createVector(posX, posY, posZ);
+        vec3d1 = Vec3D.createVector(posX + motionX, posY + motionY, posZ + motionZ);
+        if(movingobjectposition != null)
+        {
+            vec3d1 = Vec3D.createVector(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+        }
+        Entity entity = null;
+        List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+        double d = 0.0D;
+        for(int l = 0; l < list.size(); l++)
+        {
+            Entity entity1 = (Entity)list.get(l);
+            if(!entity1.canBeCollidedWith() || entity1 == shootingEntity && ticksInAir < 5)
+            {
+                continue;
+            }
+            float f5 = 0.3F;
+            AxisAlignedBB axisalignedbb1 = entity1.boundingBox.expand(f5, f5, f5);
+            MovingObjectPosition movingobjectposition1 = axisalignedbb1.func_1169_a(vec3d, vec3d1);
+            if(movingobjectposition1 == null)
+            {
+                continue;
+            }
+            double d1 = vec3d.distanceTo(movingobjectposition1.hitVec);
+            if(d1 < d || d == 0.0D)
+            {
+                entity = entity1;
+                d = d1;
+            }
+        }
 
-				return;
-			}
+        if(entity != null)
+        {
+            movingobjectposition = new MovingObjectPosition(entity);
+        }
+        if(movingobjectposition != null)
+        {
+            if(movingobjectposition.entityHit != null)
+            {
+                float f1 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                int j1 = (int)Math.ceil((double)f1 * 2D);
+                if(arrowCritical)
+                {
+                    j1 += rand.nextInt(j1 / 2 + 2);
+                }
+                DamageSource damagesource = null;
+                if(shootingEntity == null)
+                {
+                    damagesource = DamageSource.causeArrowDamage(this, this);
+                } else
+                {
+                    damagesource = DamageSource.causeArrowDamage(this, shootingEntity);
+                }
+                if(movingobjectposition.entityHit.attackEntityFrom(damagesource, j1))
+                {
+                    if(movingobjectposition.entityHit instanceof EntityLiving)
+                    {
+                        ((EntityLiving)movingobjectposition.entityHit).field_35172_bP++;
+                    }
+                    worldObj.playSoundAtEntity(this, "random.bowhit", 1.0F, 1.2F / (rand.nextFloat() * 0.2F + 0.9F));
+                    setEntityDead();
+                } else
+                {
+                    motionX *= -0.10000000149011612D;
+                    motionY *= -0.10000000149011612D;
+                    motionZ *= -0.10000000149011612D;
+                    rotationYaw += 180F;
+                    prevRotationYaw += 180F;
+                    ticksInAir = 0;
+                }
+            } else
+            {
+                xTile = movingobjectposition.blockX;
+                yTile = movingobjectposition.blockY;
+                zTile = movingobjectposition.blockZ;
+                inTile = worldObj.getBlockId(xTile, yTile, zTile);
+                inData = worldObj.getBlockMetadata(xTile, yTile, zTile);
+                motionX = (float)(movingobjectposition.hitVec.xCoord - posX);
+                motionY = (float)(movingobjectposition.hitVec.yCoord - posY);
+                motionZ = (float)(movingobjectposition.hitVec.zCoord - posZ);
+                float f2 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                posX -= (motionX / (double)f2) * 0.05000000074505806D;
+                posY -= (motionY / (double)f2) * 0.05000000074505806D;
+                posZ -= (motionZ / (double)f2) * 0.05000000074505806D;
+                worldObj.playSoundAtEntity(this, "random.bowhit", 1.0F, 1.2F / (rand.nextFloat() * 0.2F + 0.9F));
+                inGround = true;
+                arrowShake = 7;
+                arrowCritical = false;
+            }
+        }
+        if(arrowCritical)
+        {
+            for(int i1 = 0; i1 < 4; i1++)
+            {
+                worldObj.spawnParticle("crit", posX + (motionX * (double)i1) / 4D, posY + (motionY * (double)i1) / 4D, posZ + (motionZ * (double)i1) / 4D, -motionX, -motionY + 0.20000000000000001D, -motionZ);
+            }
 
-			this.inGround = false;
-			this.motionX *= (double)(this.rand.nextFloat() * 0.2F);
-			this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
-			this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
-			this.field_681_h = 0;
-			this.field_680_i = 0;
-		} else {
-			++this.field_680_i;
-		}
+        }
+        posX += motionX;
+        posY += motionY;
+        posZ += motionZ;
+        float f3 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+        rotationYaw = (float)((Math.atan2(motionX, motionZ) * 180D) / 3.1415927410125732D);
+        for(rotationPitch = (float)((Math.atan2(motionY, f3) * 180D) / 3.1415927410125732D); rotationPitch - prevRotationPitch < -180F; prevRotationPitch -= 360F) { }
+        for(; rotationPitch - prevRotationPitch >= 180F; prevRotationPitch += 360F) { }
+        for(; rotationYaw - prevRotationYaw < -180F; prevRotationYaw -= 360F) { }
+        for(; rotationYaw - prevRotationYaw >= 180F; prevRotationYaw += 360F) { }
+        rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
+        rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
+        float f4 = 0.99F;
+        float f6 = 0.05F;
+        if(isInWater())
+        {
+            for(int k1 = 0; k1 < 4; k1++)
+            {
+                float f7 = 0.25F;
+                worldObj.spawnParticle("bubble", posX - motionX * (double)f7, posY - motionY * (double)f7, posZ - motionZ * (double)f7, motionX, motionY, motionZ);
+            }
 
-		Vec3D var16 = Vec3D.createVector(this.posX, this.posY, this.posZ);
-		Vec3D var2 = Vec3D.createVector(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-		MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var16, var2);
-		var16 = Vec3D.createVector(this.posX, this.posY, this.posZ);
-		var2 = Vec3D.createVector(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-		if(var3 != null) {
-			var2 = Vec3D.createVector(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
-		}
+            f4 = 0.8F;
+        }
+        motionX *= f4;
+        motionY *= f4;
+        motionZ *= f4;
+        motionY -= f6;
+        setPosition(posX, posY, posZ);
+    }
 
-		Entity var4 = null;
-		List<Entity> var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
-		double var6 = 0.0D;
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setShort("xTile", (short)xTile);
+        nbttagcompound.setShort("yTile", (short)yTile);
+        nbttagcompound.setShort("zTile", (short)zTile);
+        nbttagcompound.setByte("inTile", (byte)inTile);
+        nbttagcompound.setByte("inData", (byte)inData);
+        nbttagcompound.setByte("shake", (byte)arrowShake);
+        nbttagcompound.setByte("inGround", (byte)(inGround ? 1 : 0));
+        nbttagcompound.setBoolean("player", doesArrowBelongToPlayer);
+    }
 
-		float var10;
-		for(int var8 = 0; var8 < var5.size(); ++var8) {
-			Entity var9 = (Entity)var5.get(var8);
-			if(var9.canBeCollidedWith() && (var9 != this.field_682_g || this.field_680_i >= 5)) {
-				var10 = 0.3F;
-				AxisAlignedBB var11 = var9.boundingBox.expand((double)var10, (double)var10, (double)var10);
-				MovingObjectPosition var12 = var11.func_1169_a(var16, var2);
-				if(var12 != null) {
-					double var13 = var16.distanceTo(var12.hitVec);
-					if(var13 < var6 || var6 == 0.0D) {
-						var4 = var9;
-						var6 = var13;
-					}
-				}
-			}
-		}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        xTile = nbttagcompound.getShort("xTile");
+        yTile = nbttagcompound.getShort("yTile");
+        zTile = nbttagcompound.getShort("zTile");
+        inTile = nbttagcompound.getByte("inTile") & 0xff;
+        inData = nbttagcompound.getByte("inData") & 0xff;
+        arrowShake = nbttagcompound.getByte("shake") & 0xff;
+        inGround = nbttagcompound.getByte("inGround") == 1;
+        doesArrowBelongToPlayer = nbttagcompound.getBoolean("player");
+    }
 
-		if(var4 != null) {
-			var3 = new MovingObjectPosition(var4);
-		}
+    public void onCollideWithPlayer(EntityPlayer entityplayer)
+    {
+        if(worldObj.multiplayerWorld)
+        {
+            return;
+        }
+        if(inGround && doesArrowBelongToPlayer && arrowShake <= 0 && entityplayer.inventory.addItemStackToInventory(new ItemStack(Item.arrow, 1)))
+        {
+            worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            entityplayer.onItemPickup(this, 1);
+            setEntityDead();
+        }
+    }
 
-		float var17;
-		if(var3 != null) {
-			if(var3.entityHit != null) {
-				if(var3.entityHit.attackEntityFrom(this.field_682_g, 4)) {
-					this.worldObj.playSoundAtEntity(this, "random.drr", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
-					this.setEntityDead();
-				} else {
-					this.motionX *= (double)-0.1F;
-					this.motionY *= (double)-0.1F;
-					this.motionZ *= (double)-0.1F;
-					this.rotationYaw += 180.0F;
-					this.prevRotationYaw += 180.0F;
-					this.field_680_i = 0;
-				}
-			} else {
-				this.xTile = var3.blockX;
-				this.yTile = var3.blockY;
-				this.zTile = var3.blockZ;
-				this.inTile = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
-				this.motionX = (double)((float)(var3.hitVec.xCoord - this.posX));
-				this.motionY = (double)((float)(var3.hitVec.yCoord - this.posY));
-				this.motionZ = (double)((float)(var3.hitVec.zCoord - this.posZ));
-				var17 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-				this.posX -= this.motionX / (double)var17 * (double)0.05F;
-				this.posY -= this.motionY / (double)var17 * (double)0.05F;
-				this.posZ -= this.motionZ / (double)var17 * (double)0.05F;
-				this.worldObj.playSoundAtEntity(this, "random.drr", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
-				this.inGround = true;
-				this.arrowShake = 7;
-			}
-		}
-
-		this.posX += this.motionX;
-		this.posY += this.motionY;
-		this.posZ += this.motionZ;
-		var17 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-		this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / (double)((float)Math.PI));
-
-		for(this.rotationPitch = (float)(Math.atan2(this.motionY, (double)var17) * 180.0D / (double)((float)Math.PI)); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F) {
-		}
-
-		while(this.rotationPitch - this.prevRotationPitch >= 180.0F) {
-			this.prevRotationPitch += 360.0F;
-		}
-
-		while(this.rotationYaw - this.prevRotationYaw < -180.0F) {
-			this.prevRotationYaw -= 360.0F;
-		}
-
-		while(this.rotationYaw - this.prevRotationYaw >= 180.0F) {
-			this.prevRotationYaw += 360.0F;
-		}
-
-		this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
-		this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-		float var18 = 0.99F;
-		var10 = 0.03F;
-		if(this.handleWaterMovement()) {
-			for(int var19 = 0; var19 < 4; ++var19) {
-				float var20 = 0.25F;
-				this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)var20, this.posY - this.motionY * (double)var20, this.posZ - this.motionZ * (double)var20, this.motionX, this.motionY, this.motionZ);
-			}
-
-			var18 = 0.8F;
-		}
-
-		this.motionX *= (double)var18;
-		this.motionY *= (double)var18;
-		this.motionZ *= (double)var18;
-		this.motionY -= (double)var10;
-		this.setPosition(this.posX, this.posY, this.posZ);
-	}
-
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		var1.setShort("xTile", (short)this.xTile);
-		var1.setShort("yTile", (short)this.yTile);
-		var1.setShort("zTile", (short)this.zTile);
-		var1.setByte("inTile", (byte)this.inTile);
-		var1.setByte("shake", (byte)this.arrowShake);
-		var1.setByte("inGround", (byte)(this.inGround ? 1 : 0));
-	}
-
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		this.xTile = var1.getShort("xTile");
-		this.yTile = var1.getShort("yTile");
-		this.zTile = var1.getShort("zTile");
-		this.inTile = var1.getByte("inTile") & 255;
-		this.arrowShake = var1.getByte("shake") & 255;
-		this.inGround = var1.getByte("inGround") == 1;
-	}
-
-	public void onCollideWithPlayer(EntityPlayer var1) {
-		if(!this.worldObj.multiplayerWorld) {
-			if(this.inGround && this.field_682_g == var1 && this.arrowShake <= 0 && var1.inventory.addItemStackToInventory(new ItemStack(Item.arrow.shiftedIndex, 1))) {
-				this.worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-				var1.onItemPickup(this, 1);
-				this.setEntityDead();
-			}
-
-		}
-	}
-
-	public float func_392_h_() {
-		return 0.0F;
-	}
+    public float getShadowSize()
+    {
+        return 0.0F;
+    }
 }

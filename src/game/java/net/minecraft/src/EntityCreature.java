@@ -1,151 +1,234 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityCreature extends EntityLiving {
-	private PathEntity pathToEntity;
-	protected Entity playerToAttack;
-	protected boolean hasAttacked = false;
+import java.util.Random;
 
-	public EntityCreature(World var1) {
-		super(var1);
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityLiving, Profiler, World, Entity, 
+//            AxisAlignedBB, MathHelper, PathEntity, Vec3D
 
-	protected void updatePlayerActionState() {
-		this.hasAttacked = false;
-		float var1 = 16.0F;
-		if(this.playerToAttack == null) {
-			this.playerToAttack = this.findPlayerToAttack();
-			if(this.playerToAttack != null) {
-				this.pathToEntity = this.worldObj.getPathToEntity(this, this.playerToAttack, var1);
-			}
-		} else if(!this.playerToAttack.isEntityAlive()) {
-			this.playerToAttack = null;
-		} else {
-			float var2 = this.playerToAttack.getDistanceToEntity(this);
-			if(this.canEntityBeSeen(this.playerToAttack)) {
-				this.attackEntity(this.playerToAttack, var2);
-			}
-		}
+public abstract class EntityCreature extends EntityLiving
+{
 
-		if(this.hasAttacked || this.playerToAttack == null || this.pathToEntity != null && this.rand.nextInt(20) != 0) {
-			if(this.pathToEntity == null && this.rand.nextInt(80) == 0 || this.rand.nextInt(80) == 0) {
-				boolean var21 = false;
-				int var3 = -1;
-				int var4 = -1;
-				int var5 = -1;
-				float var6 = -99999.0F;
+    private PathEntity pathToEntity;
+    protected Entity entityToAttack;
+    protected boolean hasAttacked;
+    protected int fleeingTick;
 
-				for(int var7 = 0; var7 < 10; ++var7) {
-					int var8 = MathHelper.floor_double(this.posX + (double)this.rand.nextInt(13) - 6.0D);
-					int var9 = MathHelper.floor_double(this.posY + (double)this.rand.nextInt(7) - 3.0D);
-					int var10 = MathHelper.floor_double(this.posZ + (double)this.rand.nextInt(13) - 6.0D);
-					float var11 = this.getBlockPathWeight(var8, var9, var10);
-					if(var11 > var6) {
-						var6 = var11;
-						var3 = var8;
-						var4 = var9;
-						var5 = var10;
-						var21 = true;
-					}
-				}
+    public EntityCreature(World world)
+    {
+        super(world);
+        hasAttacked = false;
+        fleeingTick = 0;
+    }
 
-				if(var21) {
-					this.pathToEntity = this.worldObj.getEntityPathToXYZ(this, var3, var4, var5, 10.0F);
-				}
-			}
-		} else {
-			this.pathToEntity = this.worldObj.getPathToEntity(this, this.playerToAttack, var1);
-		}
+    protected boolean isMovementCeased()
+    {
+        return false;
+    }
 
-		int var22 = MathHelper.floor_double(this.boundingBox.minY);
-		boolean var23 = this.handleWaterMovement();
-		boolean var24 = this.handleLavaMovement();
-		this.rotationPitch = 0.0F;
-		if(this.pathToEntity != null && this.rand.nextInt(100) != 0) {
-			Vec3D var25 = this.pathToEntity.getPosition(this);
-			double var26 = (double)(this.width * 2.0F);
+    protected void updateEntityActionState()
+    {
+        Profiler.startSection("ai");
+        if(fleeingTick > 0)
+        {
+            fleeingTick--;
+        }
+        hasAttacked = isMovementCeased();
+        float f = 16F;
+        if(entityToAttack == null)
+        {
+            entityToAttack = findPlayerToAttack();
+            if(entityToAttack != null)
+            {
+                pathToEntity = worldObj.getPathToEntity(this, entityToAttack, f);
+            }
+        } else
+        if(!entityToAttack.isEntityAlive())
+        {
+            entityToAttack = null;
+        } else
+        {
+            float f1 = entityToAttack.getDistanceToEntity(this);
+            if(canEntityBeSeen(entityToAttack))
+            {
+                attackEntity(entityToAttack, f1);
+            } else
+            {
+                attackBlockedEntity(entityToAttack, f1);
+            }
+        }
+        Profiler.endSection();
+        if(!hasAttacked && entityToAttack != null && (pathToEntity == null || rand.nextInt(20) == 0))
+        {
+            pathToEntity = worldObj.getPathToEntity(this, entityToAttack, f);
+        } else
+        if(!hasAttacked && (pathToEntity == null && rand.nextInt(180) == 0 || rand.nextInt(120) == 0 || fleeingTick > 0) && entityAge < 100)
+        {
+            updateWanderPath();
+        }
+        int i = MathHelper.floor_double(boundingBox.minY + 0.5D);
+        boolean flag = isInWater();
+        boolean flag1 = handleLavaMovement();
+        rotationPitch = 0.0F;
+        if(pathToEntity == null || rand.nextInt(100) == 0)
+        {
+            super.updateEntityActionState();
+            pathToEntity = null;
+            return;
+        }
+        Profiler.startSection("followpath");
+        Vec3D vec3d = pathToEntity.getPosition(this);
+        for(double d = width * 2.0F; vec3d != null && vec3d.squareDistanceTo(posX, vec3d.yCoord, posZ) < d * d;)
+        {
+            pathToEntity.incrementPathIndex();
+            if(pathToEntity.isFinished())
+            {
+                vec3d = null;
+                pathToEntity = null;
+            } else
+            {
+                vec3d = pathToEntity.getPosition(this);
+            }
+        }
 
-			while(var25 != null && var25.squareDistanceTo(this.posX, var25.yCoord, this.posZ) < var26 * var26) {
-				this.pathToEntity.incrementPathIndex();
-				if(this.pathToEntity.isFinished()) {
-					var25 = null;
-					this.pathToEntity = null;
-				} else {
-					var25 = this.pathToEntity.getPosition(this);
-				}
-			}
+        isJumping = false;
+        if(vec3d != null)
+        {
+            double d1 = vec3d.xCoord - posX;
+            double d2 = vec3d.zCoord - posZ;
+            double d3 = vec3d.yCoord - (double)i;
+            float f2 = (float)((Math.atan2(d2, d1) * 180D) / 3.1415927410125732D) - 90F;
+            float f3 = f2 - rotationYaw;
+            moveForward = moveSpeed;
+            for(; f3 < -180F; f3 += 360F) { }
+            for(; f3 >= 180F; f3 -= 360F) { }
+            if(f3 > 30F)
+            {
+                f3 = 30F;
+            }
+            if(f3 < -30F)
+            {
+                f3 = -30F;
+            }
+            rotationYaw += f3;
+            if(hasAttacked && entityToAttack != null)
+            {
+                double d4 = entityToAttack.posX - posX;
+                double d5 = entityToAttack.posZ - posZ;
+                float f5 = rotationYaw;
+                rotationYaw = (float)((Math.atan2(d5, d4) * 180D) / 3.1415927410125732D) - 90F;
+                float f4 = (((f5 - rotationYaw) + 90F) * 3.141593F) / 180F;
+                moveStrafing = -MathHelper.sin(f4) * moveForward * 1.0F;
+                moveForward = MathHelper.cos(f4) * moveForward * 1.0F;
+            }
+            if(d3 > 0.0D)
+            {
+                isJumping = true;
+            }
+        }
+        if(entityToAttack != null)
+        {
+            faceEntity(entityToAttack, 30F, 30F);
+        }
+        if(isCollidedHorizontally && !hasPath())
+        {
+            isJumping = true;
+        }
+        if(rand.nextFloat() < 0.8F && (flag || flag1))
+        {
+            isJumping = true;
+        }
+        Profiler.endSection();
+    }
 
-			this.isJumping = false;
-			if(var25 != null) {
-				double var27 = var25.xCoord - this.posX;
-				double var28 = var25.zCoord - this.posZ;
-				double var12 = var25.yCoord - (double)var22;
-				float var14 = (float)(Math.atan2(var28, var27) * 180.0D / (double)((float)Math.PI)) - 90.0F;
-				float var15 = var14 - this.rotationYaw;
+    protected void updateWanderPath()
+    {
+        Profiler.startSection("stroll");
+        boolean flag = false;
+        int i = -1;
+        int j = -1;
+        int k = -1;
+        float f = -99999F;
+        for(int l = 0; l < 10; l++)
+        {
+            int i1 = MathHelper.floor_double((posX + (double)rand.nextInt(13)) - 6D);
+            int j1 = MathHelper.floor_double((posY + (double)rand.nextInt(7)) - 3D);
+            int k1 = MathHelper.floor_double((posZ + (double)rand.nextInt(13)) - 6D);
+            float f1 = getBlockPathWeight(i1, j1, k1);
+            if(f1 > f)
+            {
+                f = f1;
+                i = i1;
+                j = j1;
+                k = k1;
+                flag = true;
+            }
+        }
 
-				for(this.moveForward = this.moveSpeed; var15 < -180.0F; var15 += 360.0F) {
-				}
+        if(flag)
+        {
+            pathToEntity = worldObj.getEntityPathToXYZ(this, i, j, k, 10F);
+        }
+        Profiler.endSection();
+    }
 
-				while(var15 >= 180.0F) {
-					var15 -= 360.0F;
-				}
+    protected void attackEntity(Entity entity, float f)
+    {
+    }
 
-				if(var15 > 30.0F) {
-					var15 = 30.0F;
-				}
+    protected void attackBlockedEntity(Entity entity, float f)
+    {
+    }
 
-				if(var15 < -30.0F) {
-					var15 = -30.0F;
-				}
+    protected float getBlockPathWeight(int i, int j, int k)
+    {
+        return 0.0F;
+    }
 
-				this.rotationYaw += var15;
-				if(this.hasAttacked && this.playerToAttack != null) {
-					double var16 = this.playerToAttack.posX - this.posX;
-					double var18 = this.playerToAttack.posZ - this.posZ;
-					float var20 = this.rotationYaw;
-					this.rotationYaw = (float)(Math.atan2(var18, var16) * 180.0D / (double)((float)Math.PI)) - 90.0F;
-					var15 = (var20 - this.rotationYaw + 90.0F) * (float)Math.PI / 180.0F;
-					this.moveStrafing = -MathHelper.sin(var15) * this.moveForward * 1.0F;
-					this.moveForward = MathHelper.cos(var15) * this.moveForward * 1.0F;
-				}
+    protected Entity findPlayerToAttack()
+    {
+        return null;
+    }
 
-				if(var12 > 0.0D) {
-					this.isJumping = true;
-				}
-			}
+    public boolean getCanSpawnHere()
+    {
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_double(boundingBox.minY);
+        int k = MathHelper.floor_double(posZ);
+        return super.getCanSpawnHere() && getBlockPathWeight(i, j, k) >= 0.0F;
+    }
 
-			if(this.playerToAttack != null) {
-				this.faceEntity(this.playerToAttack, 30.0F);
-			}
+    public boolean hasPath()
+    {
+        return pathToEntity != null;
+    }
 
-			if(this.isCollidedHorizontally) {
-				this.isJumping = true;
-			}
+    public void setPathToEntity(PathEntity pathentity)
+    {
+        pathToEntity = pathentity;
+    }
 
-			if(this.rand.nextFloat() < 0.8F && (var23 || var24)) {
-				this.isJumping = true;
-			}
+    public Entity getEntityToAttack()
+    {
+        return entityToAttack;
+    }
 
-		} else {
-			super.updatePlayerActionState();
-			this.pathToEntity = null;
-		}
-	}
+    public void setEntityToAttack(Entity entity)
+    {
+        entityToAttack = entity;
+    }
 
-	protected void attackEntity(Entity var1, float var2) {
-	}
-
-	protected float getBlockPathWeight(int var1, int var2, int var3) {
-		return 0.0F;
-	}
-
-	protected Entity findPlayerToAttack() {
-		return null;
-	}
-
-	public boolean getCanSpawnHere() {
-		int var1 = MathHelper.floor_double(this.posX);
-		int var2 = MathHelper.floor_double(this.boundingBox.minY);
-		int var3 = MathHelper.floor_double(this.posZ);
-		return super.getCanSpawnHere() && this.getBlockPathWeight(var1, var2, var3) >= 0.0F;
-	}
+    protected float func_35166_t_()
+    {
+        float f = super.func_35166_t_();
+        if(fleeingTick > 0)
+        {
+            f *= 2.0F;
+        }
+        return f;
+    }
 }

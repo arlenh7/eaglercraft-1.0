@@ -1,15 +1,52 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class RecipesIngots {
-	private Object[][] recipeItems = new Object[][]{{Block.blockGold, Item.ingotGold}, {Block.blockSteel, Item.ingotIron}, {Block.blockDiamond, Item.diamond}};
 
-	public void addRecipes(CraftingManager var1) {
-		for(int var2 = 0; var2 < this.recipeItems.length; ++var2) {
-			Block var3 = (Block)this.recipeItems[var2][0];
-			Item var4 = (Item)this.recipeItems[var2][1];
-			var1.addRecipe(new ItemStack(var3), new Object[]{"###", "###", "###", '#', var4});
-			var1.addRecipe(new ItemStack(var4, 9), new Object[]{"#", '#', var3});
-		}
+// Referenced classes of package net.minecraft.src:
+//            Block, ItemStack, Item, CraftingManager
 
-	}
+public class RecipesIngots
+{
+
+    private Object recipeItems[][];
+
+    public RecipesIngots()
+    {
+        recipeItems = (new Object[][] {
+            new Object[] {
+                Block.blockGold, new ItemStack(Item.ingotGold, 9)
+            }, new Object[] {
+                Block.blockSteel, new ItemStack(Item.ingotIron, 9)
+            }, new Object[] {
+                Block.blockDiamond, new ItemStack(Item.diamond, 9)
+            }, new Object[] {
+                Block.blockLapis, new ItemStack(Item.dyePowder, 9, 4)
+            }
+        });
+    }
+
+    public void addRecipes(CraftingManager craftingmanager)
+    {
+        for(int i = 0; i < recipeItems.length; i++)
+        {
+            Block block = (Block)recipeItems[i][0];
+            ItemStack itemstack = (ItemStack)recipeItems[i][1];
+            craftingmanager.addRecipe(new ItemStack(block), new Object[] {
+                "###", "###", "###", Character.valueOf('#'), itemstack
+            });
+            craftingmanager.addRecipe(itemstack, new Object[] {
+                "#", Character.valueOf('#'), block
+            });
+        }
+
+        craftingmanager.addRecipe(new ItemStack(Item.ingotGold), new Object[] {
+            "###", "###", "###", Character.valueOf('#'), Item.goldNugget
+        });
+        craftingmanager.addRecipe(new ItemStack(Item.goldNugget, 9), new Object[] {
+            "#", Character.valueOf('#'), Item.ingotGold
+        });
+    }
 }

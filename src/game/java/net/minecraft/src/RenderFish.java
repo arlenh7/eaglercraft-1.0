@@ -1,82 +1,102 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
-import net.peyton.eagler.minecraft.Tessellator;
+// Referenced classes of package net.minecraft.src:
+//            Render, Tessellator, RenderManager, EntityFishHook, 
+//            EntityPlayer, MathHelper, Vec3D, GameSettings, 
+//            Entity
 
-public class RenderFish extends Render {
-	public void a(EntityFish var1, double var2, double var4, double var6, float var8, float var9) {
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float)var2, (float)var4, (float)var6);
-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-		GL11.glScalef(0.5F, 0.5F, 0.5F);
-		byte var10 = 1;
-		byte var11 = 2;
-		this.loadTexture("/particles.png");
-		Tessellator var12 = Tessellator.instance;
-		float var13 = (float)(var10 * 8 + 0) / 128.0F;
-		float var14 = (float)(var10 * 8 + 8) / 128.0F;
-		float var15 = (float)(var11 * 8 + 0) / 128.0F;
-		float var16 = (float)(var11 * 8 + 8) / 128.0F;
-		float var17 = 1.0F;
-		float var18 = 0.5F;
-		float var19 = 0.5F;
-		GL11.glRotatef(180.0F - this.renderManager.field_1225_i, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(-this.renderManager.field_1224_j, 1.0F, 0.0F, 0.0F);
-		var12.startDrawingQuads();
-		var12.setNormal(0.0F, 1.0F, 0.0F);
-		var12.addVertexWithUV((double)(0.0F - var18), (double)(0.0F - var19), 0.0D, (double)var13, (double)var16);
-		var12.addVertexWithUV((double)(var17 - var18), (double)(0.0F - var19), 0.0D, (double)var14, (double)var16);
-		var12.addVertexWithUV((double)(var17 - var18), (double)(1.0F - var19), 0.0D, (double)var14, (double)var15);
-		var12.addVertexWithUV((double)(0.0F - var18), (double)(1.0F - var19), 0.0D, (double)var13, (double)var15);
-		var12.draw();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		GL11.glPopMatrix();
-		if(var1.field_4097_b != null) {
-			float var20 = (var1.field_4097_b.prevRotationYaw + (var1.field_4097_b.rotationYaw - var1.field_4097_b.prevRotationYaw) * var9) * (float)Math.PI / 180.0F;
-			float var21 = (var1.field_4097_b.prevRotationPitch + (var1.field_4097_b.rotationPitch - var1.field_4097_b.prevRotationPitch) * var9) * (float)Math.PI / 180.0F;
-			double var22 = (double)MathHelper.sin(var20);
-			double var24 = (double)MathHelper.cos(var20);
-			double var26 = (double)MathHelper.sin(var21);
-			double var28 = (double)MathHelper.cos(var21);
-			double var30 = var1.field_4097_b.prevPosX + (var1.field_4097_b.posX - var1.field_4097_b.prevPosX) * (double)var9 - var24 * 0.7D - var22 * 0.5D * var28;
-			double var32 = var1.field_4097_b.prevPosY + (var1.field_4097_b.posY - var1.field_4097_b.prevPosY) * (double)var9 - var26 * 0.5D;
-			double var34 = var1.field_4097_b.prevPosZ + (var1.field_4097_b.posZ - var1.field_4097_b.prevPosZ) * (double)var9 - var22 * 0.7D + var24 * 0.5D * var28;
-			if(this.renderManager.options.thirdPersonView) {
-				var20 = (var1.field_4097_b.prevRenderYawOffset + (var1.field_4097_b.renderYawOffset - var1.field_4097_b.prevRenderYawOffset) * var9) * (float)Math.PI / 180.0F;
-				var22 = (double)MathHelper.sin(var20);
-				var24 = (double)MathHelper.cos(var20);
-				var30 = var1.field_4097_b.prevPosX + (var1.field_4097_b.posX - var1.field_4097_b.prevPosX) * (double)var9 - var24 * 0.35D - var22 * 0.85D;
-				var32 = var1.field_4097_b.prevPosY + (var1.field_4097_b.posY - var1.field_4097_b.prevPosY) * (double)var9 - 0.45D;
-				var34 = var1.field_4097_b.prevPosZ + (var1.field_4097_b.posZ - var1.field_4097_b.prevPosZ) * (double)var9 - var22 * 0.35D + var24 * 0.85D;
-			}
+public class RenderFish extends Render
+{
 
-			double var36 = var1.prevPosX + (var1.posX - var1.prevPosX) * (double)var9;
-			double var38 = var1.prevPosY + (var1.posY - var1.prevPosY) * (double)var9 + 0.25D;
-			double var40 = var1.prevPosZ + (var1.posZ - var1.prevPosZ) * (double)var9;
-			double var42 = (double)((float)(var30 - var36));
-			double var44 = (double)((float)(var32 - var38));
-			double var46 = (double)((float)(var34 - var40));
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glDisable(GL11.GL_LIGHTING);
-			var12.startDrawing(3);
-			var12.setColorOpaque_I(0);
-			byte var48 = 16;
+    public RenderFish()
+    {
+    }
 
-			for(int var49 = 0; var49 <= var48; ++var49) {
-				float var50 = (float)var49 / (float)var48;
-				var12.addVertex(var2 + var42 * (double)var50, var4 + var44 * (double)(var50 * var50 + var50) * 0.5D + 0.25D, var6 + var46 * (double)var50);
-			}
+    public void doRenderFish(EntityFishHook entityfishhook, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d, (float)d1, (float)d2);
+        GL11.glEnable(32826 /*GL_RESCALE_NORMAL_EXT*/);
+        GL11.glScalef(0.5F, 0.5F, 0.5F);
+        int i = 1;
+        byte byte0 = 2;
+        loadTexture("/particles.png");
+        Tessellator tessellator = Tessellator.instance;
+        float f2 = (float)(i * 8 + 0) / 128F;
+        float f3 = (float)(i * 8 + 8) / 128F;
+        float f4 = (float)(byte0 * 8 + 0) / 128F;
+        float f5 = (float)(byte0 * 8 + 8) / 128F;
+        float f6 = 1.0F;
+        float f7 = 0.5F;
+        float f8 = 0.5F;
+        GL11.glRotatef(180F - renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(-renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+        tessellator.startDrawingQuads();
+        tessellator.setNormal(0.0F, 1.0F, 0.0F);
+        tessellator.addVertexWithUV(0.0F - f7, 0.0F - f8, 0.0D, f2, f5);
+        tessellator.addVertexWithUV(f6 - f7, 0.0F - f8, 0.0D, f3, f5);
+        tessellator.addVertexWithUV(f6 - f7, 1.0F - f8, 0.0D, f3, f4);
+        tessellator.addVertexWithUV(0.0F - f7, 1.0F - f8, 0.0D, f2, f4);
+        tessellator.draw();
+        GL11.glDisable(32826 /*GL_RESCALE_NORMAL_EXT*/);
+        GL11.glPopMatrix();
+        if(entityfishhook.angler != null)
+        {
+            float f9 = ((entityfishhook.angler.prevRotationYaw + (entityfishhook.angler.rotationYaw - entityfishhook.angler.prevRotationYaw) * f1) * 3.141593F) / 180F;
+            double d3 = MathHelper.sin(f9);
+            double d5 = MathHelper.cos(f9);
+            float f11 = entityfishhook.angler.getSwingProgress(f1);
+            float f12 = MathHelper.sin(MathHelper.sqrt_float(f11) * 3.141593F);
+            Vec3D vec3d = Vec3D.createVector(-0.5D, 0.029999999999999999D, 0.80000000000000004D);
+            vec3d.rotateAroundX((-(entityfishhook.angler.prevRotationPitch + (entityfishhook.angler.rotationPitch - entityfishhook.angler.prevRotationPitch) * f1) * 3.141593F) / 180F);
+            vec3d.rotateAroundY((-(entityfishhook.angler.prevRotationYaw + (entityfishhook.angler.rotationYaw - entityfishhook.angler.prevRotationYaw) * f1) * 3.141593F) / 180F);
+            vec3d.rotateAroundY(f12 * 0.5F);
+            vec3d.rotateAroundX(-f12 * 0.7F);
+            double d7 = entityfishhook.angler.prevPosX + (entityfishhook.angler.posX - entityfishhook.angler.prevPosX) * (double)f1 + vec3d.xCoord;
+            double d8 = entityfishhook.angler.prevPosY + (entityfishhook.angler.posY - entityfishhook.angler.prevPosY) * (double)f1 + vec3d.yCoord;
+            double d9 = entityfishhook.angler.prevPosZ + (entityfishhook.angler.posZ - entityfishhook.angler.prevPosZ) * (double)f1 + vec3d.zCoord;
+            if(renderManager.options.thirdPersonView > 0)
+            {
+                float f10 = ((entityfishhook.angler.prevRenderYawOffset + (entityfishhook.angler.renderYawOffset - entityfishhook.angler.prevRenderYawOffset) * f1) * 3.141593F) / 180F;
+                double d4 = MathHelper.sin(f10);
+                double d6 = MathHelper.cos(f10);
+                d7 = (entityfishhook.angler.prevPosX + (entityfishhook.angler.posX - entityfishhook.angler.prevPosX) * (double)f1) - d6 * 0.34999999999999998D - d4 * 0.84999999999999998D;
+                d8 = (entityfishhook.angler.prevPosY + (entityfishhook.angler.posY - entityfishhook.angler.prevPosY) * (double)f1) - 0.45000000000000001D;
+                d9 = ((entityfishhook.angler.prevPosZ + (entityfishhook.angler.posZ - entityfishhook.angler.prevPosZ) * (double)f1) - d4 * 0.34999999999999998D) + d6 * 0.84999999999999998D;
+            }
+            double d10 = entityfishhook.prevPosX + (entityfishhook.posX - entityfishhook.prevPosX) * (double)f1;
+            double d11 = entityfishhook.prevPosY + (entityfishhook.posY - entityfishhook.prevPosY) * (double)f1 + 0.25D;
+            double d12 = entityfishhook.prevPosZ + (entityfishhook.posZ - entityfishhook.prevPosZ) * (double)f1;
+            double d13 = (float)(d7 - d10);
+            double d14 = (float)(d8 - d11);
+            double d15 = (float)(d9 - d12);
+            GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
+            GL11.glDisable(2896 /*GL_LIGHTING*/);
+            tessellator.startDrawing(3);
+            tessellator.setColorOpaque_I(0);
+            int j = 16;
+            for(int k = 0; k <= j; k++)
+            {
+                float f13 = (float)k / (float)j;
+                tessellator.addVertex(d + d13 * (double)f13, d1 + d14 * (double)(f13 * f13 + f13) * 0.5D + 0.25D, d2 + d15 * (double)f13);
+            }
 
-			var12.draw();
-			GL11.glEnable(GL11.GL_LIGHTING);
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-		}
+            tessellator.draw();
+            GL11.glEnable(2896 /*GL_LIGHTING*/);
+            GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
+        }
+    }
 
-	}
-
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityFish)var1, var2, var4, var6, var8, var9);
-	}
+    public void doRender(Entity entity, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        doRenderFish((EntityFishHook)entity, d, d1, d2, f, f1);
+    }
 }

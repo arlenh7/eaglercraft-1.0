@@ -1,100 +1,186 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// Referenced classes of package net.minecraft.src:
+//            NBTTagCompound, World, Block, TileEntityFurnace, 
+//            TileEntityChest, TileEntityRecordPlayer, TileEntityDispenser, TileEntitySign, 
+//            TileEntityMobSpawner, TileEntityNote, TileEntityPiston, TileEntityBrewingStand, 
+//            TileEntityEnchantmentTable, TileEntityEndPortal
 
-import net.peyton.eagler.minecraft.suppliers.TileEntitySupplier;
+public class TileEntity
+{
 
-public class TileEntity {
-	private static Map<String, TileEntitySupplier<TileEntity>> nameToClassMap = new HashMap<>();
-	private static Map<Class<? extends TileEntity>, String> classToNameMap = new HashMap<>();
-	public World worldObj;
-	public int xCoord;
-	public int yCoord;
-	public int zCoord;
-	
-	private static Logger LOGGER = LogManager.getLogger();
+    private static Map nameToClassMap = new HashMap();
+    private static Map classToNameMap = new HashMap();
+    public World worldObj;
+    public int xCoord;
+    public int yCoord;
+    public int zCoord;
+    protected boolean tileEntityInvalid;
+    public int blockMetadata;
+    public Block field_35146_o;
 
-	private static void addMapping(Class<? extends TileEntity> var0, TileEntitySupplier<TileEntity> var2, String var1) {
-		if(classToNameMap.containsValue(var1)) {
-			throw new IllegalArgumentException("Duplicate id: " + var1);
-		} else {
-			nameToClassMap.put(var1, var2);
-			classToNameMap.put(var0, var1);
-		}
-	}
+    public TileEntity()
+    {
+        blockMetadata = -1;
+    }
 
-	public void readFromNBT(NBTTagCompound var1) {
-		this.xCoord = var1.getInteger("x");
-		this.yCoord = var1.getInteger("y");
-		this.zCoord = var1.getInteger("z");
-	}
+    private static void addMapping(Class class1, String s)
+    {
+        if(classToNameMap.containsKey(s))
+        {
+            throw new IllegalArgumentException((new StringBuilder()).append("Duplicate id: ").append(s).toString());
+        } else
+        {
+            nameToClassMap.put(s, class1);
+            classToNameMap.put(class1, s);
+            return;
+        }
+    }
 
-	public void writeToNBT(NBTTagCompound var1) {
-		String var2 = (String)classToNameMap.get(this.getClass());
-		if(var2 == null) {
-			throw new RuntimeException(this.getClass() + " is missing a mapping! This is a bug!");
-		} else {
-			var1.setString("id", var2);
-			var1.setInteger("x", this.xCoord);
-			var1.setInteger("y", this.yCoord);
-			var1.setInteger("z", this.zCoord);
-		}
-	}
+    public void readFromNBT(NBTTagCompound nbttagcompound)
+    {
+        xCoord = nbttagcompound.getInteger("x");
+        yCoord = nbttagcompound.getInteger("y");
+        zCoord = nbttagcompound.getInteger("z");
+    }
 
-	public void updateEntity() {
-	}
+    public void writeToNBT(NBTTagCompound nbttagcompound)
+    {
+        String s = (String)classToNameMap.get(getClass());
+        if(s == null)
+        {
+            throw new RuntimeException((new StringBuilder()).append(getClass()).append(" is missing a mapping! This is a bug!").toString());
+        } else
+        {
+            nbttagcompound.setString("id", s);
+            nbttagcompound.setInteger("x", xCoord);
+            nbttagcompound.setInteger("y", yCoord);
+            nbttagcompound.setInteger("z", zCoord);
+            return;
+        }
+    }
 
-	public static TileEntity createAndLoadEntity(NBTTagCompound var0) {
-		TileEntity var1 = null;
+    public void updateEntity()
+    {
+    }
 
-		try {
-			TileEntitySupplier<TileEntity> var2 = nameToClassMap.get(var0.getString("id"));
-			if(var2 != null) {
-				var1 = (TileEntity)var2.createTileEntity();
-			}
-		} catch (Exception var3) {
-			LOGGER.error(var3);
-		}
+    public static TileEntity createAndLoadEntity(NBTTagCompound nbttagcompound)
+    {
+        TileEntity tileentity = null;
+        try
+        {
+            Class class1 = (Class)nameToClassMap.get(nbttagcompound.getString("id"));
+            if(class1 != null)
+            {
+                tileentity = (TileEntity)class1.newInstance();
+            }
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();
+        }
+        if(tileentity != null)
+        {
+            tileentity.readFromNBT(nbttagcompound);
+        } else
+        {
+            System.out.println((new StringBuilder()).append("Skipping TileEntity with id ").append(nbttagcompound.getString("id")).toString());
+        }
+        return tileentity;
+    }
 
-		if(var1 != null) {
-			var1.readFromNBT(var0);
-		} else {
-			LOGGER.warn("Skipping TileEntity with id {}", var0.getString("id"));
-		}
+    public int getBlockMetadata()
+    {
+        if(blockMetadata == -1)
+        {
+            blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        }
+        return blockMetadata;
+    }
 
-		return var1;
-	}
+    public void onInventoryChanged()
+    {
+        if(worldObj != null)
+        {
+            blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+            worldObj.updateTileEntityChunkAndDoNothing(xCoord, yCoord, zCoord, this);
+        }
+    }
 
-	public int getBlockMetadata() {
-		return this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
-	}
+    public double getDistanceFrom(double d, double d1, double d2)
+    {
+        double d3 = ((double)xCoord + 0.5D) - d;
+        double d4 = ((double)yCoord + 0.5D) - d1;
+        double d5 = ((double)zCoord + 0.5D) - d2;
+        return d3 * d3 + d4 * d4 + d5 * d5;
+    }
 
-	public void onInventoryChanged() {
-		if(this.worldObj != null) {
-			this.worldObj.func_698_b(this.xCoord, this.yCoord, this.zCoord, this);
-		}
+    public Block getBlockType()
+    {
+        if(field_35146_o == null)
+        {
+            field_35146_o = Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)];
+        }
+        return field_35146_o;
+    }
 
-	}
+    public boolean isInvalid()
+    {
+        return tileEntityInvalid;
+    }
 
-	public double getDistanceFrom(double var1, double var3, double var5) {
-		double var7 = (double)this.xCoord + 0.5D - var1;
-		double var9 = (double)this.yCoord + 0.5D - var3;
-		double var11 = (double)this.zCoord + 0.5D - var5;
-		return var7 * var7 + var9 * var9 + var11 * var11;
-	}
+    public void invalidate()
+    {
+        tileEntityInvalid = true;
+    }
 
-	public Block getBlockType() {
-		return Block.blocksList[this.worldObj.getBlockId(this.xCoord, this.yCoord, this.zCoord)];
-	}
+    public void validate()
+    {
+        tileEntityInvalid = false;
+    }
 
-	static {
-		addMapping(TileEntityFurnace.class, TileEntityFurnace::new, "Furnace");
-		addMapping(TileEntityChest.class, TileEntityChest::new, "Chest");
-		addMapping(TileEntitySign.class, TileEntitySign::new, "Sign");
-		addMapping(TileEntityMobSpawner.class, TileEntityMobSpawner::new, "MobSpawner");
-	}
+    public void func_35143_b(int i, int j)
+    {
+    }
+
+    public void func_35144_b()
+    {
+        field_35146_o = null;
+        blockMetadata = -1;
+    }
+
+    static Class _mthclass$(String s)
+    {
+        try
+        {
+            return Class.forName(s);
+        }
+        catch(ClassNotFoundException classnotfoundexception)
+        {
+            throw new NoClassDefFoundError(classnotfoundexception.getMessage());
+        }
+    }
+
+    static 
+    {
+        addMapping(net.minecraft.src.TileEntityFurnace.class, "Furnace");
+        addMapping(net.minecraft.src.TileEntityChest.class, "Chest");
+        addMapping(net.minecraft.src.TileEntityRecordPlayer.class, "RecordPlayer");
+        addMapping(net.minecraft.src.TileEntityDispenser.class, "Trap");
+        addMapping(net.minecraft.src.TileEntitySign.class, "Sign");
+        addMapping(net.minecraft.src.TileEntityMobSpawner.class, "MobSpawner");
+        addMapping(net.minecraft.src.TileEntityNote.class, "Music");
+        addMapping(net.minecraft.src.TileEntityPiston.class, "Piston");
+        addMapping(net.minecraft.src.TileEntityBrewingStand.class, "Cauldron");
+        addMapping(net.minecraft.src.TileEntityEnchantmentTable.class, "EnchantTable");
+        addMapping(net.minecraft.src.TileEntityEndPortal.class, "Airportal");
+    }
 }

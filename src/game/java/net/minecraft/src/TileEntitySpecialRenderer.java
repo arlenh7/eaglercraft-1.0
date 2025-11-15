@@ -1,22 +1,46 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.FontRenderer;
 
-public abstract class TileEntitySpecialRenderer {
-	protected TileEntityRenderer tileEntityRenderer;
+// Referenced classes of package net.minecraft.src:
+//            TileEntityRenderer, RenderEngine, TileEntity, World, 
+//            FontRenderer
 
-	public abstract void renderTileEntityAt(TileEntity var1, double var2, double var4, double var6, float var8);
+public abstract class TileEntitySpecialRenderer
+{
 
-	protected void bindTextureByName(String var1) {
-		RenderEngine var2 = this.tileEntityRenderer.renderEngine;
-		var2.bindTexture(var2.getTexture(var1));
-	}
+    protected TileEntityRenderer tileEntityRenderer;
 
-	public void setTileEntityRenderer(TileEntityRenderer var1) {
-		this.tileEntityRenderer = var1;
-	}
+    public TileEntitySpecialRenderer()
+    {
+    }
 
-	public FontRenderer getFontRenderer() {
-		return this.tileEntityRenderer.getFontRenderer();
-	}
+    public abstract void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, 
+            float f);
+
+    protected void bindTextureByName(String s)
+    {
+        RenderEngine renderengine = tileEntityRenderer.renderEngine;
+        if(renderengine != null)
+        {
+            renderengine.bindTexture(renderengine.getTexture(s));
+        }
+    }
+
+    public void setTileEntityRenderer(TileEntityRenderer tileentityrenderer)
+    {
+        tileEntityRenderer = tileentityrenderer;
+    }
+
+    public void func_31069_a(World world)
+    {
+    }
+
+    public FontRenderer getFontRenderer()
+    {
+        return tileEntityRenderer.getFontRenderer();
+    }
 }

@@ -1,21 +1,50 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockWorkbench extends Block {
-	protected BlockWorkbench(int var1) {
-		super(var1, Material.wood);
-		this.blockIndexInTexture = 59;
-	}
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 1 ? this.blockIndexInTexture - 16 : (var1 == 0 ? Block.planks.getBlockTextureFromSide(0) : (var1 != 2 && var1 != 4 ? this.blockIndexInTexture : this.blockIndexInTexture + 1));
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, EntityPlayer
 
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		if(var1.multiplayerWorld) {
-			return true;
-		} else {
-			var5.displayWorkbenchGUI(var2, var3, var4);
-			return true;
-		}
-	}
+public class BlockWorkbench extends Block
+{
+
+    protected BlockWorkbench(int i)
+    {
+        super(i, Material.wood);
+        blockIndexInTexture = 59;
+    }
+
+    public int getBlockTextureFromSide(int i)
+    {
+        if(i == 1)
+        {
+            return blockIndexInTexture - 16;
+        }
+        if(i == 0)
+        {
+            return Block.planks.getBlockTextureFromSide(0);
+        }
+        if(i == 2 || i == 4)
+        {
+            return blockIndexInTexture + 1;
+        } else
+        {
+            return blockIndexInTexture;
+        }
+    }
+
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(world.multiplayerWorld)
+        {
+            return true;
+        } else
+        {
+            entityplayer.displayWorkbenchGUI(i, j, k);
+            return true;
+        }
+    }
 }

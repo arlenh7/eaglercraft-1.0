@@ -1,26 +1,40 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockSnowBlock extends Block {
-	protected BlockSnowBlock(int var1, int var2) {
-		super(var1, var2, Material.builtSnow);
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, Item, EnumSkyBlock, 
+//            World
 
-	public int idDropped(int var1, Random var2) {
-		return Item.snowball.shiftedIndex;
-	}
+public class BlockSnowBlock extends Block
+{
 
-	public int quantityDropped(Random var1) {
-		return 4;
-	}
+    protected BlockSnowBlock(int i, int j)
+    {
+        super(i, j, Material.craftedSnow);
+        setTickOnLoad(true);
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(var1.getSavedLightValue(EnumSkyBlock.Block, var2, var3, var4) > 11) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Item.snowball.shiftedIndex;
+    }
 
-	}
+    public int quantityDropped(Random random)
+    {
+        return 4;
+    }
+
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) > 11)
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 }

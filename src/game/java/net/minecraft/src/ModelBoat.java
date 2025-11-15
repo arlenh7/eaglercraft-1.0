@@ -1,41 +1,56 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ModelBoat extends ModelBase {
-	public ModelRenderer[] field_1287_a = new ModelRenderer[5];
 
-	public ModelBoat() {
-		this.field_1287_a[0] = new ModelRenderer(0, 8);
-		this.field_1287_a[1] = new ModelRenderer(0, 0);
-		this.field_1287_a[2] = new ModelRenderer(0, 0);
-		this.field_1287_a[3] = new ModelRenderer(0, 0);
-		this.field_1287_a[4] = new ModelRenderer(0, 0);
-		byte var1 = 24;
-		byte var2 = 6;
-		byte var3 = 20;
-		byte var4 = 4;
-		this.field_1287_a[0].addBox((float)(-var1 / 2), (float)(-var3 / 2 + 2), -3.0F, var1, var3 - 4, 4, 0.0F);
-		this.field_1287_a[0].setPosition(0.0F, (float)(0 + var4), 0.0F);
-		this.field_1287_a[1].addBox((float)(-var1 / 2 + 2), (float)(-var2 - 1), -1.0F, var1 - 4, var2, 2, 0.0F);
-		this.field_1287_a[1].setPosition((float)(-var1 / 2 + 1), (float)(0 + var4), 0.0F);
-		this.field_1287_a[2].addBox((float)(-var1 / 2 + 2), (float)(-var2 - 1), -1.0F, var1 - 4, var2, 2, 0.0F);
-		this.field_1287_a[2].setPosition((float)(var1 / 2 - 1), (float)(0 + var4), 0.0F);
-		this.field_1287_a[3].addBox((float)(-var1 / 2 + 2), (float)(-var2 - 1), -1.0F, var1 - 4, var2, 2, 0.0F);
-		this.field_1287_a[3].setPosition(0.0F, (float)(0 + var4), (float)(-var3 / 2 + 1));
-		this.field_1287_a[4].addBox((float)(-var1 / 2 + 2), (float)(-var2 - 1), -1.0F, var1 - 4, var2, 2, 0.0F);
-		this.field_1287_a[4].setPosition(0.0F, (float)(0 + var4), (float)(var3 / 2 - 1));
-		this.field_1287_a[0].rotateAngleX = (float)Math.PI * 0.5F;
-		this.field_1287_a[1].rotateAngleY = (float)Math.PI * 3.0F / 2.0F;
-		this.field_1287_a[2].rotateAngleY = (float)Math.PI * 0.5F;
-		this.field_1287_a[3].rotateAngleY = (float)Math.PI;
-	}
+// Referenced classes of package net.minecraft.src:
+//            ModelBase, ModelRenderer, Entity
 
-	public void render(float var1, float var2, float var3, float var4, float var5, float var6) {
-		for(int var7 = 0; var7 < 5; ++var7) {
-			this.field_1287_a[var7].render(var6);
-		}
+public class ModelBoat extends ModelBase
+{
 
-	}
+    public ModelRenderer boatSides[];
 
-	public void setRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6) {
-	}
+    public ModelBoat()
+    {
+        boatSides = new ModelRenderer[5];
+        boatSides[0] = new ModelRenderer(this, 0, 8);
+        boatSides[1] = new ModelRenderer(this, 0, 0);
+        boatSides[2] = new ModelRenderer(this, 0, 0);
+        boatSides[3] = new ModelRenderer(this, 0, 0);
+        boatSides[4] = new ModelRenderer(this, 0, 0);
+        byte byte0 = 24;
+        byte byte1 = 6;
+        byte byte2 = 20;
+        byte byte3 = 4;
+        boatSides[0].addBox(-byte0 / 2, -byte2 / 2 + 2, -3F, byte0, byte2 - 4, 4, 0.0F);
+        boatSides[0].setRotationPoint(0.0F, 0 + byte3, 0.0F);
+        boatSides[1].addBox(-byte0 / 2 + 2, -byte1 - 1, -1F, byte0 - 4, byte1, 2, 0.0F);
+        boatSides[1].setRotationPoint(-byte0 / 2 + 1, 0 + byte3, 0.0F);
+        boatSides[2].addBox(-byte0 / 2 + 2, -byte1 - 1, -1F, byte0 - 4, byte1, 2, 0.0F);
+        boatSides[2].setRotationPoint(byte0 / 2 - 1, 0 + byte3, 0.0F);
+        boatSides[3].addBox(-byte0 / 2 + 2, -byte1 - 1, -1F, byte0 - 4, byte1, 2, 0.0F);
+        boatSides[3].setRotationPoint(0.0F, 0 + byte3, -byte2 / 2 + 1);
+        boatSides[4].addBox(-byte0 / 2 + 2, -byte1 - 1, -1F, byte0 - 4, byte1, 2, 0.0F);
+        boatSides[4].setRotationPoint(0.0F, 0 + byte3, byte2 / 2 - 1);
+        boatSides[0].rotateAngleX = 1.570796F;
+        boatSides[1].rotateAngleY = 4.712389F;
+        boatSides[2].rotateAngleY = 1.570796F;
+        boatSides[3].rotateAngleY = 3.141593F;
+    }
+
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            boatSides[i].render(f5);
+        }
+
+    }
+
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5)
+    {
+    }
 }

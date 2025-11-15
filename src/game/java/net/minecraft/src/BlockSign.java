@@ -1,111 +1,141 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockSign extends BlockContainer {
-	private boolean isFreestanding;
+// Referenced classes of package net.minecraft.src:
+//            BlockContainer, Material, IBlockAccess, TileEntity, 
+//            Item, World, AxisAlignedBB
 
-	protected BlockSign(int var1, boolean var3) {
-		super(var1, Material.wood);
-		this.isFreestanding = var3;
-		this.blockIndexInTexture = 4;
-		float var4 = 0.25F;
-		float var5 = 1.0F;
-		this.setBlockBounds(0.5F - var4, 0.0F, 0.5F - var4, 0.5F + var4, var5, 0.5F + var4);
-	}
+public class BlockSign extends BlockContainer
+{
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+    private Class signEntityClass;
+    private boolean isFreestanding;
 
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		this.setBlockBoundsBasedOnState(var1, var2, var3, var4);
-		return super.getSelectedBoundingBoxFromPool(var1, var2, var3, var4);
-	}
+    protected BlockSign(int i, Class class1, boolean flag)
+    {
+        super(i, Material.wood);
+        isFreestanding = flag;
+        blockIndexInTexture = 4;
+        signEntityClass = class1;
+        float f = 0.25F;
+        float f1 = 1.0F;
+        setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
+    }
 
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
-		if(!this.isFreestanding) {
-			int var5 = var1.getBlockMetadata(var2, var3, var4);
-			float var6 = 9.0F / 32.0F;
-			float var7 = 25.0F / 32.0F;
-			float var8 = 0.0F;
-			float var9 = 1.0F;
-			float var10 = 2.0F / 16.0F;
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-			if(var5 == 2) {
-				this.setBlockBounds(var8, var6, 1.0F - var10, var9, var7, 1.0F);
-			}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        return null;
+    }
 
-			if(var5 == 3) {
-				this.setBlockBounds(var8, var6, 0.0F, var9, var7, var10);
-			}
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        setBlockBoundsBasedOnState(world, i, j, k);
+        return super.getSelectedBoundingBoxFromPool(world, i, j, k);
+    }
 
-			if(var5 == 4) {
-				this.setBlockBounds(1.0F - var10, var6, var8, 1.0F, var7, var9);
-			}
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        if(isFreestanding)
+        {
+            return;
+        }
+        int l = iblockaccess.getBlockMetadata(i, j, k);
+        float f = 0.28125F;
+        float f1 = 0.78125F;
+        float f2 = 0.0F;
+        float f3 = 1.0F;
+        float f4 = 0.125F;
+        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+        if(l == 2)
+        {
+            setBlockBounds(f2, f, 1.0F - f4, f3, f1, 1.0F);
+        }
+        if(l == 3)
+        {
+            setBlockBounds(f2, f, 0.0F, f3, f1, f4);
+        }
+        if(l == 4)
+        {
+            setBlockBounds(1.0F - f4, f, f2, 1.0F, f1, f3);
+        }
+        if(l == 5)
+        {
+            setBlockBounds(0.0F, f, f2, f4, f1, f3);
+        }
+    }
 
-			if(var5 == 5) {
-				this.setBlockBounds(0.0F, var6, var8, var10, var7, var9);
-			}
+    public int getRenderType()
+    {
+        return -1;
+    }
 
-		}
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	public int getRenderType() {
-		return -1;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public TileEntity getBlockEntity()
+    {
+        try
+        {
+            return (TileEntity)signEntityClass.newInstance();
+        }
+        catch(Exception exception)
+        {
+            throw new RuntimeException(exception);
+        }
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Item.sign.shiftedIndex;
+    }
 
-	protected TileEntity SetBlockEntity() {
-		try {
-			return new TileEntitySign();
-		} catch (Exception var2) {
-			throw new RuntimeException(var2);
-		}
-	}
-
-	public int idDropped(int var1, Random var2) {
-		return Item.sign.shiftedIndex;
-	}
-
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		boolean var6 = false;
-		if(this.isFreestanding) {
-			if(!var1.getBlockMaterial(var2, var3 - 1, var4).func_878_a()) {
-				var6 = true;
-			}
-		} else {
-			int var7 = var1.getBlockMetadata(var2, var3, var4);
-			var6 = true;
-			if(var7 == 2 && var1.getBlockMaterial(var2, var3, var4 + 1).func_878_a()) {
-				var6 = false;
-			}
-
-			if(var7 == 3 && var1.getBlockMaterial(var2, var3, var4 - 1).func_878_a()) {
-				var6 = false;
-			}
-
-			if(var7 == 4 && var1.getBlockMaterial(var2 + 1, var3, var4).func_878_a()) {
-				var6 = false;
-			}
-
-			if(var7 == 5 && var1.getBlockMaterial(var2 - 1, var3, var4).func_878_a()) {
-				var6 = false;
-			}
-		}
-
-		if(var6) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
-
-		super.onNeighborBlockChange(var1, var2, var3, var4, var5);
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        boolean flag = false;
+        if(isFreestanding)
+        {
+            if(!world.getBlockMaterial(i, j - 1, k).isSolid())
+            {
+                flag = true;
+            }
+        } else
+        {
+            int i1 = world.getBlockMetadata(i, j, k);
+            flag = true;
+            if(i1 == 2 && world.getBlockMaterial(i, j, k + 1).isSolid())
+            {
+                flag = false;
+            }
+            if(i1 == 3 && world.getBlockMaterial(i, j, k - 1).isSolid())
+            {
+                flag = false;
+            }
+            if(i1 == 4 && world.getBlockMaterial(i + 1, j, k).isSolid())
+            {
+                flag = false;
+            }
+            if(i1 == 5 && world.getBlockMaterial(i - 1, j, k).isSolid())
+            {
+                flag = false;
+            }
+        }
+        if(flag)
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+        super.onNeighborBlockChange(world, i, j, k, l);
+    }
 }

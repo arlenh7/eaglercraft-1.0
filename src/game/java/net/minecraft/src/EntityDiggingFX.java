@@ -1,49 +1,65 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.Tessellator;
 
-public class EntityDiggingFX extends EntityFX {
-	private Block field_4082_a;
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, Block, Tessellator, World
 
-	public EntityDiggingFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, Block var14) {
-		super(var1, var2, var4, var6, var8, var10, var12);
-		this.field_4082_a = var14;
-		this.field_670_b = var14.blockIndexInTexture;
-		this.field_664_h = var14.field_357_bm;
-		this.particleRed = this.particleBlue = this.particleGreen = 0.6F;
-		this.field_665_g /= 2.0F;
-	}
+public class EntityDiggingFX extends EntityFX
+{
 
-	public EntityDiggingFX func_4041_a(int var1, int var2, int var3) {
-		if(this.field_4082_a == Block.grass) {
-			return this;
-		} else {
-			int var4 = this.field_4082_a.colorMultiplier(this.worldObj, var1, var2, var3);
-			this.particleRed *= (float)(var4 >> 16 & 255) / 255.0F;
-			this.particleBlue *= (float)(var4 >> 8 & 255) / 255.0F;
-			this.particleGreen *= (float)(var4 & 255) / 255.0F;
-			return this;
-		}
-	}
+    private Block blockInstance;
 
-	public int func_404_c() {
-		return 1;
-	}
+    public EntityDiggingFX(World world, double d, double d1, double d2, 
+            double d3, double d4, double d5, Block block, 
+            int i, int j)
+    {
+        super(world, d, d1, d2, d3, d4, d5);
+        blockInstance = block;
+        func_40099_c(block.getBlockTextureFromSideAndMetadata(0, j));
+        particleGravity = block.blockParticleGravity;
+        particleRed = particleGreen = particleBlue = 0.6F;
+        particleScale /= 2.0F;
+    }
 
-	public void func_406_a(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-		float var8 = ((float)(this.field_670_b % 16) + this.field_669_c / 4.0F) / 16.0F;
-		float var9 = var8 + 0.999F / 64.0F;
-		float var10 = ((float)(this.field_670_b / 16) + this.field_668_d / 4.0F) / 16.0F;
-		float var11 = var10 + 0.999F / 64.0F;
-		float var12 = 0.1F * this.field_665_g;
-		float var13 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)var2 - field_660_l);
-		float var14 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)var2 - field_659_m);
-		float var15 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)var2 - field_658_n);
-		float var16 = this.getEntityBrightness(var2);
-		var1.setColorOpaque_F(var16 * this.particleRed, var16 * this.particleBlue, var16 * this.particleGreen);
-		var1.addVertexWithUV((double)(var13 - var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 - var5 * var12 - var7 * var12), (double)var8, (double)var11);
-		var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12), (double)var8, (double)var10);
-		var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12), (double)var9, (double)var10);
-		var1.addVertexWithUV((double)(var13 + var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 + var5 * var12 - var7 * var12), (double)var9, (double)var11);
-	}
+    public EntityDiggingFX func_4041_a(int i, int j, int k)
+    {
+        if(blockInstance == Block.grass)
+        {
+            return this;
+        } else
+        {
+            int l = blockInstance.colorMultiplier(worldObj, i, j, k);
+            particleRed *= (float)(l >> 16 & 0xff) / 255F;
+            particleGreen *= (float)(l >> 8 & 0xff) / 255F;
+            particleBlue *= (float)(l & 0xff) / 255F;
+            return this;
+        }
+    }
+
+    public int getFXLayer()
+    {
+        return 1;
+    }
+
+    public void renderParticle(Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        float f6 = ((float)(func_40100_q() % 16) + particleTextureJitterX / 4F) / 16F;
+        float f7 = f6 + 0.01560938F;
+        float f8 = ((float)(func_40100_q() / 16) + particleTextureJitterY / 4F) / 16F;
+        float f9 = f8 + 0.01560938F;
+        float f10 = 0.1F * particleScale;
+        float f11 = (float)((prevPosX + (posX - prevPosX) * (double)f) - interpPosX);
+        float f12 = (float)((prevPosY + (posY - prevPosY) * (double)f) - interpPosY);
+        float f13 = (float)((prevPosZ + (posZ - prevPosZ) * (double)f) - interpPosZ);
+        float f14 = 1.0F;
+        tessellator.setColorOpaque_F(f14 * particleRed, f14 * particleGreen, f14 * particleBlue);
+        tessellator.addVertexWithUV(f11 - f1 * f10 - f4 * f10, f12 - f2 * f10, f13 - f3 * f10 - f5 * f10, f6, f9);
+        tessellator.addVertexWithUV((f11 - f1 * f10) + f4 * f10, f12 + f2 * f10, (f13 - f3 * f10) + f5 * f10, f6, f8);
+        tessellator.addVertexWithUV(f11 + f1 * f10 + f4 * f10, f12 + f2 * f10, f13 + f3 * f10 + f5 * f10, f7, f8);
+        tessellator.addVertexWithUV((f11 + f1 * f10) - f4 * f10, f12 - f2 * f10, (f13 + f3 * f10) - f5 * f10, f7, f9);
+    }
 }

@@ -1,19 +1,37 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class RenderCow extends RenderLiving {
-	public RenderCow(ModelBase var1, float var2) {
-		super(var1, var2);
-	}
 
-	public void a(EntityCow var1, double var2, double var4, double var6, float var8, float var9) {
-		super.a(var1, var2, var4, var6, var8, var9);
-	}
+// Referenced classes of package net.minecraft.src:
+//            RenderLiving, EntityCow, ModelBase, EntityLiving, 
+//            Entity
 
-	public void a(EntityLiving var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityCow)var1, var2, var4, var6, var8, var9);
-	}
+public class RenderCow extends RenderLiving
+{
 
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityCow)var1, var2, var4, var6, var8, var9);
-	}
+    public RenderCow(ModelBase modelbase, float f)
+    {
+        super(modelbase, f);
+    }
+
+    public void renderCow(EntityCow entitycow, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        super.doRenderLiving(entitycow, d, d1, d2, f, f1);
+    }
+
+    public void doRenderLiving(EntityLiving entityliving, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        renderCow((EntityCow)entityliving, d, d1, d2, f, f1);
+    }
+
+    public void doRender(Entity entity, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        renderCow((EntityCow)entity, d, d1, d2, f, f1);
+    }
 }

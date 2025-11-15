@@ -1,86 +1,133 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockCactus extends Block {
-	protected BlockCactus(int var1, int var2) {
-		super(var1, var2, Material.cactus);
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, AxisAlignedBB, 
+//            DamageSource, Entity
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(var1.func_20084_d(var2, var3 + 1, var4)) {
-			int var6;
-			for(var6 = 1; var1.getBlockId(var2, var3 - var6, var4) == this.blockID; ++var6) {
-			}
+public class BlockCactus extends Block
+{
 
-			if(var6 < 3) {
-				int var7 = var1.getBlockMetadata(var2, var3, var4);
-				if(var7 == 15) {
-					var1.setBlockWithNotify(var2, var3 + 1, var4, this.blockID);
-					var1.setBlockMetadataWithNotify(var2, var3, var4, 0);
-				} else {
-					var1.setBlockMetadataWithNotify(var2, var3, var4, var7 + 1);
-				}
-			}
-		}
+    protected BlockCactus(int i, int j)
+    {
+        super(i, j, Material.cactus);
+        setTickOnLoad(true);
+    }
 
-	}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.isAirBlock(i, j + 1, k))
+        {
+            int l;
+            for(l = 1; world.getBlockId(i, j - l, k) == blockID; l++) { }
+            if(l < 3)
+            {
+                int i1 = world.getBlockMetadata(i, j, k);
+                if(i1 == 15)
+                {
+                    world.setBlockWithNotify(i, j + 1, k, blockID);
+                    world.setBlockMetadataWithNotify(i, j, k, 0);
+                } else
+                {
+                    world.setBlockMetadataWithNotify(i, j, k, i1 + 1);
+                }
+            }
+        }
+    }
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		float var5 = 1.0F / 16.0F;
-		return AxisAlignedBB.getBoundingBoxFromPool((double)((float)var2 + var5), (double)var3, (double)((float)var4 + var5), (double)((float)(var2 + 1) - var5), (double)((float)(var3 + 1) - var5), (double)((float)(var4 + 1) - var5));
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        float f = 0.0625F;
+        return AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f, (float)(i + 1) - f, (float)(j + 1) - f, (float)(k + 1) - f);
+    }
 
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		float var5 = 1.0F / 16.0F;
-		return AxisAlignedBB.getBoundingBoxFromPool((double)((float)var2 + var5), (double)var3, (double)((float)var4 + var5), (double)((float)(var2 + 1) - var5), (double)(var3 + 1), (double)((float)(var4 + 1) - var5));
-	}
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        float f = 0.0625F;
+        return AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f, (float)(i + 1) - f, j + 1, (float)(k + 1) - f);
+    }
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 1 ? this.blockIndexInTexture - 1 : (var1 == 0 ? this.blockIndexInTexture + 1 : this.blockIndexInTexture);
-	}
+    public int getBlockTextureFromSide(int i)
+    {
+        if(i == 1)
+        {
+            return blockIndexInTexture - 1;
+        }
+        if(i == 0)
+        {
+            return blockIndexInTexture + 1;
+        } else
+        {
+            return blockIndexInTexture;
+        }
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public int getRenderType() {
-		return 13;
-	}
+    public int getRenderType()
+    {
+        return 13;
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return !super.canPlaceBlockAt(var1, var2, var3, var4) ? false : this.canBlockStay(var1, var2, var3, var4);
-	}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        if(!super.canPlaceBlockAt(world, i, j, k))
+        {
+            return false;
+        } else
+        {
+            return canBlockStay(world, i, j, k);
+        }
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		if(!this.canBlockStay(var1, var2, var3, var4)) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        if(!canBlockStay(world, i, j, k))
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 
-	}
+    public boolean canBlockStay(World world, int i, int j, int k)
+    {
+        if(world.getBlockMaterial(i - 1, j, k).isSolid())
+        {
+            return false;
+        }
+        if(world.getBlockMaterial(i + 1, j, k).isSolid())
+        {
+            return false;
+        }
+        if(world.getBlockMaterial(i, j, k - 1).isSolid())
+        {
+            return false;
+        }
+        if(world.getBlockMaterial(i, j, k + 1).isSolid())
+        {
+            return false;
+        } else
+        {
+            int l = world.getBlockId(i, j - 1, k);
+            return l == Block.cactus.blockID || l == Block.sand.blockID;
+        }
+    }
 
-	public boolean canBlockStay(World var1, int var2, int var3, int var4) {
-		if(var1.getBlockMaterial(var2 - 1, var3, var4).func_878_a()) {
-			return false;
-		} else if(var1.getBlockMaterial(var2 + 1, var3, var4).func_878_a()) {
-			return false;
-		} else if(var1.getBlockMaterial(var2, var3, var4 - 1).func_878_a()) {
-			return false;
-		} else if(var1.getBlockMaterial(var2, var3, var4 + 1).func_878_a()) {
-			return false;
-		} else {
-			int var5 = var1.getBlockId(var2, var3 - 1, var4);
-			return var5 == Block.cactus.blockID || var5 == Block.sand.blockID;
-		}
-	}
-
-	public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
-		var5.attackEntityFrom((Entity)null, 1);
-	}
+    public void onEntityCollidedWithBlock(World world, int i, int j, int k, Entity entity)
+    {
+        entity.attackEntityFrom(DamageSource.cactus, 1);
+    }
 }

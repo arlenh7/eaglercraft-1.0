@@ -1,59 +1,132 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockStep extends Block {
-	private boolean a;
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, IBlockAccess, ItemStack, 
+//            World
 
-	public BlockStep(int var1, boolean var2) {
-		super(var1, 6, Material.rock);
-		this.a = var2;
-		if(!var2) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.5F, 1.0F);
-		}
+public class BlockStep extends Block
+{
 
-		this.setLightOpacity(255);
-	}
+    public static final String field_22037_a[] = {
+        "stone", "sand", "wood", "cobble", "brick", "smoothStoneBrick"
+    };
+    private boolean blockType;
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 <= 1 ? 6 : 5;
-	}
+    public BlockStep(int i, boolean flag)
+    {
+        super(i, 6, Material.rock);
+        blockType = flag;
+        if(!flag)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.5F, 1.0F);
+        } else
+        {
+            opaqueCubeLookup[i] = true;
+        }
+        setLightOpacity(255);
+    }
 
-	public boolean isOpaqueCube() {
-		return this.a;
-	}
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if(j == 0)
+        {
+            return i > 1 ? 5 : 6;
+        }
+        if(j == 1)
+        {
+            if(i == 0)
+            {
+                return 208;
+            }
+            return i != 1 ? 192 : 176;
+        }
+        if(j == 2)
+        {
+            return 4;
+        }
+        if(j == 3)
+        {
+            return 16;
+        }
+        if(j == 4)
+        {
+            return Block.brick.blockIndexInTexture;
+        }
+        if(j == 5)
+        {
+            return Block.stoneBrick.blockIndexInTexture;
+        } else
+        {
+            return 6;
+        }
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		if(this == Block.stairSingle) {
-		}
-	}
+    public int getBlockTextureFromSide(int i)
+    {
+        return getBlockTextureFromSideAndMetadata(i, 0);
+    }
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		if(this != Block.stairSingle) {
-			super.onBlockAdded(var1, var2, var3, var4);
-		}
+    public boolean isOpaqueCube()
+    {
+        return blockType;
+    }
 
-		int var5 = var1.getBlockId(var2, var3 - 1, var4);
-		if(var5 == stairSingle.blockID) {
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-			var1.setBlockWithNotify(var2, var3 - 1, var4, Block.stairDouble.blockID);
-		}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+    }
 
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Block.stairSingle.blockID;
+    }
 
-	public int idDropped(int var1, Random var2) {
-		return Block.stairSingle.blockID;
-	}
+    public int quantityDropped(Random random)
+    {
+        return !blockType ? 1 : 2;
+    }
 
-	public boolean renderAsNormalBlock() {
-		return this.a;
-	}
+    protected int damageDropped(int i)
+    {
+        return i;
+    }
 
-	public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		if(this != Block.stairSingle) {
-			super.shouldSideBeRendered(var1, var2, var3, var4, var5);
-		}
+    public boolean renderAsNormalBlock()
+    {
+        return blockType;
+    }
 
-		return var5 == 1 ? true : (!super.shouldSideBeRendered(var1, var2, var3, var4, var5) ? false : (var5 == 0 ? true : var1.getBlockId(var2, var3, var4) != this.blockID));
-	}
+    public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        if(this != Block.stairSingle)
+        {
+            super.shouldSideBeRendered(iblockaccess, i, j, k, l);
+        }
+        if(l == 1)
+        {
+            return true;
+        }
+        if(!super.shouldSideBeRendered(iblockaccess, i, j, k, l))
+        {
+            return false;
+        }
+        if(l == 0)
+        {
+            return true;
+        } else
+        {
+            return iblockaccess.getBlockId(i, j, k) != blockID;
+        }
+    }
+
+    protected ItemStack func_41049_c_(int i)
+    {
+        return new ItemStack(Block.stairSingle.blockID, 1, i);
+    }
+
 }

@@ -1,111 +1,154 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityOtherPlayerMP extends EntityPlayer {
-	private int field_785_bg;
-	private double field_784_bh;
-	private double field_783_bi;
-	private double field_782_bj;
-	private double field_780_bk;
-	private double field_786_bl;
-	float a = 0.0F;
 
-	public EntityOtherPlayerMP(World var1, String var2) {
-		super(var1);
-		this.field_771_i = var2;
-		this.yOffset = 0.0F;
-		this.stepHeight = 0.0F;
-		this.noClip = true;
-		this.renderDistanceWeight = 10.0D;
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityPlayer, MathHelper, InventoryPlayer, Item, 
+//            ItemStack, World, DamageSource
 
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		return true;
-	}
+public class EntityOtherPlayerMP extends EntityPlayer
+{
 
-	public void setPositionAndRotation2(double var1, double var3, double var5, float var7, float var8, int var9) {
-		this.yOffset = 0.0F;
-		this.field_784_bh = var1;
-		this.field_783_bi = var3;
-		this.field_782_bj = var5;
-		this.field_780_bk = (double)var7;
-		this.field_786_bl = (double)var8;
-		this.field_785_bg = var9;
-	}
+    private boolean field_35218_b;
+    private int otherPlayerMPPosRotationIncrements;
+    private double otherPlayerMPX;
+    private double otherPlayerMPY;
+    private double otherPlayerMPZ;
+    private double otherPlayerMPYaw;
+    private double otherPlayerMPPitch;
+    float field_20924_a;
 
-	public void onUpdate() {
-		super.onUpdate();
-		this.field_705_Q = this.field_704_R;
-		double var1 = this.posX - this.prevPosX;
-		double var3 = this.posZ - this.prevPosZ;
-		float var5 = MathHelper.sqrt_double(var1 * var1 + var3 * var3) * 4.0F;
-		if(var5 > 1.0F) {
-			var5 = 1.0F;
-		}
+    public EntityOtherPlayerMP(World world, String s)
+    {
+        super(world);
+        field_35218_b = false;
+        field_20924_a = 0.0F;
+        username = s;
+        yOffset = 0.0F;
+        stepHeight = 0.0F;
+        if(s != null && s.length() > 0)
+        {
+            skinUrl = (new StringBuilder()).append("http://s3.amazonaws.com/MinecraftSkins/").append(s).append(".png").toString();
+        }
+        noClip = true;
+        field_22062_y = 0.25F;
+        renderDistanceWeight = 10D;
+    }
 
-		this.field_704_R += (var5 - this.field_704_R) * 0.4F;
-		this.field_703_S += this.field_704_R;
-	}
+    protected void resetHeight()
+    {
+        yOffset = 0.0F;
+    }
 
-	public float func_392_h_() {
-		return 0.0F;
-	}
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        return true;
+    }
 
-	public void onLivingUpdate() {
-		super.updatePlayerActionState();
-		if(this.field_785_bg > 0) {
-			double var1 = this.posX + (this.field_784_bh - this.posX) / (double)this.field_785_bg;
-			double var3 = this.posY + (this.field_783_bi - this.posY) / (double)this.field_785_bg;
-			double var5 = this.posZ + (this.field_782_bj - this.posZ) / (double)this.field_785_bg;
+    public void setPositionAndRotation2(double d, double d1, double d2, float f, 
+            float f1, int i)
+    {
+        otherPlayerMPX = d;
+        otherPlayerMPY = d1;
+        otherPlayerMPZ = d2;
+        otherPlayerMPYaw = f;
+        otherPlayerMPPitch = f1;
+        otherPlayerMPPosRotationIncrements = i;
+    }
 
-			double var7;
-			for(var7 = this.field_780_bk - (double)this.rotationYaw; var7 < -180.0D; var7 += 360.0D) {
-			}
+    public void onUpdate()
+    {
+        field_22062_y = 0.0F;
+        super.onUpdate();
+        field_705_Q = field_704_R;
+        double d = posX - prevPosX;
+        double d1 = posZ - prevPosZ;
+        float f = MathHelper.sqrt_double(d * d + d1 * d1) * 4F;
+        if(f > 1.0F)
+        {
+            f = 1.0F;
+        }
+        field_704_R += (f - field_704_R) * 0.4F;
+        field_703_S += field_704_R;
+        if(!field_35218_b && isEating() && inventory.mainInventory[inventory.currentItem] != null)
+        {
+            ItemStack itemstack = inventory.mainInventory[inventory.currentItem];
+            setItemInUse(inventory.mainInventory[inventory.currentItem], Item.itemsList[itemstack.itemID].getMaxItemUseDuration(itemstack));
+            field_35218_b = true;
+        } else
+        if(field_35218_b && !isEating())
+        {
+            clearItemInUse();
+            field_35218_b = false;
+        }
+    }
 
-			while(var7 >= 180.0D) {
-				var7 -= 360.0D;
-			}
+    public float getShadowSize()
+    {
+        return 0.0F;
+    }
 
-			this.rotationYaw = (float)((double)this.rotationYaw + var7 / (double)this.field_785_bg);
-			this.rotationPitch = (float)((double)this.rotationPitch + (this.field_786_bl - (double)this.rotationPitch) / (double)this.field_785_bg);
-			--this.field_785_bg;
-			this.setPosition(var1, var3, var5);
-			this.setRotation(this.rotationYaw, this.rotationPitch);
-		}
+    public void onLivingUpdate()
+    {
+        super.updateEntityActionState();
+        if(otherPlayerMPPosRotationIncrements > 0)
+        {
+            double d = posX + (otherPlayerMPX - posX) / (double)otherPlayerMPPosRotationIncrements;
+            double d1 = posY + (otherPlayerMPY - posY) / (double)otherPlayerMPPosRotationIncrements;
+            double d2 = posZ + (otherPlayerMPZ - posZ) / (double)otherPlayerMPPosRotationIncrements;
+            double d3;
+            for(d3 = otherPlayerMPYaw - (double)rotationYaw; d3 < -180D; d3 += 360D) { }
+            for(; d3 >= 180D; d3 -= 360D) { }
+            rotationYaw += d3 / (double)otherPlayerMPPosRotationIncrements;
+            rotationPitch += (otherPlayerMPPitch - (double)rotationPitch) / (double)otherPlayerMPPosRotationIncrements;
+            otherPlayerMPPosRotationIncrements--;
+            setPosition(d, d1, d2);
+            setRotation(rotationYaw, rotationPitch);
+        }
+        prevCameraYaw = cameraYaw;
+        float f = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+        float f1 = (float)Math.atan(-motionY * 0.20000000298023224D) * 15F;
+        if(f > 0.1F)
+        {
+            f = 0.1F;
+        }
+        if(!onGround || getEntityHealth() <= 0)
+        {
+            f = 0.0F;
+        }
+        if(onGround || getEntityHealth() <= 0)
+        {
+            f1 = 0.0F;
+        }
+        cameraYaw += (f - cameraYaw) * 0.4F;
+        cameraPitch += (f1 - cameraPitch) * 0.8F;
+    }
 
-		this.field_775_e = this.field_774_f;
-		float var9 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-		float var2 = (float)Math.atan(-this.motionY * (double)0.2F) * 15.0F;
-		if(var9 > 0.1F) {
-			var9 = 0.1F;
-		}
+    public void outfitWithItem(int i, int j, int k)
+    {
+        ItemStack itemstack = null;
+        if(j >= 0)
+        {
+            itemstack = new ItemStack(j, 1, k);
+        }
+        if(i == 0)
+        {
+            inventory.mainInventory[inventory.currentItem] = itemstack;
+        } else
+        {
+            inventory.armorInventory[i - 1] = itemstack;
+        }
+    }
 
-		if(!this.onGround || this.health <= 0) {
-			var9 = 0.0F;
-		}
+    public void func_6420_o()
+    {
+    }
 
-		if(this.onGround || this.health <= 0) {
-			var2 = 0.0F;
-		}
-
-		this.field_774_f += (var9 - this.field_774_f) * 0.4F;
-		this.field_9328_R += (var2 - this.field_9328_R) * 0.8F;
-	}
-
-	public boolean isSneaking() {
-		return this.field_12240_bw;
-	}
-
-	public void func_20045_c(int var1, int var2) {
-		ItemStack var3 = null;
-		if(var2 >= 0) {
-			var3 = new ItemStack(var2);
-		}
-
-		if(var1 == 0) {
-			this.inventory.mainInventory[this.inventory.currentItem] = var3;
-		} else {
-			this.inventory.armorInventory[var1 - 1] = var3;
-		}
-
-	}
+    public float getEyeHeight()
+    {
+        return 1.82F;
+    }
 }

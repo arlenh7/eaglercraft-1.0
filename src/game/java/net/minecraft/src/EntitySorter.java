@@ -1,30 +1,42 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.Comparator;
 
-public class EntitySorter implements Comparator<WorldRenderer> {
-	public static final EntitySorter instance = new EntitySorter();
-	private double field_30008_a;
-	private double field_30007_b;
-	private double field_30009_c;
-	
-	private EntitySorter() {
-	}
+// Referenced classes of package net.minecraft.src:
+//            Entity, WorldRenderer
 
-	public EntitySorter setEntity(Entity var1) {
-		this.field_30008_a = -var1.posX;
-		this.field_30007_b = -var1.posY;
-		this.field_30009_c = -var1.posZ;
-		return this;
-	}
+public class EntitySorter
+    implements Comparator
+{
 
-	public int compare(WorldRenderer var1, WorldRenderer var2) {
-		double var3 = (double)var1.field_1746_q + this.field_30008_a;
-		double var5 = (double)var1.field_1743_r + this.field_30007_b;
-		double var7 = (double)var1.field_1741_s + this.field_30009_c;
-		double var9 = (double)var2.field_1746_q + this.field_30008_a;
-		double var11 = (double)var2.field_1743_r + this.field_30007_b;
-		double var13 = (double)var2.field_1741_s + this.field_30009_c;
-		return (int)((var3 * var3 + var5 * var5 + var7 * var7 - (var9 * var9 + var11 * var11 + var13 * var13)) * 1024.0D);
-	}
+    private double entityPosX;
+    private double entityPosY;
+    private double entityPosZ;
+
+    public EntitySorter(Entity entity)
+    {
+        entityPosX = -entity.posX;
+        entityPosY = -entity.posY;
+        entityPosZ = -entity.posZ;
+    }
+
+    public int sortByDistanceToEntity(WorldRenderer worldrenderer, WorldRenderer worldrenderer1)
+    {
+        double d = (double)worldrenderer.posXPlus + entityPosX;
+        double d1 = (double)worldrenderer.posYPlus + entityPosY;
+        double d2 = (double)worldrenderer.posZPlus + entityPosZ;
+        double d3 = (double)worldrenderer1.posXPlus + entityPosX;
+        double d4 = (double)worldrenderer1.posYPlus + entityPosY;
+        double d5 = (double)worldrenderer1.posZPlus + entityPosZ;
+        return (int)(((d * d + d1 * d1 + d2 * d2) - (d3 * d3 + d4 * d4 + d5 * d5)) * 1024D);
+    }
+
+    public int compare(Object obj, Object obj1)
+    {
+        return sortByDistanceToEntity((WorldRenderer)obj, (WorldRenderer)obj1);
+    }
 }

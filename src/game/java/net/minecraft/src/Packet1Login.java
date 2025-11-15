@@ -1,46 +1,69 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet1Login extends Packet {
-	public int protocolVersion;
-	public String username;
-	public String password;
-	public long field_4074_d;
-	public byte field_4073_e;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet1Login() {
-	}
+public class Packet1Login extends Packet
+{
 
-	public Packet1Login(String var1, String var2, int var3) {
-		this.username = var1;
-		this.password = var2;
-		this.protocolVersion = var3;
-	}
+    public int protocolVersion;
+    public String username;
+    public long mapSeed;
+    public int serverMode;
+    public byte worldType;
+    public byte difficultySetting;
+    public byte worldHeight;
+    public byte maxPlayers;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.protocolVersion = var1.readInt();
-		this.username = var1.readUTF();
-		this.password = var1.readUTF();
-		this.field_4074_d = var1.readLong();
-		this.field_4073_e = var1.readByte();
-	}
+    public Packet1Login()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.protocolVersion);
-		var1.writeUTF(this.username);
-		var1.writeUTF(this.password);
-		var1.writeLong(this.field_4074_d);
-		var1.writeByte(this.field_4073_e);
-	}
+    public Packet1Login(String s, int i)
+    {
+        username = s;
+        protocolVersion = i;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleLogin(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        protocolVersion = datainputstream.readInt();
+        username = readString(datainputstream, 16);
+        mapSeed = datainputstream.readLong();
+        serverMode = datainputstream.readInt();
+        worldType = datainputstream.readByte();
+        difficultySetting = datainputstream.readByte();
+        worldHeight = datainputstream.readByte();
+        maxPlayers = datainputstream.readByte();
+    }
 
-	public int getPacketSize() {
-		return 4 + this.username.length() + this.password.length() + 4 + 5;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(protocolVersion);
+        writeString(username, dataoutputstream);
+        dataoutputstream.writeLong(mapSeed);
+        dataoutputstream.writeInt(serverMode);
+        dataoutputstream.writeByte(worldType);
+        dataoutputstream.writeByte(difficultySetting);
+        dataoutputstream.writeByte(worldHeight);
+        dataoutputstream.writeByte(maxPlayers);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleLogin(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 4 + username.length() + 4 + 7 + 4;
+    }
 }

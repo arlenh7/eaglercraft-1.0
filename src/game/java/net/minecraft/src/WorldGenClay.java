@@ -1,53 +1,57 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenClay extends WorldGenerator {
-	private int clayBlockId = Block.blockClay.blockID;
-	private int numberOfBlocks;
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, Block, World, Material
 
-	public WorldGenClay(int var1) {
-		this.numberOfBlocks = var1;
-	}
+public class WorldGenClay extends WorldGenerator
+{
 
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		if(var1.getBlockMaterial(var3, var4, var5) != Material.water) {
-			return false;
-		} else {
-			float var6 = var2.nextFloat() * (float)Math.PI;
-			double var7 = (double)((float)(var3 + 8) + MathHelper.sin(var6) * (float)this.numberOfBlocks / 8.0F);
-			double var9 = (double)((float)(var3 + 8) - MathHelper.sin(var6) * (float)this.numberOfBlocks / 8.0F);
-			double var11 = (double)((float)(var5 + 8) + MathHelper.cos(var6) * (float)this.numberOfBlocks / 8.0F);
-			double var13 = (double)((float)(var5 + 8) - MathHelper.cos(var6) * (float)this.numberOfBlocks / 8.0F);
-			double var15 = (double)(var4 + var2.nextInt(3) + 2);
-			double var17 = (double)(var4 + var2.nextInt(3) + 2);
+    private int clayBlockId;
+    private int numberOfBlocks;
 
-			for(int var19 = 0; var19 <= this.numberOfBlocks; ++var19) {
-				double var20 = var7 + (var9 - var7) * (double)var19 / (double)this.numberOfBlocks;
-				double var22 = var15 + (var17 - var15) * (double)var19 / (double)this.numberOfBlocks;
-				double var24 = var11 + (var13 - var11) * (double)var19 / (double)this.numberOfBlocks;
-				double var26 = var2.nextDouble() * (double)this.numberOfBlocks / 16.0D;
-				double var28 = (double)(MathHelper.sin((float)var19 * (float)Math.PI / (float)this.numberOfBlocks) + 1.0F) * var26 + 1.0D;
-				double var30 = (double)(MathHelper.sin((float)var19 * (float)Math.PI / (float)this.numberOfBlocks) + 1.0F) * var26 + 1.0D;
+    public WorldGenClay(int i)
+    {
+        clayBlockId = Block.blockClay.blockID;
+        numberOfBlocks = i;
+    }
 
-				for(int var32 = (int)(var20 - var28 / 2.0D); var32 <= (int)(var20 + var28 / 2.0D); ++var32) {
-					for(int var33 = (int)(var22 - var30 / 2.0D); var33 <= (int)(var22 + var30 / 2.0D); ++var33) {
-						for(int var34 = (int)(var24 - var28 / 2.0D); var34 <= (int)(var24 + var28 / 2.0D); ++var34) {
-							double var35 = ((double)var32 + 0.5D - var20) / (var28 / 2.0D);
-							double var37 = ((double)var33 + 0.5D - var22) / (var30 / 2.0D);
-							double var39 = ((double)var34 + 0.5D - var24) / (var28 / 2.0D);
-							if(var35 * var35 + var37 * var37 + var39 * var39 < 1.0D) {
-								int var41 = var1.getBlockId(var32, var33, var34);
-								if(var41 == Block.sand.blockID) {
-									var1.setBlock(var32, var33, var34, this.clayBlockId);
-								}
-							}
-						}
-					}
-				}
-			}
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        if(world.getBlockMaterial(i, j, k) != Material.water)
+        {
+            return false;
+        }
+        int l = random.nextInt(numberOfBlocks - 2) + 2;
+        int i1 = 1;
+        for(int j1 = i - l; j1 <= i + l; j1++)
+        {
+            for(int k1 = k - l; k1 <= k + l; k1++)
+            {
+                int l1 = j1 - i;
+                int i2 = k1 - k;
+                if(l1 * l1 + i2 * i2 > l * l)
+                {
+                    continue;
+                }
+                for(int j2 = j - i1; j2 <= j + i1; j2++)
+                {
+                    int k2 = world.getBlockId(j1, j2, k1);
+                    if(k2 == Block.dirt.blockID || k2 == Block.blockClay.blockID)
+                    {
+                        world.setBlock(j1, j2, k1, clayBlockId);
+                    }
+                }
 
-			return true;
-		}
-	}
+            }
+
+        }
+
+        return true;
+    }
 }

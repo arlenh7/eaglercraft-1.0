@@ -1,44 +1,59 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderSlime extends RenderLiving {
-	private ModelBase scaleAmount;
+// Referenced classes of package net.minecraft.src:
+//            RenderLiving, EntitySlime, ModelBase, EntityLiving
 
-	public RenderSlime(ModelBase var1, ModelBase var2, float var3) {
-		super(var1, var3);
-		this.scaleAmount = var2;
-	}
+public class RenderSlime extends RenderLiving
+{
 
-	protected boolean a(EntitySlime var1, int var2) {
-		if(var2 == 0) {
-			this.setRenderPassModel(this.scaleAmount);
-			GL11.glEnable(GL11.GL_NORMALIZE);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			return true;
-		} else {
-			if(var2 == 1) {
-				GL11.glDisable(GL11.GL_BLEND);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			}
+    private ModelBase scaleAmount;
 
-			return false;
-		}
-	}
+    public RenderSlime(ModelBase modelbase, ModelBase modelbase1, float f)
+    {
+        super(modelbase, f);
+        scaleAmount = modelbase1;
+    }
 
-	protected void a(EntitySlime var1, float var2) {
-		float var3 = (var1.field_767_b + (var1.field_768_a - var1.field_767_b) * var2) / ((float)var1.field_770_c * 0.5F + 1.0F);
-		float var4 = 1.0F / (var3 + 1.0F);
-		float var5 = (float)var1.field_770_c;
-		GL11.glScalef(var4 * var5, 1.0F / var4 * var5, var4 * var5);
-	}
+    protected int func_40287_a(EntitySlime entityslime, int i, float f)
+    {
+        if(i == 0)
+        {
+            setRenderPassModel(scaleAmount);
+            GL11.glEnable(2977 /*GL_NORMALIZE*/);
+            GL11.glEnable(3042 /*GL_BLEND*/);
+            GL11.glBlendFunc(770, 771);
+            return 1;
+        }
+        if(i == 1)
+        {
+            GL11.glDisable(3042 /*GL_BLEND*/);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+        return -1;
+    }
 
-	protected void preRenderCallback(EntityLiving var1, float var2) {
-		this.a((EntitySlime)var1, var2);
-	}
+    protected void scaleSlime(EntitySlime entityslime, float f)
+    {
+        int i = entityslime.getSlimeSize();
+        float f1 = (entityslime.field_767_b + (entityslime.field_768_a - entityslime.field_767_b) * f) / ((float)i * 0.5F + 1.0F);
+        float f2 = 1.0F / (f1 + 1.0F);
+        float f3 = i;
+        GL11.glScalef(f2 * f3, (1.0F / f2) * f3, f2 * f3);
+    }
 
-	protected boolean shouldRenderPass(EntityLiving var1, int var2) {
-		return this.a((EntitySlime)var1, var2);
-	}
+    protected void preRenderCallback(EntityLiving entityliving, float f)
+    {
+        scaleSlime((EntitySlime)entityliving, f);
+    }
+
+    protected int shouldRenderPass(EntityLiving entityliving, int i, float f)
+    {
+        return func_40287_a((EntitySlime)entityliving, i, f);
+    }
 }

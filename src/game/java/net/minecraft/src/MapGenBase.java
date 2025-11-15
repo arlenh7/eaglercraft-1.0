@@ -1,26 +1,49 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class MapGenBase {
-	protected int field_1306_a = 8;
-	protected Random rand = new Random();
+// Referenced classes of package net.minecraft.src:
+//            World, IChunkProvider
 
-	public void func_867_a(IChunkProvider var1, World var2, int var3, int var4, byte[] var5) {
-		int var6 = this.field_1306_a;
-		this.rand.setSeed(var2.randomSeed);
-		long var7 = this.rand.nextLong() / 2L * 2L + 1L;
-		long var9 = this.rand.nextLong() / 2L * 2L + 1L;
+public class MapGenBase
+{
 
-		for(int var11 = var3 - var6; var11 <= var3 + var6; ++var11) {
-			for(int var12 = var4 - var6; var12 <= var4 + var6; ++var12) {
-				this.rand.setSeed((long)var11 * var7 + (long)var12 * var9 ^ var2.randomSeed);
-				this.func_868_a(var2, var11, var12, var3, var4, var5);
-			}
-		}
+    protected int field_1306_a;
+    protected Random rand;
+    protected World worldObj;
 
-	}
+    public MapGenBase()
+    {
+        field_1306_a = 8;
+        rand = new Random();
+    }
 
-	protected void func_868_a(World var1, int var2, int var3, int var4, int var5, byte[] var6) {
-	}
+    public void generate(IChunkProvider ichunkprovider, World world, int i, int j, byte abyte0[])
+    {
+        int k = field_1306_a;
+        worldObj = world;
+        rand.setSeed(world.getWorldSeed());
+        long l = rand.nextLong();
+        long l1 = rand.nextLong();
+        for(int i1 = i - k; i1 <= i + k; i1++)
+        {
+            for(int j1 = j - k; j1 <= j + k; j1++)
+            {
+                long l2 = (long)i1 * l;
+                long l3 = (long)j1 * l1;
+                rand.setSeed(l2 ^ l3 ^ world.getWorldSeed());
+                recursiveGenerate(world, i1, j1, i, j, abyte0);
+            }
+
+        }
+
+    }
+
+    protected void recursiveGenerate(World world, int i, int j, int k, int l, byte abyte0[])
+    {
+    }
 }

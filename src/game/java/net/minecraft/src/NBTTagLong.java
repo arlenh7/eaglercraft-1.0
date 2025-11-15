@@ -1,32 +1,66 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
-public class NBTTagLong extends NBTBase {
-	public long longValue;
+// Referenced classes of package net.minecraft.src:
+//            NBTBase
 
-	public NBTTagLong() {
-	}
+public class NBTTagLong extends NBTBase
+{
 
-	public NBTTagLong(long var1) {
-		this.longValue = var1;
-	}
+    public long longValue;
 
-	void writeTagContents(DataOutput var1) throws IOException {
-		var1.writeLong(this.longValue);
-	}
+    public NBTTagLong(String s)
+    {
+        super(s);
+    }
 
-	void readTagContents(DataInput var1) throws IOException {
-		this.longValue = var1.readLong();
-	}
+    public NBTTagLong(String s, long l)
+    {
+        super(s);
+        longValue = l;
+    }
 
-	public byte getType() {
-		return (byte)4;
-	}
+    void writeTagContents(DataOutput dataoutput)
+        throws IOException
+    {
+        dataoutput.writeLong(longValue);
+    }
 
-	public String toString() {
-		return "" + this.longValue;
-	}
+    void readTagContents(DataInput datainput)
+        throws IOException
+    {
+        longValue = datainput.readLong();
+    }
+
+    public byte getType()
+    {
+        return 4;
+    }
+
+    public String toString()
+    {
+        return (new StringBuilder()).append("").append(longValue).toString();
+    }
+
+    public NBTBase func_40195_b()
+    {
+        return new NBTTagLong(getKey(), longValue);
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(super.equals(obj))
+        {
+            NBTTagLong nbttaglong = (NBTTagLong)obj;
+            return longValue == nbttaglong.longValue;
+        } else
+        {
+            return false;
+        }
+    }
 }

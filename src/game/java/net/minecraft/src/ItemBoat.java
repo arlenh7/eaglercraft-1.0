@@ -1,43 +1,90 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemBoat extends Item {
-	public ItemBoat(int var1) {
-		super(var1);
-		this.maxStackSize = 1;
-	}
+import java.util.List;
 
-	public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3) {
-		float var4 = 1.0F;
-		float var5 = var3.prevRotationPitch + (var3.rotationPitch - var3.prevRotationPitch) * var4;
-		float var6 = var3.prevRotationYaw + (var3.rotationYaw - var3.prevRotationYaw) * var4;
-		double var7 = var3.prevPosX + (var3.posX - var3.prevPosX) * (double)var4;
-		double var9 = var3.prevPosY + (var3.posY - var3.prevPosY) * (double)var4 + 1.62D - (double)var3.yOffset;
-		double var11 = var3.prevPosZ + (var3.posZ - var3.prevPosZ) * (double)var4;
-		Vec3D var13 = Vec3D.createVector(var7, var9, var11);
-		float var14 = MathHelper.cos(-var6 * ((float)Math.PI / 180.0F) - (float)Math.PI);
-		float var15 = MathHelper.sin(-var6 * ((float)Math.PI / 180.0F) - (float)Math.PI);
-		float var16 = -MathHelper.cos(-var5 * ((float)Math.PI / 180.0F));
-		float var17 = MathHelper.sin(-var5 * ((float)Math.PI / 180.0F));
-		float var18 = var15 * var16;
-		float var20 = var14 * var16;
-		double var21 = 5.0D;
-		Vec3D var23 = var13.addVector((double)var18 * var21, (double)var17 * var21, (double)var20 * var21);
-		MovingObjectPosition var24 = var2.rayTraceBlocks_do(var13, var23, true);
-		if(var24 == null) {
-			return var1;
-		} else {
-			if(var24.typeOfHit == 0) {
-				int var25 = var24.blockX;
-				int var26 = var24.blockY;
-				int var27 = var24.blockZ;
-				if(!var2.multiplayerWorld) {
-					var2.entityJoinedWorld(new EntityBoat(var2, (double)((float)var25 + 0.5F), (double)((float)var26 + 1.5F), (double)((float)var27 + 0.5F)));
-				}
+// Referenced classes of package net.minecraft.src:
+//            Item, EntityPlayer, Vec3D, MathHelper, 
+//            World, AxisAlignedBB, Entity, MovingObjectPosition, 
+//            EnumMovingObjectType, Block, EntityBoat, PlayerCapabilities, 
+//            ItemStack
 
-				--var1.stackSize;
-			}
+public class ItemBoat extends Item
+{
 
-			return var1;
-		}
-	}
+    public ItemBoat(int i)
+    {
+        super(i);
+        maxStackSize = 1;
+    }
+
+    public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer)
+    {
+        float f = 1.0F;
+        float f1 = entityplayer.prevRotationPitch + (entityplayer.rotationPitch - entityplayer.prevRotationPitch) * f;
+        float f2 = entityplayer.prevRotationYaw + (entityplayer.rotationYaw - entityplayer.prevRotationYaw) * f;
+        double d = entityplayer.prevPosX + (entityplayer.posX - entityplayer.prevPosX) * (double)f;
+        double d1 = (entityplayer.prevPosY + (entityplayer.posY - entityplayer.prevPosY) * (double)f + 1.6200000000000001D) - (double)entityplayer.yOffset;
+        double d2 = entityplayer.prevPosZ + (entityplayer.posZ - entityplayer.prevPosZ) * (double)f;
+        Vec3D vec3d = Vec3D.createVector(d, d1, d2);
+        float f3 = MathHelper.cos(-f2 * 0.01745329F - 3.141593F);
+        float f4 = MathHelper.sin(-f2 * 0.01745329F - 3.141593F);
+        float f5 = -MathHelper.cos(-f1 * 0.01745329F);
+        float f6 = MathHelper.sin(-f1 * 0.01745329F);
+        float f7 = f4 * f5;
+        float f8 = f6;
+        float f9 = f3 * f5;
+        double d3 = 5D;
+        Vec3D vec3d1 = vec3d.addVector((double)f7 * d3, (double)f8 * d3, (double)f9 * d3);
+        MovingObjectPosition movingobjectposition = world.rayTraceBlocks_do(vec3d, vec3d1, true);
+        if(movingobjectposition == null)
+        {
+            return itemstack;
+        }
+        Vec3D vec3d2 = entityplayer.getLook(f);
+        boolean flag = false;
+        float f10 = 1.0F;
+        List list = world.getEntitiesWithinAABBExcludingEntity(entityplayer, entityplayer.boundingBox.addCoord(vec3d2.xCoord * d3, vec3d2.yCoord * d3, vec3d2.zCoord * d3).expand(f10, f10, f10));
+        for(int l = 0; l < list.size(); l++)
+        {
+            Entity entity = (Entity)list.get(l);
+            if(!entity.canBeCollidedWith())
+            {
+                continue;
+            }
+            float f11 = entity.getCollisionBorderSize();
+            AxisAlignedBB axisalignedbb = entity.boundingBox.expand(f11, f11, f11);
+            if(axisalignedbb.isVecInside(vec3d))
+            {
+                flag = true;
+            }
+        }
+
+        if(flag)
+        {
+            return itemstack;
+        }
+        if(movingobjectposition.typeOfHit == EnumMovingObjectType.TILE)
+        {
+            int i = movingobjectposition.blockX;
+            int j = movingobjectposition.blockY;
+            int k = movingobjectposition.blockZ;
+            if(!world.multiplayerWorld)
+            {
+                if(world.getBlockId(i, j, k) == Block.snow.blockID)
+                {
+                    j--;
+                }
+                world.entityJoinedWorld(new EntityBoat(world, (float)i + 0.5F, (float)j + 1.0F, (float)k + 0.5F));
+            }
+            if(!entityplayer.capabilities.depleteBuckets)
+            {
+                itemstack.stackSize--;
+            }
+        }
+        return itemstack;
+    }
 }

@@ -1,31 +1,50 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class GuiYesNo extends GuiScreen {
-	private GuiScreen parentScreen;
-	private String message1;
-	private String message2;
-	private int worldNumber;
+import java.util.List;
 
-	public GuiYesNo(GuiScreen var1, String var2, String var3, int var4) {
-		this.parentScreen = var1;
-		this.message1 = var2;
-		this.message2 = var3;
-		this.worldNumber = var4;
-	}
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, GuiSmallButton, GuiButton
 
-	public void initGui() {
-		this.controlList.add(new GuiSmallButton(0, this.width / 2 - 155 + 0, this.height / 6 + 96, "Yes"));
-		this.controlList.add(new GuiSmallButton(1, this.width / 2 - 155 + 160, this.height / 6 + 96, "No"));
-	}
+public class GuiYesNo extends GuiScreen
+{
 
-	protected void actionPerformed(GuiButton var1) {
-		this.parentScreen.deleteWorld(var1.id == 0, this.worldNumber);
-	}
+    private GuiScreen parentScreen;
+    private String message1;
+    private String message2;
+    private String buttonText1;
+    private String buttonText2;
+    private int worldNumber;
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRenderer, this.message1, this.width / 2, 70, 16777215);
-		this.drawCenteredString(this.fontRenderer, this.message2, this.width / 2, 90, 16777215);
-		super.drawScreen(var1, var2, var3);
-	}
+    public GuiYesNo(GuiScreen guiscreen, String s, String s1, String s2, String s3, int i)
+    {
+        parentScreen = guiscreen;
+        message1 = s;
+        message2 = s1;
+        buttonText1 = s2;
+        buttonText2 = s3;
+        worldNumber = i;
+    }
+
+    public void initGui()
+    {
+        controlList.add(new GuiSmallButton(0, (width / 2 - 155) + 0, height / 6 + 96, buttonText1));
+        controlList.add(new GuiSmallButton(1, (width / 2 - 155) + 160, height / 6 + 96, buttonText2));
+    }
+
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        parentScreen.deleteWorld(guibutton.id == 0, worldNumber);
+    }
+
+    public void drawScreen(int i, int j, float f)
+    {
+        drawDefaultBackground();
+        drawCenteredString(fontRenderer, message1, width / 2, 70, 0xffffff);
+        drawCenteredString(fontRenderer, message2, width / 2, 90, 0xffffff);
+        super.drawScreen(i, j, f);
+    }
 }

@@ -1,56 +1,73 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.Tessellator;
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, Entity, MathHelper, OpenGlHelper, 
+//            RenderManager, World, Tessellator
 
-public class EntityPickupFX extends EntityFX {
-	private Entity field_675_a;
-	private Entity field_679_o;
-	private int field_678_p = 0;
-	private int field_677_q = 0;
-	private float field_676_r;
+public class EntityPickupFX extends EntityFX
+{
 
-	public EntityPickupFX(World var1, Entity var2, Entity var3, float var4) {
-		super(var1, var2.posX, var2.posY, var2.posZ, var2.motionX, var2.motionY, var2.motionZ);
-		this.field_675_a = var2;
-		this.field_679_o = var3;
-		this.field_677_q = 3;
-		this.field_676_r = var4;
-	}
+    private Entity field_675_a;
+    private Entity field_679_o;
+    private int age;
+    private int maxAge;
+    private float field_676_r;
 
-	public void func_406_a(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-		float var8 = ((float)this.field_678_p + var2) / (float)this.field_677_q;
-		var8 *= var8;
-		double var9 = this.field_675_a.posX;
-		double var11 = this.field_675_a.posY;
-		double var13 = this.field_675_a.posZ;
-		double var15 = this.field_679_o.lastTickPosX + (this.field_679_o.posX - this.field_679_o.lastTickPosX) * (double)var2;
-		double var17 = this.field_679_o.lastTickPosY + (this.field_679_o.posY - this.field_679_o.lastTickPosY) * (double)var2 + (double)this.field_676_r;
-		double var19 = this.field_679_o.lastTickPosZ + (this.field_679_o.posZ - this.field_679_o.lastTickPosZ) * (double)var2;
-		double var21 = var9 + (var15 - var9) * (double)var8;
-		double var23 = var11 + (var17 - var11) * (double)var8;
-		double var25 = var13 + (var19 - var13) * (double)var8;
-		int var27 = MathHelper.floor_double(var21);
-		int var28 = MathHelper.floor_double(var23 + (double)(this.yOffset / 2.0F));
-		int var29 = MathHelper.floor_double(var25);
-		float var30 = this.worldObj.getLightBrightness(var27, var28, var29);
-		var21 -= field_660_l;
-		var23 -= field_659_m;
-		var25 -= field_658_n;
-		GL11.glColor4f(var30, var30, var30, 1.0F);
-		RenderManager.instance.renderEntityWithPosYaw(this.field_675_a, (double)((float)var21), (double)((float)var23), (double)((float)var25), this.field_675_a.rotationYaw, var2);
-	}
+    public EntityPickupFX(World world, Entity entity, Entity entity1, float f)
+    {
+        super(world, entity.posX, entity.posY, entity.posZ, entity.motionX, entity.motionY, entity.motionZ);
+        age = 0;
+        maxAge = 0;
+        field_675_a = entity;
+        field_679_o = entity1;
+        maxAge = 3;
+        field_676_r = f;
+    }
 
-	public void onUpdate() {
-		++this.field_678_p;
-		if(this.field_678_p == this.field_677_q) {
-			this.setEntityDead();
-		}
+    public void renderParticle(Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        float f6 = ((float)age + f) / (float)maxAge;
+        f6 *= f6;
+        double d = field_675_a.posX;
+        double d1 = field_675_a.posY;
+        double d2 = field_675_a.posZ;
+        double d3 = field_679_o.lastTickPosX + (field_679_o.posX - field_679_o.lastTickPosX) * (double)f;
+        double d4 = field_679_o.lastTickPosY + (field_679_o.posY - field_679_o.lastTickPosY) * (double)f + (double)field_676_r;
+        double d5 = field_679_o.lastTickPosZ + (field_679_o.posZ - field_679_o.lastTickPosZ) * (double)f;
+        double d6 = d + (d3 - d) * (double)f6;
+        double d7 = d1 + (d4 - d1) * (double)f6;
+        double d8 = d2 + (d5 - d2) * (double)f6;
+        int i = MathHelper.floor_double(d6);
+        int j = MathHelper.floor_double(d7 + (double)(yOffset / 2.0F));
+        int k = MathHelper.floor_double(d8);
+        int l = getEntityBrightnessForRender(f);
+        int i1 = l % 0x10000;
+        int j1 = l / 0x10000;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapEnabled, (float)i1 / 1.0F, (float)j1 / 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        d6 -= interpPosX;
+        d7 -= interpPosY;
+        d8 -= interpPosZ;
+        RenderManager.instance.renderEntityWithPosYaw(field_675_a, (float)d6, (float)d7, (float)d8, field_675_a.rotationYaw, f);
+    }
 
-	}
+    public void onUpdate()
+    {
+        age++;
+        if(age == maxAge)
+        {
+            setEntityDead();
+        }
+    }
 
-	public int func_404_c() {
-		return 3;
-	}
+    public int getFXLayer()
+    {
+        return 3;
+    }
 }

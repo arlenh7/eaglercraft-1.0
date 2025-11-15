@@ -1,26 +1,61 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.awt.Component;
+import java.nio.IntBuffer;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
 
-public class MouseHelper {
-	public int field_1114_a;
-	public int field_1113_b;
+// Referenced classes of package net.minecraft.src:
+//            GLAllocation
 
-	public MouseHelper() {
-	}
+public class MouseHelper
+{
 
-	public void func_774_a() {
-		Mouse.setGrabbed(true);
-		this.field_1114_a = 0;
-		this.field_1113_b = 0;
-	}
+    private Component windowComponent;
+    private Cursor cursor;
+    public int deltaX;
+    public int deltaY;
+    private int field_1115_e;
 
-	public void func_773_b() {
-		Mouse.setGrabbed(false);
-	}
+    public MouseHelper(Component component)
+    {
+        field_1115_e = 10;
+        windowComponent = component;
+        IntBuffer intbuffer = GLAllocation.createDirectIntBuffer(1);
+        intbuffer.put(0);
+        intbuffer.flip();
+        IntBuffer intbuffer1 = GLAllocation.createDirectIntBuffer(1024);
+        try
+        {
+            cursor = new Cursor(32, 32, 16, 16, 1, intbuffer1, intbuffer);
+        }
+        catch(LWJGLException lwjglexception)
+        {
+            lwjglexception.printStackTrace();
+        }
+    }
 
-	public void mouseXYChange() {
-		this.field_1114_a = Mouse.getDX();
-		this.field_1113_b = Mouse.getDY();
-	}
+    public void grabMouseCursor()
+    {
+        Mouse.setGrabbed(true);
+        deltaX = 0;
+        deltaY = 0;
+    }
+
+    public void ungrabMouseCursor()
+    {
+        Mouse.setCursorPosition(windowComponent.getWidth() / 2, windowComponent.getHeight() / 2);
+        Mouse.setGrabbed(false);
+    }
+
+    public void mouseXYChange()
+    {
+        deltaX = Mouse.getDX();
+        deltaY = Mouse.getDY();
+    }
 }

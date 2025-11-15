@@ -1,40 +1,54 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet11PlayerPosition extends Packet10Flying {
-	public Packet11PlayerPosition() {
-		this.moving = true;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Packet10Flying
 
-	public Packet11PlayerPosition(double var1, double var3, double var5, double var7, boolean var9) {
-		this.xPosition = var1;
-		this.yPosition = var3;
-		this.stance = var5;
-		this.zPosition = var7;
-		this.onGround = var9;
-		this.moving = true;
-	}
+public class Packet11PlayerPosition extends Packet10Flying
+{
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readDouble();
-		this.yPosition = var1.readDouble();
-		this.stance = var1.readDouble();
-		this.zPosition = var1.readDouble();
-		super.readPacketData(var1);
-	}
+    public Packet11PlayerPosition()
+    {
+        moving = true;
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeDouble(this.xPosition);
-		var1.writeDouble(this.yPosition);
-		var1.writeDouble(this.stance);
-		var1.writeDouble(this.zPosition);
-		super.writePacketData(var1);
-	}
+    public Packet11PlayerPosition(double d, double d1, double d2, double d3, boolean flag)
+    {
+        xPosition = d;
+        yPosition = d1;
+        stance = d2;
+        zPosition = d3;
+        onGround = flag;
+        moving = true;
+    }
 
-	public int getPacketSize() {
-		return 33;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readDouble();
+        yPosition = datainputstream.readDouble();
+        stance = datainputstream.readDouble();
+        zPosition = datainputstream.readDouble();
+        super.readPacketData(datainputstream);
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeDouble(xPosition);
+        dataoutputstream.writeDouble(yPosition);
+        dataoutputstream.writeDouble(stance);
+        dataoutputstream.writeDouble(zPosition);
+        super.writePacketData(dataoutputstream);
+    }
+
+    public int getPacketSize()
+    {
+        return 33;
+    }
 }

@@ -1,158 +1,253 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockLeaves extends BlockLeavesBase {
-	private int baseIndexInPNG;
-	int[] field_20017_a;
+// Referenced classes of package net.minecraft.src:
+//            BlockLeavesBase, Material, ColorizerFoliage, IBlockAccess, 
+//            WorldChunkManager, BiomeGenBase, World, Block, 
+//            EntityPlayer, ItemStack, Item, ItemShears, 
+//            StatList, Entity
 
-	protected BlockLeaves(int var1, int var2) {
-		super(var1, var2, Material.leaves, false);
-		this.baseIndexInPNG = var2;
-		this.setTickOnLoad(true);
-	}
+public class BlockLeaves extends BlockLeavesBase
+{
 
-	public int colorMultiplier(IBlockAccess var1, int var2, int var3, int var4) {
-		var1.func_4075_a().func_4069_a(var2, var4, 1, 1);
-		double var5 = var1.func_4075_a().temperature[0];
-		double var7 = var1.func_4075_a().humidity[0];
-		return ColorizerFoliage.func_4146_a(var5, var7);
-	}
+    private int baseIndexInPNG;
+    int adjacentTreeBlocks[];
 
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		byte var5 = 1;
-		int var6 = var5 + 1;
-		if(var1.checkChunksExist(var2 - var6, var3 - var6, var4 - var6, var2 + var6, var3 + var6, var4 + var6)) {
-			for(int var7 = -var5; var7 <= var5; ++var7) {
-				for(int var8 = -var5; var8 <= var5; ++var8) {
-					for(int var9 = -var5; var9 <= var5; ++var9) {
-						int var10 = var1.getBlockId(var2 + var7, var3 + var8, var4 + var9);
-						if(var10 == Block.leaves.blockID) {
-							var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, 7);
-						}
-					}
-				}
-			}
-		}
+    protected BlockLeaves(int i, int j)
+    {
+        super(i, j, Material.leaves, false);
+        baseIndexInPNG = j;
+        setTickOnLoad(true);
+    }
 
-	}
+    public int getBlockColor()
+    {
+        double d = 0.5D;
+        double d1 = 1.0D;
+        return ColorizerFoliage.getFoliageColor(d, d1);
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(!var1.multiplayerWorld) {
-			if(var1.getBlockMetadata(var2, var3, var4) == 7) {
-				byte var6 = 4;
-				int var7 = var6 + 1;
-				byte var8 = 32;
-				int var9 = var8 * var8;
-				int var10 = var8 / 2;
-				if(this.field_20017_a == null) {
-					this.field_20017_a = new int[var8 * var8 * var8];
-				}
+    public int getRenderColor(int i)
+    {
+        if((i & 1) == 1)
+        {
+            return ColorizerFoliage.getFoliageColorPine();
+        }
+        if((i & 2) == 2)
+        {
+            return ColorizerFoliage.getFoliageColorBirch();
+        } else
+        {
+            return ColorizerFoliage.getFoliageColorBasic();
+        }
+    }
 
-				int var11;
-				if(var1.checkChunksExist(var2 - var7, var3 - var7, var4 - var7, var2 + var7, var3 + var7, var4 + var7)) {
-					var11 = -var6;
+    public int colorMultiplier(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        int l = iblockaccess.getBlockMetadata(i, j, k);
+        if((l & 1) == 1)
+        {
+            return ColorizerFoliage.getFoliageColorPine();
+        }
+        if((l & 2) == 2)
+        {
+            return ColorizerFoliage.getFoliageColorBirch();
+        } else
+        {
+            return iblockaccess.getWorldChunkManager().getBiomeGenAt(i, k).func_40255_b(iblockaccess, i, j, k);
+        }
+    }
 
-					label111:
-					while(true) {
-						int var12;
-						int var13;
-						int var14;
-						if(var11 > var6) {
-							var11 = 1;
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        int l = 1;
+        int i1 = l + 1;
+        if(world.checkChunksExist(i - i1, j - i1, k - i1, i + i1, j + i1, k + i1))
+        {
+            for(int j1 = -l; j1 <= l; j1++)
+            {
+                for(int k1 = -l; k1 <= l; k1++)
+                {
+                    for(int l1 = -l; l1 <= l; l1++)
+                    {
+                        int i2 = world.getBlockId(i + j1, j + k1, k + l1);
+                        if(i2 == Block.leaves.blockID)
+                        {
+                            int j2 = world.getBlockMetadata(i + j1, j + k1, k + l1);
+                            world.setBlockMetadata(i + j1, j + k1, k + l1, j2 | 8);
+                        }
+                    }
 
-							while(true) {
-								if(var11 > 4) {
-									break label111;
-								}
+                }
 
-								for(var12 = -var6; var12 <= var6; ++var12) {
-									for(var13 = -var6; var13 <= var6; ++var13) {
-										for(var14 = -var6; var14 <= var6; ++var14) {
-											if(this.field_20017_a[(var12 + var10) * var9 + (var13 + var10) * var8 + var14 + var10] == var11 - 1) {
-												if(this.field_20017_a[(var12 + var10 - 1) * var9 + (var13 + var10) * var8 + var14 + var10] == -2) {
-													this.field_20017_a[(var12 + var10 - 1) * var9 + (var13 + var10) * var8 + var14 + var10] = var11;
-												}
+            }
 
-												if(this.field_20017_a[(var12 + var10 + 1) * var9 + (var13 + var10) * var8 + var14 + var10] == -2) {
-													this.field_20017_a[(var12 + var10 + 1) * var9 + (var13 + var10) * var8 + var14 + var10] = var11;
-												}
+        }
+    }
 
-												if(this.field_20017_a[(var12 + var10) * var9 + (var13 + var10 - 1) * var8 + var14 + var10] == -2) {
-													this.field_20017_a[(var12 + var10) * var9 + (var13 + var10 - 1) * var8 + var14 + var10] = var11;
-												}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        int l = world.getBlockMetadata(i, j, k);
+        if((l & 8) != 0 && (l & 4) == 0)
+        {
+            byte byte0 = 4;
+            int i1 = byte0 + 1;
+            byte byte1 = 32;
+            int j1 = byte1 * byte1;
+            int k1 = byte1 / 2;
+            if(adjacentTreeBlocks == null)
+            {
+                adjacentTreeBlocks = new int[byte1 * byte1 * byte1];
+            }
+            if(world.checkChunksExist(i - i1, j - i1, k - i1, i + i1, j + i1, k + i1))
+            {
+                for(int l1 = -byte0; l1 <= byte0; l1++)
+                {
+                    for(int k2 = -byte0; k2 <= byte0; k2++)
+                    {
+                        for(int i3 = -byte0; i3 <= byte0; i3++)
+                        {
+                            int k3 = world.getBlockId(i + l1, j + k2, k + i3);
+                            if(k3 == Block.wood.blockID)
+                            {
+                                adjacentTreeBlocks[(l1 + k1) * j1 + (k2 + k1) * byte1 + (i3 + k1)] = 0;
+                                continue;
+                            }
+                            if(k3 == Block.leaves.blockID)
+                            {
+                                adjacentTreeBlocks[(l1 + k1) * j1 + (k2 + k1) * byte1 + (i3 + k1)] = -2;
+                            } else
+                            {
+                                adjacentTreeBlocks[(l1 + k1) * j1 + (k2 + k1) * byte1 + (i3 + k1)] = -1;
+                            }
+                        }
 
-												if(this.field_20017_a[(var12 + var10) * var9 + (var13 + var10 + 1) * var8 + var14 + var10] == -2) {
-													this.field_20017_a[(var12 + var10) * var9 + (var13 + var10 + 1) * var8 + var14 + var10] = var11;
-												}
+                    }
 
-												if(this.field_20017_a[(var12 + var10) * var9 + (var13 + var10) * var8 + (var14 + var10 - 1)] == -2) {
-													this.field_20017_a[(var12 + var10) * var9 + (var13 + var10) * var8 + (var14 + var10 - 1)] = var11;
-												}
+                }
 
-												if(this.field_20017_a[(var12 + var10) * var9 + (var13 + var10) * var8 + var14 + var10 + 1] == -2) {
-													this.field_20017_a[(var12 + var10) * var9 + (var13 + var10) * var8 + var14 + var10 + 1] = var11;
-												}
-											}
-										}
-									}
-								}
+                for(int i2 = 1; i2 <= 4; i2++)
+                {
+                    for(int l2 = -byte0; l2 <= byte0; l2++)
+                    {
+                        for(int j3 = -byte0; j3 <= byte0; j3++)
+                        {
+                            for(int l3 = -byte0; l3 <= byte0; l3++)
+                            {
+                                if(adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1) * byte1 + (l3 + k1)] != i2 - 1)
+                                {
+                                    continue;
+                                }
+                                if(adjacentTreeBlocks[((l2 + k1) - 1) * j1 + (j3 + k1) * byte1 + (l3 + k1)] == -2)
+                                {
+                                    adjacentTreeBlocks[((l2 + k1) - 1) * j1 + (j3 + k1) * byte1 + (l3 + k1)] = i2;
+                                }
+                                if(adjacentTreeBlocks[(l2 + k1 + 1) * j1 + (j3 + k1) * byte1 + (l3 + k1)] == -2)
+                                {
+                                    adjacentTreeBlocks[(l2 + k1 + 1) * j1 + (j3 + k1) * byte1 + (l3 + k1)] = i2;
+                                }
+                                if(adjacentTreeBlocks[(l2 + k1) * j1 + ((j3 + k1) - 1) * byte1 + (l3 + k1)] == -2)
+                                {
+                                    adjacentTreeBlocks[(l2 + k1) * j1 + ((j3 + k1) - 1) * byte1 + (l3 + k1)] = i2;
+                                }
+                                if(adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1 + 1) * byte1 + (l3 + k1)] == -2)
+                                {
+                                    adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1 + 1) * byte1 + (l3 + k1)] = i2;
+                                }
+                                if(adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1) * byte1 + ((l3 + k1) - 1)] == -2)
+                                {
+                                    adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1) * byte1 + ((l3 + k1) - 1)] = i2;
+                                }
+                                if(adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1) * byte1 + (l3 + k1 + 1)] == -2)
+                                {
+                                    adjacentTreeBlocks[(l2 + k1) * j1 + (j3 + k1) * byte1 + (l3 + k1 + 1)] = i2;
+                                }
+                            }
 
-								++var11;
-							}
-						}
+                        }
 
-						for(var12 = -var6; var12 <= var6; ++var12) {
-							for(var13 = -var6; var13 <= var6; ++var13) {
-								var14 = var1.getBlockId(var2 + var11, var3 + var12, var4 + var13);
-								if(var14 == Block.wood.blockID) {
-									this.field_20017_a[(var11 + var10) * var9 + (var12 + var10) * var8 + var13 + var10] = 0;
-								} else if(var14 == Block.leaves.blockID) {
-									this.field_20017_a[(var11 + var10) * var9 + (var12 + var10) * var8 + var13 + var10] = -2;
-								} else {
-									this.field_20017_a[(var11 + var10) * var9 + (var12 + var10) * var8 + var13 + var10] = -1;
-								}
-							}
-						}
+                    }
 
-						++var11;
-					}
-				}
+                }
 
-				var11 = this.field_20017_a[var10 * var9 + var10 * var8 + var10];
-				if(var11 >= 0) {
-					var1.setBlockMetadataWithNotify(var2, var3, var4, 0);
-				} else {
-					this.func_6360_i(var1, var2, var3, var4);
-				}
-			}
+            }
+            int j2 = adjacentTreeBlocks[k1 * j1 + k1 * byte1 + k1];
+            if(j2 >= 0)
+            {
+                world.setBlockMetadata(i, j, k, l & -9);
+            } else
+            {
+                removeLeaves(world, i, j, k);
+            }
+        }
+    }
 
-		}
-	}
+    private void removeLeaves(World world, int i, int j, int k)
+    {
+        dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+        world.setBlockWithNotify(i, j, k, 0);
+    }
 
-	private void func_6360_i(World var1, int var2, int var3, int var4) {
-		this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-		var1.setBlockWithNotify(var2, var3, var4, 0);
-	}
+    public int quantityDropped(Random random)
+    {
+        return random.nextInt(20) != 0 ? 0 : 1;
+    }
 
-	public int quantityDropped(Random var1) {
-		return var1.nextInt(16) == 0 ? 1 : 0;
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Block.sapling.blockID;
+    }
 
-	public int idDropped(int var1, Random var2) {
-		return Block.sapling.blockID;
-	}
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        if(!world.multiplayerWorld && entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.shears.shiftedIndex)
+        {
+            entityplayer.addStat(StatList.mineBlockStatArray[blockID], 1);
+            dropBlockAsItem_do(world, i, j, k, new ItemStack(Block.leaves.blockID, 1, l & 3));
+        } else
+        {
+            super.harvestBlock(world, entityplayer, i, j, k, l);
+        }
+    }
 
-	public boolean isOpaqueCube() {
-		return !this.graphicsLevel;
-	}
+    protected int damageDropped(int i)
+    {
+        return i & 3;
+    }
 
-	public void setGraphicsLevel(boolean var1) {
-		this.graphicsLevel = var1;
-		this.blockIndexInTexture = this.baseIndexInPNG + (var1 ? 0 : 1);
-	}
+    public boolean isOpaqueCube()
+    {
+        return !graphicsLevel;
+    }
 
-	public void onEntityWalking(World var1, int var2, int var3, int var4, Entity var5) {
-		super.onEntityWalking(var1, var2, var3, var4, var5);
-	}
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if((j & 3) == 1)
+        {
+            return blockIndexInTexture + 80;
+        } else
+        {
+            return blockIndexInTexture;
+        }
+    }
+
+    public void setGraphicsLevel(boolean flag)
+    {
+        graphicsLevel = flag;
+        blockIndexInTexture = baseIndexInPNG + (flag ? 0 : 1);
+    }
+
+    public void onEntityWalking(World world, int i, int j, int k, Entity entity)
+    {
+        super.onEntityWalking(world, i, j, k, entity);
+    }
 }

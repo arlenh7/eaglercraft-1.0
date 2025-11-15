@@ -1,79 +1,129 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.FontRenderer;
-import net.peyton.eagler.minecraft.Tessellator;
+// Referenced classes of package net.minecraft.src:
+//            Tessellator, FontRenderer
 
-public class Gui {
-	protected float zLevel = 0.0F;
+public class Gui
+{
 
-	protected void drawRect(int var1, int var2, int var3, int var4, int var5) {
-		float var6 = (float)(var5 >> 24 & 255) / 255.0F;
-		float var7 = (float)(var5 >> 16 & 255) / 255.0F;
-		float var8 = (float)(var5 >> 8 & 255) / 255.0F;
-		float var9 = (float)(var5 & 255) / 255.0F;
-		Tessellator var10 = Tessellator.instance;
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glColor4f(var7, var8, var9, var6);
-		var10.startDrawingQuads();
-		var10.addVertex((double)var1, (double)var4, 0.0D);
-		var10.addVertex((double)var3, (double)var4, 0.0D);
-		var10.addVertex((double)var3, (double)var2, 0.0D);
-		var10.addVertex((double)var1, (double)var2, 0.0D);
-		var10.draw();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_BLEND);
-	}
+    protected float zLevel;
 
-	protected void drawGradientRect(int var1, int var2, int var3, int var4, int var5, int var6) {
-		float var7 = (float)(var5 >> 24 & 255) / 255.0F;
-		float var8 = (float)(var5 >> 16 & 255) / 255.0F;
-		float var9 = (float)(var5 >> 8 & 255) / 255.0F;
-		float var10 = (float)(var5 & 255) / 255.0F;
-		float var11 = (float)(var6 >> 24 & 255) / 255.0F;
-		float var12 = (float)(var6 >> 16 & 255) / 255.0F;
-		float var13 = (float)(var6 >> 8 & 255) / 255.0F;
-		float var14 = (float)(var6 & 255) / 255.0F;
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
-		Tessellator var15 = Tessellator.instance;
-		var15.startDrawingQuads();
-		var15.setColorRGBA_F(var8, var9, var10, var7);
-		var15.addVertex((double)var3, (double)var2, 0.0D);
-		var15.addVertex((double)var1, (double)var2, 0.0D);
-		var15.setColorRGBA_F(var12, var13, var14, var11);
-		var15.addVertex((double)var1, (double)var4, 0.0D);
-		var15.addVertex((double)var3, (double)var4, 0.0D);
-		var15.draw();
-		GL11.glShadeModel(GL11.GL_FLAT);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-	}
+    public Gui()
+    {
+        zLevel = 0.0F;
+    }
 
-	public void drawCenteredString(FontRenderer var1, String var2, int var3, int var4, int var5) {
-		var1.drawStringWithShadow(var2, var3 - var1.getStringWidth(var2) / 2, var4, var5);
-	}
+    protected void func_27100_a(int i, int j, int k, int l)
+    {
+        if(j < i)
+        {
+            int i1 = i;
+            i = j;
+            j = i1;
+        }
+        drawRect(i, k, j + 1, k + 1, l);
+    }
 
-	public void drawString(FontRenderer var1, String var2, int var3, int var4, int var5) {
-		var1.drawStringWithShadow(var2, var3, var4, var5);
-	}
+    protected void func_27099_b(int i, int j, int k, int l)
+    {
+        if(k < j)
+        {
+            int i1 = j;
+            j = k;
+            k = i1;
+        }
+        drawRect(i, j + 1, i + 1, k, l);
+    }
 
-	public void drawTexturedModalRect(int var1, int var2, int var3, int var4, int var5, int var6) {
-		float var7 = 0.00390625F;
-		float var8 = 0.00390625F;
-		Tessellator var9 = Tessellator.instance;
-		var9.startDrawingQuads();
-		var9.addVertexWithUV((double)(var1 + 0), (double)(var2 + var6), (double)this.zLevel, (double)((float)(var3 + 0) * var7), (double)((float)(var4 + var6) * var8));
-		var9.addVertexWithUV((double)(var1 + var5), (double)(var2 + var6), (double)this.zLevel, (double)((float)(var3 + var5) * var7), (double)((float)(var4 + var6) * var8));
-		var9.addVertexWithUV((double)(var1 + var5), (double)(var2 + 0), (double)this.zLevel, (double)((float)(var3 + var5) * var7), (double)((float)(var4 + 0) * var8));
-		var9.addVertexWithUV((double)(var1 + 0), (double)(var2 + 0), (double)this.zLevel, (double)((float)(var3 + 0) * var7), (double)((float)(var4 + 0) * var8));
-		var9.draw();
-	}
+    protected void drawRect(int i, int j, int k, int l, int i1)
+    {
+        if(i < k)
+        {
+            int j1 = i;
+            i = k;
+            k = j1;
+        }
+        if(j < l)
+        {
+            int k1 = j;
+            j = l;
+            l = k1;
+        }
+        float f = (float)(i1 >> 24 & 0xff) / 255F;
+        float f1 = (float)(i1 >> 16 & 0xff) / 255F;
+        float f2 = (float)(i1 >> 8 & 0xff) / 255F;
+        float f3 = (float)(i1 & 0xff) / 255F;
+        Tessellator tessellator = Tessellator.instance;
+        GL11.glEnable(3042 /*GL_BLEND*/);
+        GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
+        GL11.glBlendFunc(770, 771);
+        GL11.glColor4f(f1, f2, f3, f);
+        tessellator.startDrawingQuads();
+        tessellator.addVertex(i, l, 0.0D);
+        tessellator.addVertex(k, l, 0.0D);
+        tessellator.addVertex(k, j, 0.0D);
+        tessellator.addVertex(i, j, 0.0D);
+        tessellator.draw();
+        GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
+        GL11.glDisable(3042 /*GL_BLEND*/);
+    }
+
+    protected void drawGradientRect(int i, int j, int k, int l, int i1, int j1)
+    {
+        float f = (float)(i1 >> 24 & 0xff) / 255F;
+        float f1 = (float)(i1 >> 16 & 0xff) / 255F;
+        float f2 = (float)(i1 >> 8 & 0xff) / 255F;
+        float f3 = (float)(i1 & 0xff) / 255F;
+        float f4 = (float)(j1 >> 24 & 0xff) / 255F;
+        float f5 = (float)(j1 >> 16 & 0xff) / 255F;
+        float f6 = (float)(j1 >> 8 & 0xff) / 255F;
+        float f7 = (float)(j1 & 0xff) / 255F;
+        GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
+        GL11.glEnable(3042 /*GL_BLEND*/);
+        GL11.glDisable(3008 /*GL_ALPHA_TEST*/);
+        GL11.glBlendFunc(770, 771);
+        GL11.glShadeModel(7425 /*GL_SMOOTH*/);
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.setColorRGBA_F(f1, f2, f3, f);
+        tessellator.addVertex(k, j, zLevel);
+        tessellator.addVertex(i, j, zLevel);
+        tessellator.setColorRGBA_F(f5, f6, f7, f4);
+        tessellator.addVertex(i, l, zLevel);
+        tessellator.addVertex(k, l, zLevel);
+        tessellator.draw();
+        GL11.glShadeModel(7424 /*GL_FLAT*/);
+        GL11.glDisable(3042 /*GL_BLEND*/);
+        GL11.glEnable(3008 /*GL_ALPHA_TEST*/);
+        GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
+    }
+
+    public void drawCenteredString(FontRenderer fontrenderer, String s, int i, int j, int k)
+    {
+        fontrenderer.drawStringWithShadow(s, i - fontrenderer.getStringWidth(s) / 2, j, k);
+    }
+
+    public void drawString(FontRenderer fontrenderer, String s, int i, int j, int k)
+    {
+        fontrenderer.drawStringWithShadow(s, i, j, k);
+    }
+
+    public void drawTexturedModalRect(int i, int j, int k, int l, int i1, int j1)
+    {
+        float f = 0.00390625F;
+        float f1 = 0.00390625F;
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(i + 0, j + j1, zLevel, (float)(k + 0) * f, (float)(l + j1) * f1);
+        tessellator.addVertexWithUV(i + i1, j + j1, zLevel, (float)(k + i1) * f, (float)(l + j1) * f1);
+        tessellator.addVertexWithUV(i + i1, j + 0, zLevel, (float)(k + i1) * f, (float)(l + 0) * f1);
+        tessellator.addVertexWithUV(i + 0, j + 0, zLevel, (float)(k + 0) * f, (float)(l + 0) * f1);
+        tessellator.draw();
+    }
 }

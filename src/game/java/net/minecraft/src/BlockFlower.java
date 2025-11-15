@@ -1,58 +1,79 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockFlower extends Block {
-	protected BlockFlower(int var1, int var2) {
-		super(var1, Material.plants);
-		this.blockIndexInTexture = var2;
-		this.setTickOnLoad(true);
-		float var3 = 0.2F;
-		this.setBlockBounds(0.5F - var3, 0.0F, 0.5F - var3, 0.5F + var3, var3 * 3.0F, 0.5F + var3);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, BlockGrass, 
+//            AxisAlignedBB
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return this.canThisPlantGrowOnThisBlockID(var1.getBlockId(var2, var3 - 1, var4));
-	}
+public class BlockFlower extends Block
+{
 
-	protected boolean canThisPlantGrowOnThisBlockID(int var1) {
-		return var1 == Block.grass.blockID || var1 == Block.dirt.blockID || var1 == Block.tilledField.blockID;
-	}
+    protected BlockFlower(int i, int j)
+    {
+        super(i, Material.plants);
+        blockIndexInTexture = j;
+        setTickOnLoad(true);
+        float f = 0.2F;
+        setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 3F, 0.5F + f);
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		super.onNeighborBlockChange(var1, var2, var3, var4, var5);
-		this.func_268_h(var1, var2, var3, var4);
-	}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        return super.canPlaceBlockAt(world, i, j, k) && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		this.func_268_h(var1, var2, var3, var4);
-	}
+    protected boolean canThisPlantGrowOnThisBlockID(int i)
+    {
+        return i == Block.grass.blockID || i == Block.dirt.blockID || i == Block.tilledField.blockID;
+    }
 
-	protected final void func_268_h(World var1, int var2, int var3, int var4) {
-		if(!this.canBlockStay(var1, var2, var3, var4)) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        super.onNeighborBlockChange(world, i, j, k, l);
+        checkFlowerChange(world, i, j, k);
+    }
 
-	}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        checkFlowerChange(world, i, j, k);
+    }
 
-	public boolean canBlockStay(World var1, int var2, int var3, int var4) {
-		return (var1.getBlockLightValue(var2, var3, var4) >= 8 || var1.canBlockSeeTheSky(var2, var3, var4)) && this.canThisPlantGrowOnThisBlockID(var1.getBlockId(var2, var3 - 1, var4));
-	}
+    protected final void checkFlowerChange(World world, int i, int j, int k)
+    {
+        if(!canBlockStay(world, i, j, k))
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+    public boolean canBlockStay(World world, int i, int j, int k)
+    {
+        return (world.getFullBlockLightValue(i, j, k) >= 8 || world.canBlockSeeTheSky(i, j, k)) && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        return null;
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public int getRenderType() {
-		return 1;
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+
+    public int getRenderType()
+    {
+        return 1;
+    }
 }

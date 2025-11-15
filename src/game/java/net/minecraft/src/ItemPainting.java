@@ -1,37 +1,58 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemPainting extends Item {
-	public ItemPainting(int var1) {
-		super(var1);
-		this.maxDamage = 64;
-	}
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 == 0) {
-			return false;
-		} else if(var7 == 1) {
-			return false;
-		} else {
-			byte var8 = 0;
-			if(var7 == 4) {
-				var8 = 1;
-			}
+// Referenced classes of package net.minecraft.src:
+//            Item, EntityPlayer, EntityPainting, World, 
+//            ItemStack
 
-			if(var7 == 3) {
-				var8 = 2;
-			}
+public class ItemPainting extends Item
+{
 
-			if(var7 == 5) {
-				var8 = 3;
-			}
+    public ItemPainting(int i)
+    {
+        super(i);
+    }
 
-			EntityPainting var9 = new EntityPainting(var3, var4, var5, var6, var8);
-			if(var9.func_410_i()) {
-				var3.entityJoinedWorld(var9);
-				--var1.stackSize;
-			}
-
-			return true;
-		}
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(l == 0)
+        {
+            return false;
+        }
+        if(l == 1)
+        {
+            return false;
+        }
+        byte byte0 = 0;
+        if(l == 4)
+        {
+            byte0 = 1;
+        }
+        if(l == 3)
+        {
+            byte0 = 2;
+        }
+        if(l == 5)
+        {
+            byte0 = 3;
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        EntityPainting entitypainting = new EntityPainting(world, i, j, k, byte0);
+        if(entitypainting.canStay())
+        {
+            if(!world.multiplayerWorld)
+            {
+                world.entityJoinedWorld(entitypainting);
+            }
+            itemstack.stackSize--;
+        }
+        return true;
+    }
 }

@@ -1,153 +1,264 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.Tessellator;
+// Referenced classes of package net.minecraft.src:
+//            ModelBase, TextureOffset, ModelBox, GLAllocation, 
+//            Tessellator
 
-public class ModelRenderer {
-	private PositionTexureVertex[] corners;
-	private TexturedQuad[] faces;
-	private int textureOffsetX;
-	private int textureOffsetY;
-	public float offsetX;
-	public float offsetY;
-	public float offsetZ;
-	public float rotateAngleX;
-	public float rotateAngleY;
-	public float rotateAngleZ;
-	private boolean compiled = false;
-	private int displayList = 0;
-	public boolean mirror = false;
-	public boolean field_1403_h = true;
-	public boolean field_1402_i = false;
+public class ModelRenderer
+{
 
-	public ModelRenderer(int var1, int var2) {
-		this.textureOffsetX = var1;
-		this.textureOffsetY = var2;
-	}
+    public float textureWidth;
+    public float textureHeight;
+    private int textureOffsetX;
+    private int textureOffsetY;
+    public float rotationPointX;
+    public float rotationPointY;
+    public float rotationPointZ;
+    public float rotateAngleX;
+    public float rotateAngleY;
+    public float rotateAngleZ;
+    private boolean compiled;
+    private int displayList;
+    public boolean mirror;
+    public boolean showModel;
+    public boolean isHidden;
+    public List cubeList;
+    public List childModels;
+    public final String boxName;
+    private ModelBase baseModel;
 
-	public void func_921_a(float var1, float var2, float var3, int var4, int var5, int var6) {
-		this.addBox(var1, var2, var3, var4, var5, var6, 0.0F);
-	}
+    public ModelRenderer(ModelBase modelbase, String s)
+    {
+        textureWidth = 64F;
+        textureHeight = 32F;
+        compiled = false;
+        displayList = 0;
+        mirror = false;
+        showModel = true;
+        isHidden = false;
+        cubeList = new ArrayList();
+        baseModel = modelbase;
+        modelbase.boxList.add(this);
+        boxName = s;
+        setTextureSize(modelbase.textureWidth, modelbase.textureHeight);
+    }
 
-	public void addBox(float var1, float var2, float var3, int var4, int var5, int var6, float var7) {
-		this.corners = new PositionTexureVertex[8];
-		this.faces = new TexturedQuad[6];
-		float var8 = var1 + (float)var4;
-		float var9 = var2 + (float)var5;
-		float var10 = var3 + (float)var6;
-		var1 -= var7;
-		var2 -= var7;
-		var3 -= var7;
-		var8 += var7;
-		var9 += var7;
-		var10 += var7;
-		if(this.mirror) {
-			float var11 = var8;
-			var8 = var1;
-			var1 = var11;
-		}
+    public ModelRenderer(ModelBase modelbase)
+    {
+        this(modelbase, null);
+    }
 
-		PositionTexureVertex var20 = new PositionTexureVertex(var1, var2, var3, 0.0F, 0.0F);
-		PositionTexureVertex var12 = new PositionTexureVertex(var8, var2, var3, 0.0F, 8.0F);
-		PositionTexureVertex var13 = new PositionTexureVertex(var8, var9, var3, 8.0F, 8.0F);
-		PositionTexureVertex var14 = new PositionTexureVertex(var1, var9, var3, 8.0F, 0.0F);
-		PositionTexureVertex var15 = new PositionTexureVertex(var1, var2, var10, 0.0F, 0.0F);
-		PositionTexureVertex var16 = new PositionTexureVertex(var8, var2, var10, 0.0F, 8.0F);
-		PositionTexureVertex var17 = new PositionTexureVertex(var8, var9, var10, 8.0F, 8.0F);
-		PositionTexureVertex var18 = new PositionTexureVertex(var1, var9, var10, 8.0F, 0.0F);
-		this.corners[0] = var20;
-		this.corners[1] = var12;
-		this.corners[2] = var13;
-		this.corners[3] = var14;
-		this.corners[4] = var15;
-		this.corners[5] = var16;
-		this.corners[6] = var17;
-		this.corners[7] = var18;
-		this.faces[0] = new TexturedQuad(new PositionTexureVertex[]{var16, var12, var13, var17}, this.textureOffsetX + var6 + var4, this.textureOffsetY + var6, this.textureOffsetX + var6 + var4 + var6, this.textureOffsetY + var6 + var5);
-		this.faces[1] = new TexturedQuad(new PositionTexureVertex[]{var20, var15, var18, var14}, this.textureOffsetX + 0, this.textureOffsetY + var6, this.textureOffsetX + var6, this.textureOffsetY + var6 + var5);
-		this.faces[2] = new TexturedQuad(new PositionTexureVertex[]{var16, var15, var20, var12}, this.textureOffsetX + var6, this.textureOffsetY + 0, this.textureOffsetX + var6 + var4, this.textureOffsetY + var6);
-		this.faces[3] = new TexturedQuad(new PositionTexureVertex[]{var13, var14, var18, var17}, this.textureOffsetX + var6 + var4, this.textureOffsetY + 0, this.textureOffsetX + var6 + var4 + var4, this.textureOffsetY + var6);
-		this.faces[4] = new TexturedQuad(new PositionTexureVertex[]{var12, var20, var14, var13}, this.textureOffsetX + var6, this.textureOffsetY + var6, this.textureOffsetX + var6 + var4, this.textureOffsetY + var6 + var5);
-		this.faces[5] = new TexturedQuad(new PositionTexureVertex[]{var15, var16, var17, var18}, this.textureOffsetX + var6 + var4 + var6, this.textureOffsetY + var6, this.textureOffsetX + var6 + var4 + var6 + var4, this.textureOffsetY + var6 + var5);
-		if(this.mirror) {
-			for(int var19 = 0; var19 < this.faces.length; ++var19) {
-				this.faces[var19].func_809_a();
-			}
-		}
+    public ModelRenderer(ModelBase modelbase, int i, int j)
+    {
+        this(modelbase);
+        setTextureOffset(i, j);
+    }
 
-	}
+    public void addChild(ModelRenderer modelrenderer)
+    {
+        if(childModels == null)
+        {
+            childModels = new ArrayList();
+        }
+        childModels.add(modelrenderer);
+    }
 
-	public void setPosition(float var1, float var2, float var3) {
-		this.offsetX = var1;
-		this.offsetY = var2;
-		this.offsetZ = var3;
-	}
+    public ModelRenderer setTextureOffset(int i, int j)
+    {
+        textureOffsetX = i;
+        textureOffsetY = j;
+        return this;
+    }
 
-	public void render(float var1) {
-		if(!this.field_1402_i) {
-			if(this.field_1403_h) {
-				if(!this.compiled) {
-					this.compileDisplayList(var1);
-				}
+    public ModelRenderer addBox(String s, float f, float f1, float f2, int i, int j, int k)
+    {
+        s = (new StringBuilder()).append(boxName).append(".").append(s).toString();
+        TextureOffset textureoffset = baseModel.func_40297_a(s);
+        setTextureOffset(textureoffset.field_40734_a, textureoffset.field_40733_b);
+        cubeList.add((new ModelBox(this, textureOffsetX, textureOffsetY, f, f1, f2, i, j, k, 0.0F)).func_40671_a(s));
+        return this;
+    }
 
-				if(this.rotateAngleX == 0.0F && this.rotateAngleY == 0.0F && this.rotateAngleZ == 0.0F) {
-					if(this.offsetX == 0.0F && this.offsetY == 0.0F && this.offsetZ == 0.0F) {
-						GL11.glCallList(this.displayList);
-					} else {
-						GL11.glTranslatef(this.offsetX * var1, this.offsetY * var1, this.offsetZ * var1);
-						GL11.glCallList(this.displayList);
-						GL11.glTranslatef(-this.offsetX * var1, -this.offsetY * var1, -this.offsetZ * var1);
-					}
-				} else {
-					GL11.glPushMatrix();
-					GL11.glTranslatef(this.offsetX * var1, this.offsetY * var1, this.offsetZ * var1);
+    public ModelRenderer addBox(float f, float f1, float f2, int i, int j, int k)
+    {
+        cubeList.add(new ModelBox(this, textureOffsetX, textureOffsetY, f, f1, f2, i, j, k, 0.0F));
+        return this;
+    }
 
-					GL11.glRotateZYXRad(this.rotateAngleX, this.rotateAngleY, this.rotateAngleZ);
+    public void addBox(float f, float f1, float f2, int i, int j, int k, float f3)
+    {
+        cubeList.add(new ModelBox(this, textureOffsetX, textureOffsetY, f, f1, f2, i, j, k, f3));
+    }
 
-					GL11.glCallList(this.displayList);
-					GL11.glPopMatrix();
-				}
+    public void setRotationPoint(float f, float f1, float f2)
+    {
+        rotationPointX = f;
+        rotationPointY = f1;
+        rotationPointZ = f2;
+    }
 
-			}
-		}
-	}
+    public void render(float f)
+    {
+        if(isHidden)
+        {
+            return;
+        }
+        if(!showModel)
+        {
+            return;
+        }
+        if(!compiled)
+        {
+            compileDisplayList(f);
+        }
+        if(rotateAngleX != 0.0F || rotateAngleY != 0.0F || rotateAngleZ != 0.0F)
+        {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(rotationPointX * f, rotationPointY * f, rotationPointZ * f);
+            if(rotateAngleZ != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleZ * 57.29578F, 0.0F, 0.0F, 1.0F);
+            }
+            if(rotateAngleY != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleY * 57.29578F, 0.0F, 1.0F, 0.0F);
+            }
+            if(rotateAngleX != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleX * 57.29578F, 1.0F, 0.0F, 0.0F);
+            }
+            GL11.glCallList(displayList);
+            if(childModels != null)
+            {
+                for(int i = 0; i < childModels.size(); i++)
+                {
+                    ((ModelRenderer)childModels.get(i)).render(f);
+                }
 
-	public void func_926_b(float var1) {
-		if(!this.field_1402_i) {
-			if(this.field_1403_h) {
-				if(!this.compiled) {
-					this.compileDisplayList(var1);
-				}
+            }
+            GL11.glPopMatrix();
+        } else
+        if(rotationPointX != 0.0F || rotationPointY != 0.0F || rotationPointZ != 0.0F)
+        {
+            GL11.glTranslatef(rotationPointX * f, rotationPointY * f, rotationPointZ * f);
+            GL11.glCallList(displayList);
+            if(childModels != null)
+            {
+                for(int j = 0; j < childModels.size(); j++)
+                {
+                    ((ModelRenderer)childModels.get(j)).render(f);
+                }
 
-				if(this.rotateAngleX == 0.0F && this.rotateAngleY == 0.0F && this.rotateAngleZ == 0.0F) {
-					if(this.offsetX != 0.0F || this.offsetY != 0.0F || this.offsetZ != 0.0F) {
-						GL11.glTranslatef(this.offsetX * var1, this.offsetY * var1, this.offsetZ * var1);
-					}
-				} else {
-					GL11.glTranslatef(this.offsetX * var1, this.offsetY * var1, this.offsetZ * var1);
-					GL11.glRotateZYXRad(this.rotateAngleX, this.rotateAngleY, this.rotateAngleZ);
-				}
+            }
+            GL11.glTranslatef(-rotationPointX * f, -rotationPointY * f, -rotationPointZ * f);
+        } else
+        {
+            GL11.glCallList(displayList);
+            if(childModels != null)
+            {
+                for(int k = 0; k < childModels.size(); k++)
+                {
+                    ((ModelRenderer)childModels.get(k)).render(f);
+                }
 
-			}
-		}
-	}
+            }
+        }
+    }
 
-	private void compileDisplayList(float var1) {
-		this.displayList = GLAllocation.generateDisplayLists(1);
-		GL11.glNewList(this.displayList, GL11.GL_COMPILE);
-		Tessellator var2 = Tessellator.instance;
+    public void renderWithRotation(float f)
+    {
+        if(isHidden)
+        {
+            return;
+        }
+        if(!showModel)
+        {
+            return;
+        }
+        if(!compiled)
+        {
+            compileDisplayList(f);
+        }
+        GL11.glPushMatrix();
+        GL11.glTranslatef(rotationPointX * f, rotationPointY * f, rotationPointZ * f);
+        if(rotateAngleY != 0.0F)
+        {
+            GL11.glRotatef(rotateAngleY * 57.29578F, 0.0F, 1.0F, 0.0F);
+        }
+        if(rotateAngleX != 0.0F)
+        {
+            GL11.glRotatef(rotateAngleX * 57.29578F, 1.0F, 0.0F, 0.0F);
+        }
+        if(rotateAngleZ != 0.0F)
+        {
+            GL11.glRotatef(rotateAngleZ * 57.29578F, 0.0F, 0.0F, 1.0F);
+        }
+        GL11.glCallList(displayList);
+        GL11.glPopMatrix();
+    }
 
-		int j = this.faces.length;
-		if(j > 0) {
-			var2.startDrawingQuads();
-			for(int i = 0; i < j; ++i) {
-				this.faces[i].render(var2, var1);
-			}
-			var2.draw();
-		}
+    public void postRender(float f)
+    {
+        if(isHidden)
+        {
+            return;
+        }
+        if(!showModel)
+        {
+            return;
+        }
+        if(!compiled)
+        {
+            compileDisplayList(f);
+        }
+        if(rotateAngleX != 0.0F || rotateAngleY != 0.0F || rotateAngleZ != 0.0F)
+        {
+            GL11.glTranslatef(rotationPointX * f, rotationPointY * f, rotationPointZ * f);
+            if(rotateAngleZ != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleZ * 57.29578F, 0.0F, 0.0F, 1.0F);
+            }
+            if(rotateAngleY != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleY * 57.29578F, 0.0F, 1.0F, 0.0F);
+            }
+            if(rotateAngleX != 0.0F)
+            {
+                GL11.glRotatef(rotateAngleX * 57.29578F, 1.0F, 0.0F, 0.0F);
+            }
+        } else
+        if(rotationPointX != 0.0F || rotationPointY != 0.0F || rotationPointZ != 0.0F)
+        {
+            GL11.glTranslatef(rotationPointX * f, rotationPointY * f, rotationPointZ * f);
+        }
+    }
 
-		GL11.glEndList();
-		this.compiled = true;
-	}
+    private void compileDisplayList(float f)
+    {
+        displayList = GLAllocation.generateDisplayLists(1);
+        GL11.glNewList(displayList, 4864 /*GL_COMPILE*/);
+        Tessellator tessellator = Tessellator.instance;
+        for(int i = 0; i < cubeList.size(); i++)
+        {
+            ((ModelBox)cubeList.get(i)).func_40670_a(tessellator, f);
+        }
+
+        GL11.glEndList();
+        compiled = true;
+    }
+
+    public ModelRenderer setTextureSize(int i, int j)
+    {
+        textureWidth = i;
+        textureHeight = j;
+        return this;
+    }
 }

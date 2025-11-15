@@ -1,170 +1,214 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.*;
+import org.lwjgl.opengl.GL11;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.peyton.eagler.minecraft.Tessellator;
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, ActiveRenderInfo, Entity, RenderEngine, 
+//            Tessellator, MathHelper, Block, EntityDiggingFX, 
+//            World
 
-public class EffectRenderer {
-	protected World worldObj;
-	private ObjectArrayList<ObjectArrayList<EntityFX>> field_1728_b = new ObjectArrayList<>(4);
-	private Random rand = new Random();
+public class EffectRenderer
+{
 
-	public EffectRenderer(World var1, RenderEngine var2) {
-		if(var1 != null) {
-			this.worldObj = var1;
-		}
+    protected World worldObj;
+    private List fxLayers[];
+    private RenderEngine renderer;
+    private Random rand;
 
-		for(int var3 = 0; var3 < 4; ++var3) {
-			this.field_1728_b.add(var3, new ObjectArrayList<>());
-		}
+    public EffectRenderer(World world, RenderEngine renderengine)
+    {
+        fxLayers = new List[4];
+        rand = new Random();
+        if(world != null)
+        {
+            worldObj = world;
+        }
+        renderer = renderengine;
+        for(int i = 0; i < 4; i++)
+        {
+            fxLayers[i] = new ArrayList();
+        }
 
-	}
+    }
 
-	public void func_1192_a(EntityFX var1) {
-		int var2 = var1.func_404_c();
-		this.field_1728_b.get(var2).add(var1);
-	}
+    public void addEffect(EntityFX entityfx)
+    {
+        int i = entityfx.getFXLayer();
+        if(fxLayers[i].size() >= 4000)
+        {
+            fxLayers[i].remove(0);
+        }
+        fxLayers[i].add(entityfx);
+    }
 
-	public void func_1193_a() {
-		for(int var1 = 0; var1 < 4; ++var1) {
-			ObjectArrayList<EntityFX> list = this.field_1728_b.get(var1);
-			for(int var2 = 0; var2 < list.size(); ++var2) {
-				EntityFX var3 = list.get(var2);
-				var3.onUpdate();
-				if(var3.isDead) {
-					list.remove(var2--);
-				}
-			}
-		}
+    public void updateEffects()
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            for(int j = 0; j < fxLayers[i].size(); j++)
+            {
+                EntityFX entityfx = (EntityFX)fxLayers[i].get(j);
+                entityfx.onUpdate();
+                if(entityfx.isDead)
+                {
+                    fxLayers[i].remove(j--);
+                }
+            }
 
-	}
+        }
 
-	public void func_1189_a(Entity var1, float var2) {
-		float var3 = MathHelper.cos(var1.rotationYaw * (float)Math.PI / 180.0F);
-		float var4 = MathHelper.sin(var1.rotationYaw * (float)Math.PI / 180.0F);
-		float var5 = -var4 * MathHelper.sin(var1.rotationPitch * (float)Math.PI / 180.0F);
-		float var6 = var3 * MathHelper.sin(var1.rotationPitch * (float)Math.PI / 180.0F);
-		float var7 = MathHelper.cos(var1.rotationPitch * (float)Math.PI / 180.0F);
-		EntityFX.field_660_l = var1.lastTickPosX + (var1.posX - var1.lastTickPosX) * (double)var2;
-		EntityFX.field_659_m = var1.lastTickPosY + (var1.posY - var1.lastTickPosY) * (double)var2;
-		EntityFX.field_658_n = var1.lastTickPosZ + (var1.posZ - var1.lastTickPosZ) * (double)var2;
+    }
 
-		for(int var8 = 0; var8 < 3; ++var8) {
-			ObjectArrayList<EntityFX> list = this.field_1728_b.get(var8);
-			int size = list.size();
-			if(size != 0) {
-				TextureLocation var9 = null;
-				if(var8 == 0) {
-					var9 = TextureLocation.particles;
-				}
+    public void renderParticles(Entity entity, float f)
+    {
+        float f1 = ActiveRenderInfo.field_41070_d;
+        float f2 = ActiveRenderInfo.field_41068_f;
+        float f3 = ActiveRenderInfo.field_41069_g;
+        float f4 = ActiveRenderInfo.field_41078_h;
+        float f5 = ActiveRenderInfo.field_41071_e;
+        EntityFX.interpPosX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)f;
+        EntityFX.interpPosY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)f;
+        EntityFX.interpPosZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)f;
+        for(int i = 0; i < 3; i++)
+        {
+            if(fxLayers[i].size() == 0)
+            {
+                continue;
+            }
+            int j = 0;
+            if(i == 0)
+            {
+                j = renderer.getTexture("/particles.png");
+            }
+            if(i == 1)
+            {
+                j = renderer.getTexture("/terrain.png");
+            }
+            if(i == 2)
+            {
+                j = renderer.getTexture("/gui/items.png");
+            }
+            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, j);
+            Tessellator tessellator = Tessellator.instance;
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            tessellator.startDrawingQuads();
+            for(int k = 0; k < fxLayers[i].size(); k++)
+            {
+                EntityFX entityfx = (EntityFX)fxLayers[i].get(k);
+                tessellator.setBrightness(entityfx.getEntityBrightnessForRender(f));
+                entityfx.renderParticle(tessellator, f, f1, f5, f2, f3, f4);
+            }
 
-				if(var8 == 1) {
-					var9 = TextureLocation.terrain;
-				}
+            tessellator.draw();
+        }
 
-				if(var8 == 2) {
-					var9 = TextureLocation.items;
-				}
+    }
 
-				if(var9 != null) {
-					var9.bindTexture();
-				}
-				Tessellator var10 = Tessellator.instance;
-				var10.startDrawingQuads();
+    public void func_1187_b(Entity entity, float f)
+    {
+        float f1 = MathHelper.cos((entity.rotationYaw * 3.141593F) / 180F);
+        float f2 = MathHelper.sin((entity.rotationYaw * 3.141593F) / 180F);
+        float f3 = -f2 * MathHelper.sin((entity.rotationPitch * 3.141593F) / 180F);
+        float f4 = f1 * MathHelper.sin((entity.rotationPitch * 3.141593F) / 180F);
+        float f5 = MathHelper.cos((entity.rotationPitch * 3.141593F) / 180F);
+        byte byte0 = 3;
+        if(fxLayers[byte0].size() == 0)
+        {
+            return;
+        }
+        Tessellator tessellator = Tessellator.instance;
+        for(int i = 0; i < fxLayers[byte0].size(); i++)
+        {
+            EntityFX entityfx = (EntityFX)fxLayers[byte0].get(i);
+            tessellator.setBrightness(entityfx.getEntityBrightnessForRender(f));
+            entityfx.renderParticle(tessellator, f, f1, f5, f2, f3, f4);
+        }
 
-				for(int var11 = 0; var11 < size; ++var11) {
-					EntityFX var12 = list.get(var11);
-					var12.func_406_a(var10, var2, var3, var7, var4, var5, var6);
-				}
+    }
 
-				var10.draw();
-			}
-		}
-	}
+    public void clearEffects(World world)
+    {
+        worldObj = world;
+        for(int i = 0; i < 4; i++)
+        {
+            fxLayers[i].clear();
+        }
 
-	public void func_1187_b(Entity var1, float var2) {
-		byte var3 = 3;
-		ObjectArrayList<EntityFX> list = this.field_1728_b.get(var3);
-		int size = list.size();
-		if(size != 0) {
-			Tessellator var4 = Tessellator.instance;
+    }
 
-			for(int var5 = 0; var5 < size; ++var5) {
-				EntityFX var6 = list.get(var5);
-				var6.func_406_a(var4, var2, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
-			}
+    public void addBlockDestroyEffects(int i, int j, int k, int l, int i1)
+    {
+        if(l == 0)
+        {
+            return;
+        }
+        Block block = Block.blocksList[l];
+        int j1 = 4;
+        for(int k1 = 0; k1 < j1; k1++)
+        {
+            for(int l1 = 0; l1 < j1; l1++)
+            {
+                for(int i2 = 0; i2 < j1; i2++)
+                {
+                    double d = (double)i + ((double)k1 + 0.5D) / (double)j1;
+                    double d1 = (double)j + ((double)l1 + 0.5D) / (double)j1;
+                    double d2 = (double)k + ((double)i2 + 0.5D) / (double)j1;
+                    int j2 = rand.nextInt(6);
+                    addEffect((new EntityDiggingFX(worldObj, d, d1, d2, d - (double)i - 0.5D, d1 - (double)j - 0.5D, d2 - (double)k - 0.5D, block, j2, i1)).func_4041_a(i, j, k));
+                }
 
-		}
-	}
+            }
 
-	public void func_1188_a(World var1) {
-		this.worldObj = var1;
+        }
 
-		for(int var2 = 0; var2 < 4; ++var2) {
-			this.field_1728_b.get(var2).clear();
-		}
+    }
 
-	}
+    public void addBlockHitEffects(int i, int j, int k, int l)
+    {
+        int i1 = worldObj.getBlockId(i, j, k);
+        if(i1 == 0)
+        {
+            return;
+        }
+        Block block = Block.blocksList[i1];
+        float f = 0.1F;
+        double d = (double)i + rand.nextDouble() * (block.maxX - block.minX - (double)(f * 2.0F)) + (double)f + block.minX;
+        double d1 = (double)j + rand.nextDouble() * (block.maxY - block.minY - (double)(f * 2.0F)) + (double)f + block.minY;
+        double d2 = (double)k + rand.nextDouble() * (block.maxZ - block.minZ - (double)(f * 2.0F)) + (double)f + block.minZ;
+        if(l == 0)
+        {
+            d1 = ((double)j + block.minY) - (double)f;
+        }
+        if(l == 1)
+        {
+            d1 = (double)j + block.maxY + (double)f;
+        }
+        if(l == 2)
+        {
+            d2 = ((double)k + block.minZ) - (double)f;
+        }
+        if(l == 3)
+        {
+            d2 = (double)k + block.maxZ + (double)f;
+        }
+        if(l == 4)
+        {
+            d = ((double)i + block.minX) - (double)f;
+        }
+        if(l == 5)
+        {
+            d = (double)i + block.maxX + (double)f;
+        }
+        addEffect((new EntityDiggingFX(worldObj, d, d1, d2, 0.0D, 0.0D, 0.0D, block, l, worldObj.getBlockMetadata(i, j, k))).func_4041_a(i, j, k).multiplyVelocity(0.2F).func_405_d(0.6F));
+    }
 
-	public void func_1186_a(int var1, int var2, int var3) {
-		int var4 = this.worldObj.getBlockId(var1, var2, var3);
-		if(var4 != 0) {
-			Block var5 = Block.blocksList[var4];
-			byte var6 = 4;
-
-			for(int var7 = 0; var7 < var6; ++var7) {
-				for(int var8 = 0; var8 < var6; ++var8) {
-					for(int var9 = 0; var9 < var6; ++var9) {
-						double var10 = (double)var1 + ((double)var7 + 0.5D) / (double)var6;
-						double var12 = (double)var2 + ((double)var8 + 0.5D) / (double)var6;
-						double var14 = (double)var3 + ((double)var9 + 0.5D) / (double)var6;
-						this.func_1192_a((new EntityDiggingFX(this.worldObj, var10, var12, var14, var10 - (double)var1 - 0.5D, var12 - (double)var2 - 0.5D, var14 - (double)var3 - 0.5D, var5)).func_4041_a(var1, var2, var3));
-					}
-				}
-			}
-
-		}
-	}
-
-	public void func_1191_a(int var1, int var2, int var3, int var4) {
-		int var5 = this.worldObj.getBlockId(var1, var2, var3);
-		if(var5 != 0) {
-			Block var6 = Block.blocksList[var5];
-			float var7 = 0.1F;
-			double var8 = (double)var1 + this.rand.nextDouble() * (var6.maxX - var6.minX - (double)(var7 * 2.0F)) + (double)var7 + var6.minX;
-			double var10 = (double)var2 + this.rand.nextDouble() * (var6.maxY - var6.minY - (double)(var7 * 2.0F)) + (double)var7 + var6.minY;
-			double var12 = (double)var3 + this.rand.nextDouble() * (var6.maxZ - var6.minZ - (double)(var7 * 2.0F)) + (double)var7 + var6.minZ;
-			if(var4 == 0) {
-				var10 = (double)var2 + var6.minY - (double)var7;
-			}
-
-			if(var4 == 1) {
-				var10 = (double)var2 + var6.maxY + (double)var7;
-			}
-
-			if(var4 == 2) {
-				var12 = (double)var3 + var6.minZ - (double)var7;
-			}
-
-			if(var4 == 3) {
-				var12 = (double)var3 + var6.maxZ + (double)var7;
-			}
-
-			if(var4 == 4) {
-				var8 = (double)var1 + var6.minX - (double)var7;
-			}
-
-			if(var4 == 5) {
-				var8 = (double)var1 + var6.maxX + (double)var7;
-			}
-
-			this.func_1192_a((new EntityDiggingFX(this.worldObj, var8, var10, var12, 0.0D, 0.0D, 0.0D, var6)).func_4041_a(var1, var2, var3).func_407_b(0.2F).func_405_d(0.6F));
-		}
-	}
-
-	public String func_1190_b() {
-		return "" + (this.field_1728_b.get(0).size() + this.field_1728_b.get(1).size() + this.field_1728_b.get(2).size());
-	}
+    public String getStatistics()
+    {
+        return (new StringBuilder()).append("").append(fxLayers[0].size() + fxLayers[1].size() + fxLayers[2].size()).toString();
+    }
 }

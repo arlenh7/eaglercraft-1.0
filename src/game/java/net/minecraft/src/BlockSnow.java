@@ -1,75 +1,126 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockSnow extends Block {
-	protected BlockSnow(int var1, int var2) {
-		super(var1, var2, Material.snow);
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 2.0F / 16.0F, 1.0F);
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, AxisAlignedBB, 
+//            IBlockAccess, Item, EntityItem, ItemStack, 
+//            StatList, EntityPlayer, EnumSkyBlock
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+public class BlockSnow extends Block
+{
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    protected BlockSnow(int i, int j)
+    {
+        super(i, j, Material.snow);
+        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
+        setTickOnLoad(true);
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k) & 7;
+        if(l >= 3)
+        {
+            return AxisAlignedBB.getBoundingBoxFromPool((double)i + minX, (double)j + minY, (double)k + minZ, (double)i + maxX, (float)j + 0.5F, (double)k + maxZ);
+        } else
+        {
+            return null;
+        }
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockId(var2, var3 - 1, var4);
-		return var5 != 0 && Block.blocksList[var5].isOpaqueCube() ? var1.getBlockMaterial(var2, var3 - 1, var4).getIsSolid() : false;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		this.func_314_h(var1, var2, var3, var4);
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	private boolean func_314_h(World var1, int var2, int var3, int var4) {
-		if(!this.canPlaceBlockAt(var1, var2, var3, var4)) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-			return false;
-		} else {
-			return true;
-		}
-	}
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        int l = iblockaccess.getBlockMetadata(i, j, k) & 7;
+        float f = (float)(2 * (1 + l)) / 16F;
+        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
+    }
 
-	public void harvestBlock(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = Item.snowball.shiftedIndex;
-		float var7 = 0.7F;
-		double var8 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
-		double var10 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
-		double var12 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
-		EntityItem var14 = new EntityItem(var1, (double)var2 + var8, (double)var3 + var10, (double)var4 + var12, new ItemStack(var6));
-		var14.delayBeforeCanPickup = 10;
-		var1.entityJoinedWorld(var14);
-		var1.setBlockWithNotify(var2, var3, var4, 0);
-	}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        int l = world.getBlockId(i, j - 1, k);
+        if(l == 0 || !Block.blocksList[l].isOpaqueCube())
+        {
+            return false;
+        } else
+        {
+            return world.getBlockMaterial(i, j - 1, k).getIsSolid();
+        }
+    }
 
-	public int idDropped(int var1, Random var2) {
-		return Item.snowball.shiftedIndex;
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        func_314_h(world, i, j, k);
+    }
 
-	public int quantityDropped(Random var1) {
-		return 0;
-	}
+    private boolean func_314_h(World world, int i, int j, int k)
+    {
+        if(!canPlaceBlockAt(world, i, j, k))
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+            return false;
+        } else
+        {
+            return true;
+        }
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(var1.getSavedLightValue(EnumSkyBlock.Block, var2, var3, var4) > 11) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        int i1 = Item.snowball.shiftedIndex;
+        float f = 0.7F;
+        double d = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+        double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+        double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+        EntityItem entityitem = new EntityItem(world, (double)i + d, (double)j + d1, (double)k + d2, new ItemStack(i1, 1, 0));
+        entityitem.delayBeforeCanPickup = 10;
+        world.entityJoinedWorld(entityitem);
+        world.setBlockWithNotify(i, j, k, 0);
+        entityplayer.addStat(StatList.mineBlockStatArray[blockID], 1);
+    }
 
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Item.snowball.shiftedIndex;
+    }
 
-	public boolean shouldSideBeRendered(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		Material var6 = var1.getBlockMaterial(var2, var3, var4);
-		return var5 == 1 ? true : (var6 == this.blockMaterial ? false : super.shouldSideBeRendered(var1, var2, var3, var4, var5));
-	}
+    public int quantityDropped(Random random)
+    {
+        return 0;
+    }
+
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.getSavedLightValue(EnumSkyBlock.Block, i, j, k) > 11)
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
+
+    public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        if(l == 1)
+        {
+            return true;
+        } else
+        {
+            return super.shouldSideBeRendered(iblockaccess, i, j, k, l);
+        }
+    }
 }

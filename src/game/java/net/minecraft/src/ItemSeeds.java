@@ -1,25 +1,45 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemSeeds extends Item {
-	private int field_318_a;
 
-	public ItemSeeds(int var1, int var2) {
-		super(var1);
-		this.field_318_a = var2;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, EntityPlayer, World, ItemStack
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 != 1) {
-			return false;
-		} else {
-			int var8 = var3.getBlockId(var4, var5, var6);
-			if(var8 == Block.tilledField.blockID) {
-				var3.setBlockWithNotify(var4, var5 + 1, var6, this.field_318_a);
-				--var1.stackSize;
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
+public class ItemSeeds extends Item
+{
+
+    private int blockType;
+    private int field_40438_b;
+
+    public ItemSeeds(int i, int j, int k)
+    {
+        super(i);
+        blockType = j;
+        field_40438_b = k;
+    }
+
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(l != 1)
+        {
+            return false;
+        }
+        if(!entityplayer.func_35190_e(i, j, k) || !entityplayer.func_35190_e(i, j + 1, k))
+        {
+            return false;
+        }
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 == field_40438_b && world.isAirBlock(i, j + 1, k))
+        {
+            world.setBlockWithNotify(i, j + 1, k, blockType);
+            itemstack.stackSize--;
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 }

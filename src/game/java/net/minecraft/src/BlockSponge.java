@@ -1,35 +1,55 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockSponge extends Block {
-	protected BlockSponge(int var1) {
-		super(var1, Material.sponge);
-		this.blockIndexInTexture = 48;
-	}
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		byte var5 = 2;
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World
 
-		for(int var6 = var2 - var5; var6 <= var2 + var5; ++var6) {
-			for(int var7 = var3 - var5; var7 <= var3 + var5; ++var7) {
-				for(int var8 = var4 - var5; var8 <= var4 + var5; ++var8) {
-					if(var1.getBlockMaterial(var6, var7, var8) == Material.water) {
-					}
-				}
-			}
-		}
+public class BlockSponge extends Block
+{
 
-	}
+    protected BlockSponge(int i)
+    {
+        super(i, Material.sponge);
+        blockIndexInTexture = 48;
+    }
 
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		byte var5 = 2;
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+        byte byte0 = 2;
+        for(int l = i - byte0; l <= i + byte0; l++)
+        {
+            for(int i1 = j - byte0; i1 <= j + byte0; i1++)
+            {
+                for(int j1 = k - byte0; j1 <= k + byte0; j1++)
+                {
+                    if(world.getBlockMaterial(l, i1, j1) != Material.water);
+                }
 
-		for(int var6 = var2 - var5; var6 <= var2 + var5; ++var6) {
-			for(int var7 = var3 - var5; var7 <= var3 + var5; ++var7) {
-				for(int var8 = var4 - var5; var8 <= var4 + var5; ++var8) {
-					var1.notifyBlocksOfNeighborChange(var6, var7, var8, var1.getBlockId(var6, var7, var8));
-				}
-			}
-		}
+            }
 
-	}
+        }
+
+    }
+
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        byte byte0 = 2;
+        for(int l = i - byte0; l <= i + byte0; l++)
+        {
+            for(int i1 = j - byte0; i1 <= j + byte0; i1++)
+            {
+                for(int j1 = k - byte0; j1 <= k + byte0; j1++)
+                {
+                    world.notifyBlocksOfNeighborChange(l, i1, j1, world.getBlockId(l, i1, j1));
+                }
+
+            }
+
+        }
+
+    }
 }

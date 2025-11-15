@@ -1,151 +1,205 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockPressurePlate extends Block {
-	private EnumMobType triggerMobType;
+// Referenced classes of package net.minecraft.src:
+//            Block, World, EnumMobType, AxisAlignedBB, 
+//            EntityLiving, EntityPlayer, IBlockAccess, Material, 
+//            Entity
 
-	protected BlockPressurePlate(int var1, int var2, EnumMobType var3) {
-		super(var1, var2, Material.rock);
-		this.triggerMobType = var3;
-		this.setTickOnLoad(true);
-		float var4 = 1.0F / 16.0F;
-		this.setBlockBounds(var4, 0.0F, var4, 1.0F - var4, 0.03125F, 1.0F - var4);
-	}
+public class BlockPressurePlate extends Block
+{
 
-	public int tickRate() {
-		return 20;
-	}
+    private EnumMobType triggerMobType;
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+    protected BlockPressurePlate(int i, int j, EnumMobType enummobtype, Material material)
+    {
+        super(i, j, material);
+        triggerMobType = enummobtype;
+        setTickOnLoad(true);
+        float f = 0.0625F;
+        setBlockBounds(f, 0.0F, f, 1.0F - f, 0.03125F, 1.0F - f);
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public int tickRate()
+    {
+        return 20;
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        return null;
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var1.isBlockOpaqueCube(var2, var3 - 1, var4);
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		boolean var6 = false;
-		if(!var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-			var6 = true;
-		}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        return world.isBlockNormalCube(i, j - 1, k) || world.getBlockId(i, j - 1, k) == Block.fence.blockID;
+    }
 
-		if(var6) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+    }
 
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        boolean flag = false;
+        if(!world.isBlockNormalCube(i, j - 1, k) && world.getBlockId(i, j - 1, k) != Block.fence.blockID)
+        {
+            flag = true;
+        }
+        if(flag)
+        {
+            dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(!var1.multiplayerWorld) {
-			if(var1.getBlockMetadata(var2, var3, var4) != 0) {
-				this.setStateIfMobInteractsWithPlate(var1, var2, var3, var4);
-			}
-		}
-	}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        if(world.getBlockMetadata(i, j, k) == 0)
+        {
+            return;
+        } else
+        {
+            setStateIfMobInteractsWithPlate(world, i, j, k);
+            return;
+        }
+    }
 
-	public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
-		if(!var1.multiplayerWorld) {
-			if(var1.getBlockMetadata(var2, var3, var4) != 1) {
-				this.setStateIfMobInteractsWithPlate(var1, var2, var3, var4);
-			}
-		}
-	}
+    public void onEntityCollidedWithBlock(World world, int i, int j, int k, Entity entity)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        if(world.getBlockMetadata(i, j, k) == 1)
+        {
+            return;
+        } else
+        {
+            setStateIfMobInteractsWithPlate(world, i, j, k);
+            return;
+        }
+    }
 
-	private void setStateIfMobInteractsWithPlate(World var1, int var2, int var3, int var4) {
-		boolean var5 = var1.getBlockMetadata(var2, var3, var4) == 1;
-		boolean var6 = false;
-		float var7 = 2.0F / 16.0F;
-		List<Entity> var8 = null;
-		if(this.triggerMobType == EnumMobType.everything) {
-			var8 = var1.getEntitiesWithinAABBExcludingEntity((Entity)null, AxisAlignedBB.getBoundingBoxFromPool((double)((float)var2 + var7), (double)var3, (double)((float)var4 + var7), (double)((float)(var2 + 1) - var7), (double)var3 + 0.25D, (double)((float)(var4 + 1) - var7)));
-		}
+    private void setStateIfMobInteractsWithPlate(World world, int i, int j, int k)
+    {
+        boolean flag = world.getBlockMetadata(i, j, k) == 1;
+        boolean flag1 = false;
+        float f = 0.125F;
+        List list = null;
+        if(triggerMobType == EnumMobType.everything)
+        {
+            list = world.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f, (float)(i + 1) - f, (double)j + 0.25D, (float)(k + 1) - f));
+        }
+        if(triggerMobType == EnumMobType.mobs)
+        {
+            list = world.getEntitiesWithinAABB(net.minecraft.src.EntityLiving.class, AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f, (float)(i + 1) - f, (double)j + 0.25D, (float)(k + 1) - f));
+        }
+        if(triggerMobType == EnumMobType.players)
+        {
+            list = world.getEntitiesWithinAABB(net.minecraft.src.EntityPlayer.class, AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f, (float)(i + 1) - f, (double)j + 0.25D, (float)(k + 1) - f));
+        }
+        if(list.size() > 0)
+        {
+            flag1 = true;
+        }
+        if(flag1 && !flag)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 1);
+            world.notifyBlocksOfNeighborChange(i, j, k, blockID);
+            world.notifyBlocksOfNeighborChange(i, j - 1, k, blockID);
+            world.markBlocksDirty(i, j, k, i, j, k);
+            world.playSoundEffect((double)i + 0.5D, (double)j + 0.10000000000000001D, (double)k + 0.5D, "random.click", 0.3F, 0.6F);
+        }
+        if(!flag1 && flag)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 0);
+            world.notifyBlocksOfNeighborChange(i, j, k, blockID);
+            world.notifyBlocksOfNeighborChange(i, j - 1, k, blockID);
+            world.markBlocksDirty(i, j, k, i, j, k);
+            world.playSoundEffect((double)i + 0.5D, (double)j + 0.10000000000000001D, (double)k + 0.5D, "random.click", 0.3F, 0.5F);
+        }
+        if(flag1)
+        {
+            world.scheduleBlockUpdate(i, j, k, blockID, tickRate());
+        }
+    }
 
-		if(this.triggerMobType == EnumMobType.mobs) {
-			var8 = var1.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBoxFromPool((double)((float)var2 + var7), (double)var3, (double)((float)var4 + var7), (double)((float)(var2 + 1) - var7), (double)var3 + 0.25D, (double)((float)(var4 + 1) - var7)));
-		}
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        if(l > 0)
+        {
+            world.notifyBlocksOfNeighborChange(i, j, k, blockID);
+            world.notifyBlocksOfNeighborChange(i, j - 1, k, blockID);
+        }
+        super.onBlockRemoval(world, i, j, k);
+    }
 
-		if(this.triggerMobType == EnumMobType.players) {
-			var8 = var1.getEntitiesWithinAABB(EntityPlayer.class, AxisAlignedBB.getBoundingBoxFromPool((double)((float)var2 + var7), (double)var3, (double)((float)var4 + var7), (double)((float)(var2 + 1) - var7), (double)var3 + 0.25D, (double)((float)(var4 + 1) - var7)));
-		}
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        boolean flag = iblockaccess.getBlockMetadata(i, j, k) == 1;
+        float f = 0.0625F;
+        if(flag)
+        {
+            setBlockBounds(f, 0.0F, f, 1.0F - f, 0.03125F, 1.0F - f);
+        } else
+        {
+            setBlockBounds(f, 0.0F, f, 1.0F - f, 0.0625F, 1.0F - f);
+        }
+    }
 
-		if(var8.size() > 0) {
-			var6 = true;
-		}
+    public boolean isPoweringTo(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        return iblockaccess.getBlockMetadata(i, j, k) > 0;
+    }
 
-		if(var6 && !var5) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 1);
-			var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
-			var1.notifyBlocksOfNeighborChange(var2, var3 - 1, var4, this.blockID);
-			var1.func_701_b(var2, var3, var4, var2, var3, var4);
-			var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.1D, (double)var4 + 0.5D, "random.click", 0.3F, 0.6F);
-		}
+    public boolean isIndirectlyPoweringTo(World world, int i, int j, int k, int l)
+    {
+        if(world.getBlockMetadata(i, j, k) == 0)
+        {
+            return false;
+        } else
+        {
+            return l == 1;
+        }
+    }
 
-		if(!var6 && var5) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 0);
-			var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
-			var1.notifyBlocksOfNeighborChange(var2, var3 - 1, var4, this.blockID);
-			var1.func_701_b(var2, var3, var4, var2, var3, var4);
-			var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.1D, (double)var4 + 0.5D, "random.click", 0.3F, 0.5F);
-		}
+    public boolean canProvidePower()
+    {
+        return true;
+    }
 
-		if(var6) {
-			var1.scheduleBlockUpdate(var2, var3, var4, this.blockID);
-		}
+    public void setBlockBoundsForItemRender()
+    {
+        float f = 0.5F;
+        float f1 = 0.125F;
+        float f2 = 0.5F;
+        setBlockBounds(0.5F - f, 0.5F - f1, 0.5F - f2, 0.5F + f, 0.5F + f1, 0.5F + f2);
+    }
 
-	}
-
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4);
-		if(var5 > 0) {
-			var1.notifyBlocksOfNeighborChange(var2, var3, var4, this.blockID);
-			var1.notifyBlocksOfNeighborChange(var2, var3 - 1, var4, this.blockID);
-		}
-
-		super.onBlockRemoval(var1, var2, var3, var4);
-	}
-
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
-		boolean var5 = var1.getBlockMetadata(var2, var3, var4) == 1;
-		float var6 = 1.0F / 16.0F;
-		if(var5) {
-			this.setBlockBounds(var6, 0.0F, var6, 1.0F - var6, 0.03125F, 1.0F - var6);
-		} else {
-			this.setBlockBounds(var6, 0.0F, var6, 1.0F - var6, 1.0F / 16.0F, 1.0F - var6);
-		}
-
-	}
-
-	public boolean isPoweringTo(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		return var1.getBlockMetadata(var2, var3, var4) > 0;
-	}
-
-	public boolean isIndirectlyPoweringTo(World var1, int var2, int var3, int var4, int var5) {
-		return var1.getBlockMetadata(var2, var3, var4) == 0 ? false : var5 == 1;
-	}
-
-	public boolean canProvidePower() {
-		return true;
-	}
-
-	public void func_237_e() {
-		float var1 = 0.5F;
-		float var2 = 2.0F / 16.0F;
-		float var3 = 0.5F;
-		this.setBlockBounds(0.5F - var1, 0.5F - var2, 0.5F - var3, 0.5F + var1, 0.5F + var2, 0.5F + var3);
-	}
+    public int getMobilityFlag()
+    {
+        return 1;
+    }
 }

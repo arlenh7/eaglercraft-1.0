@@ -1,74 +1,184 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import java.util.Random;
 
-public class EntitySpider extends EntityMobs {
-	
-	private static final TextureLocation spider = new TextureLocation("/mob/spider.png");
-	
-	public EntitySpider(World var1) {
-		super(var1);
-		this.texture = spider;
-		this.setSize(1.4F, 0.9F);
-		this.moveSpeed = 0.8F;
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityMob, DataWatcher, World, Entity, 
+//            MathHelper, Item, EnumCreatureAttribute, PotionEffect, 
+//            Potion, NBTTagCompound
 
-	public double getMountedYOffset() {
-		return (double)this.height * 0.75D - 0.5D;
-	}
+public class EntitySpider extends EntityMob
+{
 
-	protected Entity findPlayerToAttack() {
-		float var1 = this.getEntityBrightness(1.0F);
-		if(var1 < 0.5F) {
-			double var2 = 16.0D;
-			return this.worldObj.getClosestPlayerToEntity(this, var2);
-		} else {
-			return null;
-		}
-	}
+    public EntitySpider(World world)
+    {
+        super(world);
+        texture = "/mob/spider.png";
+        setSize(1.4F, 0.9F);
+        moveSpeed = 0.8F;
+    }
 
-	protected String getLivingSound() {
-		return "mob.spider";
-	}
+    protected void entityInit()
+    {
+        super.entityInit();
+        dataWatcher.addObject(16, new Byte((byte)0));
+    }
 
-	protected String getHurtSound() {
-		return "mob.spider";
-	}
+    public void onLivingUpdate()
+    {
+        super.onLivingUpdate();
+    }
 
-	protected String getDeathSound() {
-		return "mob.spiderdeath";
-	}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        if(!worldObj.multiplayerWorld)
+        {
+            func_40148_a(isCollidedHorizontally);
+        }
+    }
 
-	protected void attackEntity(Entity var1, float var2) {
-		float var3 = this.getEntityBrightness(1.0F);
-		if(var3 > 0.5F && this.rand.nextInt(100) == 0) {
-			this.playerToAttack = null;
-		} else {
-			if(var2 > 2.0F && var2 < 6.0F && this.rand.nextInt(10) == 0) {
-				if(this.onGround) {
-					double var4 = var1.posX - this.posX;
-					double var6 = var1.posZ - this.posZ;
-					float var8 = MathHelper.sqrt_double(var4 * var4 + var6 * var6);
-					this.motionX = var4 / (double)var8 * 0.5D * (double)0.8F + this.motionX * (double)0.2F;
-					this.motionZ = var6 / (double)var8 * 0.5D * (double)0.8F + this.motionZ * (double)0.2F;
-					this.motionY = (double)0.4F;
-				}
-			} else {
-				super.attackEntity(var1, var2);
-			}
+    public int getMaxHealth()
+    {
+        return 16;
+    }
 
-		}
-	}
+    public double getMountedYOffset()
+    {
+        return (double)height * 0.75D - 0.5D;
+    }
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-	}
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-	}
+    protected Entity findPlayerToAttack()
+    {
+        float f = getEntityBrightness(1.0F);
+        if(f < 0.5F)
+        {
+            double d = 16D;
+            return worldObj.getClosestVulnerablePlayerToEntity(this, d);
+        } else
+        {
+            return null;
+        }
+    }
 
-	protected int getDropItemId() {
-		return Item.silk.shiftedIndex;
-	}
+    protected String getLivingSound()
+    {
+        return "mob.spider";
+    }
+
+    protected String getHurtSound()
+    {
+        return "mob.spider";
+    }
+
+    protected String getDeathSound()
+    {
+        return "mob.spiderdeath";
+    }
+
+    protected void attackEntity(Entity entity, float f)
+    {
+        float f1 = getEntityBrightness(1.0F);
+        if(f1 > 0.5F && rand.nextInt(100) == 0)
+        {
+            entityToAttack = null;
+            return;
+        }
+        if(f > 2.0F && f < 6F && rand.nextInt(10) == 0)
+        {
+            if(onGround)
+            {
+                double d = entity.posX - posX;
+                double d1 = entity.posZ - posZ;
+                float f2 = MathHelper.sqrt_double(d * d + d1 * d1);
+                motionX = (d / (double)f2) * 0.5D * 0.80000001192092896D + motionX * 0.20000000298023224D;
+                motionZ = (d1 / (double)f2) * 0.5D * 0.80000001192092896D + motionZ * 0.20000000298023224D;
+                motionY = 0.40000000596046448D;
+            }
+        } else
+        {
+            super.attackEntity(entity, f);
+        }
+    }
+
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+    }
+
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+    }
+
+    protected int getDropItemId()
+    {
+        return Item.silk.shiftedIndex;
+    }
+
+    protected void dropFewItems(boolean flag, int i)
+    {
+        super.dropFewItems(flag, i);
+        if(flag && (rand.nextInt(3) == 0 || rand.nextInt(1 + i) > 0))
+        {
+            dropItem(Item.spiderEye.shiftedIndex, 1);
+        }
+    }
+
+    public boolean isOnLadder()
+    {
+        return func_40149_l_();
+    }
+
+    public void setInWeb()
+    {
+    }
+
+    public float spiderScaleAmount()
+    {
+        return 1.0F;
+    }
+
+    public EnumCreatureAttribute func_40124_t()
+    {
+        return EnumCreatureAttribute.ARTHROPOD;
+    }
+
+    public boolean func_40126_a(PotionEffect potioneffect)
+    {
+        if(potioneffect.getPotionID() == Potion.potionPoison.id)
+        {
+            return false;
+        } else
+        {
+            return super.func_40126_a(potioneffect);
+        }
+    }
+
+    public boolean func_40149_l_()
+    {
+        return (dataWatcher.getWatchableObjectByte(16) & 1) != 0;
+    }
+
+    public void func_40148_a(boolean flag)
+    {
+        byte byte0 = dataWatcher.getWatchableObjectByte(16);
+        if(flag)
+        {
+            byte0 |= 1;
+        } else
+        {
+            byte0 &= 0xfe;
+        }
+        dataWatcher.updateObject(16, Byte.valueOf(byte0));
+    }
 }

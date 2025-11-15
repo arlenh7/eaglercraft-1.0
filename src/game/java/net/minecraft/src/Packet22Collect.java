@@ -1,28 +1,45 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet22Collect extends Packet {
-	public int collectedEntityId;
-	public int collectorEntityId;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.collectedEntityId = var1.readInt();
-		this.collectorEntityId = var1.readInt();
-	}
+public class Packet22Collect extends Packet
+{
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.collectedEntityId);
-		var1.writeInt(this.collectorEntityId);
-	}
+    public int collectedEntityId;
+    public int collectorEntityId;
 
-	public void processPacket(NetHandler var1) {
-		var1.handleCollect(this);
-	}
+    public Packet22Collect()
+    {
+    }
 
-	public int getPacketSize() {
-		return 8;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        collectedEntityId = datainputstream.readInt();
+        collectorEntityId = datainputstream.readInt();
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(collectedEntityId);
+        dataoutputstream.writeInt(collectorEntityId);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleCollect(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 8;
+    }
 }

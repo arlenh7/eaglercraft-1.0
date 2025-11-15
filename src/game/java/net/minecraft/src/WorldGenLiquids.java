@@ -1,64 +1,79 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenLiquids extends WorldGenerator {
-	private int liquidBlockId;
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Block
 
-	public WorldGenLiquids(int var1) {
-		this.liquidBlockId = var1;
-	}
+public class WorldGenLiquids extends WorldGenerator
+{
 
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		if(var1.getBlockId(var3, var4 + 1, var5) != Block.stone.blockID) {
-			return false;
-		} else if(var1.getBlockId(var3, var4 - 1, var5) != Block.stone.blockID) {
-			return false;
-		} else if(var1.getBlockId(var3, var4, var5) != 0 && var1.getBlockId(var3, var4, var5) != Block.stone.blockID) {
-			return false;
-		} else {
-			int var6 = 0;
-			if(var1.getBlockId(var3 - 1, var4, var5) == Block.stone.blockID) {
-				++var6;
-			}
+    private int liquidBlockId;
 
-			if(var1.getBlockId(var3 + 1, var4, var5) == Block.stone.blockID) {
-				++var6;
-			}
+    public WorldGenLiquids(int i)
+    {
+        liquidBlockId = i;
+    }
 
-			if(var1.getBlockId(var3, var4, var5 - 1) == Block.stone.blockID) {
-				++var6;
-			}
-
-			if(var1.getBlockId(var3, var4, var5 + 1) == Block.stone.blockID) {
-				++var6;
-			}
-
-			int var7 = 0;
-			if(var1.func_20084_d(var3 - 1, var4, var5)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3 + 1, var4, var5)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3, var4, var5 - 1)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3, var4, var5 + 1)) {
-				++var7;
-			}
-
-			if(var6 == 3 && var7 == 1) {
-				var1.setBlockWithNotify(var3, var4, var5, this.liquidBlockId);
-				var1.field_4214_a = true;
-				Block.blocksList[this.liquidBlockId].updateTick(var1, var3, var4, var5, var2);
-				var1.field_4214_a = false;
-			}
-
-			return true;
-		}
-	}
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        if(world.getBlockId(i, j + 1, k) != Block.stone.blockID)
+        {
+            return false;
+        }
+        if(world.getBlockId(i, j - 1, k) != Block.stone.blockID)
+        {
+            return false;
+        }
+        if(world.getBlockId(i, j, k) != 0 && world.getBlockId(i, j, k) != Block.stone.blockID)
+        {
+            return false;
+        }
+        int l = 0;
+        if(world.getBlockId(i - 1, j, k) == Block.stone.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i + 1, j, k) == Block.stone.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i, j, k - 1) == Block.stone.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i, j, k + 1) == Block.stone.blockID)
+        {
+            l++;
+        }
+        int i1 = 0;
+        if(world.isAirBlock(i - 1, j, k))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i + 1, j, k))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i, j, k - 1))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i, j, k + 1))
+        {
+            i1++;
+        }
+        if(l == 3 && i1 == 1)
+        {
+            world.setBlockWithNotify(i, j, k, liquidBlockId);
+            world.scheduledUpdatesAreImmediate = true;
+            Block.blocksList[liquidBlockId].updateTick(world, i, j, k, random);
+            world.scheduledUpdatesAreImmediate = false;
+        }
+        return true;
+    }
 }

@@ -1,15 +1,45 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.Comparator;
 
-class RecipeSorter implements Comparator<CraftingRecipe> {
-	
-	public static final RecipeSorter instance = new RecipeSorter();
-	
-	private RecipeSorter() {
-	}
+// Referenced classes of package net.minecraft.src:
+//            ShapelessRecipes, ShapedRecipes, IRecipe, CraftingManager
 
-	public int compare(CraftingRecipe var1, CraftingRecipe var2) {
-		return var2.getRecipeSize() < var1.getRecipeSize() ? -1 : (var2.getRecipeSize() > var1.getRecipeSize() ? 1 : 0);
-	}
+class RecipeSorter
+    implements Comparator
+{
+
+    final CraftingManager craftingManager; /* synthetic field */
+
+    RecipeSorter(CraftingManager craftingmanager)
+    {
+        craftingManager = craftingmanager;
+//        super();
+    }
+
+    public int compareRecipes(IRecipe irecipe, IRecipe irecipe1)
+    {
+        if((irecipe instanceof ShapelessRecipes) && (irecipe1 instanceof ShapedRecipes))
+        {
+            return 1;
+        }
+        if((irecipe1 instanceof ShapelessRecipes) && (irecipe instanceof ShapedRecipes))
+        {
+            return -1;
+        }
+        if(irecipe1.getRecipeSize() < irecipe.getRecipeSize())
+        {
+            return -1;
+        }
+        return irecipe1.getRecipeSize() <= irecipe.getRecipeSize() ? 0 : 1;
+    }
+
+    public int compare(Object obj, Object obj1)
+    {
+        return compareRecipes((IRecipe)obj, (IRecipe)obj1);
+    }
 }

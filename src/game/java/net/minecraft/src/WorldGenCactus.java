@@ -1,24 +1,43 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenCactus extends WorldGenerator {
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		for(int var6 = 0; var6 < 10; ++var6) {
-			int var7 = var3 + var2.nextInt(8) - var2.nextInt(8);
-			int var8 = var4 + var2.nextInt(4) - var2.nextInt(4);
-			int var9 = var5 + var2.nextInt(8) - var2.nextInt(8);
-			if(var1.func_20084_d(var7, var8, var9)) {
-				int var10 = 1 + var2.nextInt(var2.nextInt(3) + 1);
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Block
 
-				for(int var11 = 0; var11 < var10; ++var11) {
-					if(Block.cactus.canBlockStay(var1, var7, var8 + var11, var9)) {
-						var1.setBlock(var7, var8 + var11, var9, Block.cactus.blockID);
-					}
-				}
-			}
-		}
+public class WorldGenCactus extends WorldGenerator
+{
 
-		return true;
-	}
+    public WorldGenCactus()
+    {
+    }
+
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        for(int l = 0; l < 10; l++)
+        {
+            int i1 = (i + random.nextInt(8)) - random.nextInt(8);
+            int j1 = (j + random.nextInt(4)) - random.nextInt(4);
+            int k1 = (k + random.nextInt(8)) - random.nextInt(8);
+            if(!world.isAirBlock(i1, j1, k1))
+            {
+                continue;
+            }
+            int l1 = 1 + random.nextInt(random.nextInt(3) + 1);
+            for(int i2 = 0; i2 < l1; i2++)
+            {
+                if(Block.cactus.canBlockStay(world, i1, j1 + i2, k1))
+                {
+                    world.setBlock(i1, j1 + i2, k1, Block.cactus.blockID);
+                }
+            }
+
+        }
+
+        return true;
+    }
 }

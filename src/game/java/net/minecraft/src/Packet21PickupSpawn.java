@@ -1,64 +1,84 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet21PickupSpawn extends Packet {
-	public int entityId;
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
-	public byte rotation;
-	public byte pitch;
-	public byte roll;
-	public int itemId;
-	public int count;
+// Referenced classes of package net.minecraft.src:
+//            Packet, EntityItem, ItemStack, MathHelper, 
+//            NetHandler
 
-	public Packet21PickupSpawn() {
-	}
+public class Packet21PickupSpawn extends Packet
+{
 
-	public Packet21PickupSpawn(EntityItem var1) {
-		this.entityId = var1.field_620_ab;
-		this.itemId = var1.item.itemID;
-		this.count = var1.item.stackSize;
-		this.xPosition = MathHelper.floor_double(var1.posX * 32.0D);
-		this.yPosition = MathHelper.floor_double(var1.posY * 32.0D);
-		this.zPosition = MathHelper.floor_double(var1.posZ * 32.0D);
-		this.rotation = (byte)((int)(var1.motionX * 128.0D));
-		this.pitch = (byte)((int)(var1.motionY * 128.0D));
-		this.roll = (byte)((int)(var1.motionZ * 128.0D));
-	}
+    public int entityId;
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
+    public byte rotation;
+    public byte pitch;
+    public byte roll;
+    public int itemID;
+    public int count;
+    public int itemDamage;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.entityId = var1.readInt();
-		this.itemId = var1.readShort();
-		this.count = var1.readByte();
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.readInt();
-		this.zPosition = var1.readInt();
-		this.rotation = var1.readByte();
-		this.pitch = var1.readByte();
-		this.roll = var1.readByte();
-	}
+    public Packet21PickupSpawn()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.entityId);
-		var1.writeShort(this.itemId);
-		var1.writeByte(this.count);
-		var1.writeInt(this.xPosition);
-		var1.writeInt(this.yPosition);
-		var1.writeInt(this.zPosition);
-		var1.writeByte(this.rotation);
-		var1.writeByte(this.pitch);
-		var1.writeByte(this.roll);
-	}
+    public Packet21PickupSpawn(EntityItem entityitem)
+    {
+        entityId = entityitem.entityId;
+        itemID = entityitem.item.itemID;
+        count = entityitem.item.stackSize;
+        itemDamage = entityitem.item.getItemDamage();
+        xPosition = MathHelper.floor_double(entityitem.posX * 32D);
+        yPosition = MathHelper.floor_double(entityitem.posY * 32D);
+        zPosition = MathHelper.floor_double(entityitem.posZ * 32D);
+        rotation = (byte)(int)(entityitem.motionX * 128D);
+        pitch = (byte)(int)(entityitem.motionY * 128D);
+        roll = (byte)(int)(entityitem.motionZ * 128D);
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handlePickupSpawn(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        entityId = datainputstream.readInt();
+        itemID = datainputstream.readShort();
+        count = datainputstream.readByte();
+        itemDamage = datainputstream.readShort();
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.readInt();
+        zPosition = datainputstream.readInt();
+        rotation = datainputstream.readByte();
+        pitch = datainputstream.readByte();
+        roll = datainputstream.readByte();
+    }
 
-	public int getPacketSize() {
-		return 22;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(entityId);
+        dataoutputstream.writeShort(itemID);
+        dataoutputstream.writeByte(count);
+        dataoutputstream.writeShort(itemDamage);
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeInt(yPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.writeByte(rotation);
+        dataoutputstream.writeByte(pitch);
+        dataoutputstream.writeByte(roll);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handlePickupSpawn(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 24;
+    }
 }

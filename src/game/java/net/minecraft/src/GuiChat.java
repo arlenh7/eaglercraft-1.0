@@ -1,62 +1,106 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
-public class GuiChat extends GuiScreen {
-	private String message = "";
-	private int updateCounter = 0;
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, EntityPlayerSP, GuiIngame, ChatAllowedCharacters
 
-	public void initGui() {
-		Keyboard.enableRepeatEvents(true);
-	}
+public class GuiChat extends GuiScreen
+{
 
-	public void onGuiClosed() {
-		Keyboard.enableRepeatEvents(false);
-	}
+    protected String message;
+    private int updateCounter;
+    private static final String allowedCharacters;
 
-	public void updateScreen() {
-		++this.updateCounter;
-	}
+    public GuiChat()
+    {
+        message = "";
+        updateCounter = 0;
+    }
 
-	protected void keyTyped(char var1, int var2) {
-		if(var2 == 1) {
-			this.mc.displayGuiScreen((GuiScreen)null);
-		} else if(var2 == 28) {
-			String var3 = this.message.trim();
-			if(var3.length() > 0) {
-				this.mc.thePlayer.sendChatMessage(this.message.trim());
-			}
+    public void initGui()
+    {
+        Keyboard.enableRepeatEvents(true);
+    }
 
-			this.mc.displayGuiScreen((GuiScreen)null);
-		} else {
-			if(var2 == 14 && this.message.length() > 0) {
-				this.message = this.message.substring(0, this.message.length() - 1);
-			}
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
+    }
 
-			if(FontAllowedCharacters.isAllowed(var1) >= 0 && this.message.length() < 100) {
-				this.message = this.message + var1;
-			}
+    public void updateScreen()
+    {
+        updateCounter++;
+    }
 
-		}
-	}
+    protected void keyTyped(char c, int i)
+    {
+        if(i == 1)
+        {
+            mc.displayGuiScreen(null);
+            return;
+        }
+        if(i == 28)
+        {
+            String s = message.trim();
+            if(s.length() > 0)
+            {
+                String s1 = message.trim();
+                if(!mc.lineIsCommand(s1))
+                {
+                    mc.thePlayer.sendChatMessage(s1);
+                }
+            }
+            mc.displayGuiScreen(null);
+            return;
+        }
+        if(i == 14 && message.length() > 0)
+        {
+            message = message.substring(0, message.length() - 1);
+        }
+        if(allowedCharacters.indexOf(c) >= 0 && message.length() < 100)
+        {
+            message += c;
+        }
+    }
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
-		this.drawString(this.fontRenderer, "> " + this.message + (this.updateCounter / 6 % 2 == 0 ? "_" : ""), 4, this.height - 12, 14737632);
-	}
+    public void drawScreen(int i, int j, float f)
+    {
+        drawRect(2, height - 14, width - 2, height - 2, 0x80000000);
+        drawString(fontRenderer, (new StringBuilder()).append("> ").append(message).append((updateCounter / 6) % 2 != 0 ? "" : "_").toString(), 4, height - 12, 0xe0e0e0);
+        super.drawScreen(i, j, f);
+    }
 
-	protected void mouseClicked(int var1, int var2, int var3) {
-		if(var3 == 0 && this.mc.ingameGUI.field_933_a != null) {
-			if(this.message.length() > 0 && !this.message.endsWith(" ")) {
-				this.message = this.message + " ";
-			}
+    protected void mouseClicked(int i, int j, int k)
+    {
+        super.mouseClicked(i, j, k);
+        if(k != 0)
+        {
+            return;
+        }
+        if(mc.ingameGUI.field_933_a == null)
+        {
+            return;
+        }
+        if(message.length() > 0 && !message.endsWith(" "))
+        {
+            message += " ";
+        }
+        message += mc.ingameGUI.field_933_a;
+        byte byte0 = 100;
+        if(message.length() > byte0)
+        {
+            message = message.substring(0, byte0);
+        }
+    }
 
-			this.message = this.message + this.mc.ingameGUI.field_933_a;
-			byte var4 = 100;
-			if(this.message.length() > var4) {
-				this.message = this.message.substring(0, var4);
-			}
-		}
-
-	}
+    static 
+    {
+        allowedCharacters = ChatAllowedCharacters.allowedCharacters;
+    }
 }

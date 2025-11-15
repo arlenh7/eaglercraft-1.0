@@ -1,35 +1,45 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.util.Arrays;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public class ColorizerFoliage
+{
 
-import net.lax1dude.eaglercraft.EagRuntime;
-import net.lax1dude.eaglercraft.opengl.ImageData;
-import net.minecraft.client.Minecraft;
+    private static int foliageBuffer[] = new int[0x10000];
 
-public class ColorizerFoliage {
-	private static final int[] field_6529_a = new int[65536];
-	private static Logger LOGGER = LogManager.getLogger();
-	
-	public static void init() {
-		Arrays.fill(field_6529_a, 0);
-		
-		try {
-			TexturePackBase pack = Minecraft.getMinecraft().renderEngine.field_6527_k.selectedTexturePack;
-			String tex = "/misc/foliagecolor.png";
-			ImageData img = ImageData.loadImageFile(pack != null ? pack.func_6481_a(tex) : EagRuntime.getRequiredResourceStream(tex)).swapRB();
-			img.getRGB(0, 0, 256, 256, field_6529_a, 0, 256);
-		} catch (Exception var1) {
-			LOGGER.error(var1);
-		}
-	}
+    public ColorizerFoliage()
+    {
+    }
 
-	public static int func_4146_a(double var0, double var2) {
-		var2 *= var0;
-		int var4 = (int)((1.0D - var0) * 255.0D);
-		int var5 = (int)((1.0D - var2) * 255.0D);
-		return field_6529_a[var5 << 8 | var4];
-	}
+    public static void getFoilageBiomeColorizer(int ai[])
+    {
+        foliageBuffer = ai;
+    }
+
+    public static int getFoliageColor(double d, double d1)
+    {
+        d1 *= d;
+        int i = (int)((1.0D - d) * 255D);
+        int j = (int)((1.0D - d1) * 255D);
+        return foliageBuffer[j << 8 | i];
+    }
+
+    public static int getFoliageColorPine()
+    {
+        return 0x619961;
+    }
+
+    public static int getFoliageColorBirch()
+    {
+        return 0x80a755;
+    }
+
+    public static int getFoliageColorBasic()
+    {
+        return 0x48b518;
+    }
+
 }

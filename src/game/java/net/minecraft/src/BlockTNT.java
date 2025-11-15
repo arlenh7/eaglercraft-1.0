@@ -1,39 +1,102 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockTNT extends Block {
-	public BlockTNT(int var1, int var2) {
-		super(var1, var2, Material.tnt);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, EntityTNTPrimed, 
+//            ItemStack, EntityPlayer, Item
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 0 ? this.blockIndexInTexture + 2 : (var1 == 1 ? this.blockIndexInTexture + 1 : this.blockIndexInTexture);
-	}
+public class BlockTNT extends Block
+{
 
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		if(var5 > 0 && Block.blocksList[var5].canProvidePower() && var1.isBlockIndirectlyGettingPowered(var2, var3, var4)) {
-			this.onBlockDestroyedByPlayer(var1, var2, var3, var4, 0);
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
+    public BlockTNT(int i, int j)
+    {
+        super(i, j, Material.tnt);
+    }
 
-	}
+    public int getBlockTextureFromSide(int i)
+    {
+        if(i == 0)
+        {
+            return blockIndexInTexture + 2;
+        }
+        if(i == 1)
+        {
+            return blockIndexInTexture + 1;
+        } else
+        {
+            return blockIndexInTexture;
+        }
+    }
 
-	public int quantityDropped(Random var1) {
-		return 0;
-	}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+        super.onBlockAdded(world, i, j, k);
+        if(world.isBlockIndirectlyGettingPowered(i, j, k))
+        {
+            onBlockDestroyedByPlayer(world, i, j, k, 1);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 
-	public void onBlockDestroyedByExplosion(World var1, int var2, int var3, int var4) {
-		EntityTNTPrimed var5 = new EntityTNTPrimed(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F));
-		var5.fuse = var1.rand.nextInt(var5.fuse / 4) + var5.fuse / 8;
-		var1.entityJoinedWorld(var5);
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        if(l > 0 && Block.blocksList[l].canProvidePower() && world.isBlockIndirectlyGettingPowered(i, j, k))
+        {
+            onBlockDestroyedByPlayer(world, i, j, k, 1);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+    }
 
-	public void onBlockDestroyedByPlayer(World var1, int var2, int var3, int var4, int var5) {
-		if(!var1.multiplayerWorld) {
-			EntityTNTPrimed var6 = new EntityTNTPrimed(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F));
-			var1.entityJoinedWorld(var6);
-			var1.playSoundAtEntity(var6, "random.fuse", 1.0F, 1.0F);
-		}
-	}
+    public int quantityDropped(Random random)
+    {
+        return 0;
+    }
+
+    public void onBlockDestroyedByExplosion(World world, int i, int j, int k)
+    {
+        EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, (float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F);
+        entitytntprimed.fuse = world.rand.nextInt(entitytntprimed.fuse / 4) + entitytntprimed.fuse / 8;
+        world.entityJoinedWorld(entitytntprimed);
+    }
+
+    public void onBlockDestroyedByPlayer(World world, int i, int j, int k, int l)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        if((l & 1) == 0)
+        {
+            dropBlockAsItem_do(world, i, j, k, new ItemStack(Block.tnt.blockID, 1, 0));
+        } else
+        {
+            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, (float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F);
+            world.entityJoinedWorld(entitytntprimed);
+            world.playSoundAtEntity(entitytntprimed, "random.fuse", 1.0F, 1.0F);
+        }
+    }
+
+    public void onBlockClicked(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.flintAndSteel.shiftedIndex)
+        {
+            world.setBlockMetadata(i, j, k, 1);
+        }
+        super.onBlockClicked(world, i, j, k, entityplayer);
+    }
+
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        return super.blockActivated(world, i, j, k, entityplayer);
+    }
+
+    protected ItemStack func_41049_c_(int i)
+    {
+        return null;
+    }
 }

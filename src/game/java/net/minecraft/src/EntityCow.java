@@ -1,53 +1,102 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import java.util.Random;
 
-public class EntityCow extends EntityAnimals {
-	public boolean unusedBoolean = false;
-	
-	private static final TextureLocation cow = new TextureLocation("/mob/cow.png");
+// Referenced classes of package net.minecraft.src:
+//            EntityAnimal, Item, EntityPlayer, InventoryPlayer, 
+//            ItemStack, World, NBTTagCompound
 
-	public EntityCow(World var1) {
-		super(var1);
-		this.texture = cow;
-		this.setSize(0.9F, 1.3F);
-	}
+public class EntityCow extends EntityAnimal
+{
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-	}
+    public EntityCow(World world)
+    {
+        super(world);
+        texture = "/mob/cow.png";
+        setSize(0.9F, 1.3F);
+    }
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-	}
+    public int getMaxHealth()
+    {
+        return 10;
+    }
 
-	protected String getLivingSound() {
-		return "mob.cow";
-	}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+    }
 
-	protected String getHurtSound() {
-		return "mob.cowhurt";
-	}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+    }
 
-	protected String getDeathSound() {
-		return "mob.cowhurt";
-	}
+    protected String getLivingSound()
+    {
+        return "mob.cow";
+    }
 
-	protected float getSoundVolume() {
-		return 0.4F;
-	}
+    protected String getHurtSound()
+    {
+        return "mob.cowhurt";
+    }
 
-	protected int getDropItemId() {
-		return Item.leather.shiftedIndex;
-	}
+    protected String getDeathSound()
+    {
+        return "mob.cowhurt";
+    }
 
-	public boolean interact(EntityPlayer var1) {
-		ItemStack var2 = var1.inventory.getCurrentItem();
-		if(var2 != null && var2.itemID == Item.bucketEmpty.shiftedIndex) {
-			var1.inventory.setInventorySlotContents(var1.inventory.currentItem, new ItemStack(Item.bucketMilk));
-			return true;
-		} else {
-			return false;
-		}
-	}
+    protected float getSoundVolume()
+    {
+        return 0.4F;
+    }
+
+    protected int getDropItemId()
+    {
+        return Item.leather.shiftedIndex;
+    }
+
+    protected void dropFewItems(boolean flag, int i)
+    {
+        int j = rand.nextInt(3) + rand.nextInt(1 + i);
+        for(int k = 0; k < j; k++)
+        {
+            dropItem(Item.leather.shiftedIndex, 1);
+        }
+
+        j = rand.nextInt(3) + 1 + rand.nextInt(1 + i);
+        for(int l = 0; l < j; l++)
+        {
+            if(isBurning())
+            {
+                dropItem(Item.beefCooked.shiftedIndex, 1);
+            } else
+            {
+                dropItem(Item.beefRaw.shiftedIndex, 1);
+            }
+        }
+
+    }
+
+    public boolean interact(EntityPlayer entityplayer)
+    {
+        ItemStack itemstack = entityplayer.inventory.getCurrentItem();
+        if(itemstack != null && itemstack.itemID == Item.bucketEmpty.shiftedIndex)
+        {
+            entityplayer.inventory.setInventorySlotContents(entityplayer.inventory.currentItem, new ItemStack(Item.bucketMilk));
+            return true;
+        } else
+        {
+            return super.interact(entityplayer);
+        }
+    }
+
+    protected EntityAnimal func_40145_a(EntityAnimal entityanimal)
+    {
+        return new EntityCow(worldObj);
+    }
 }

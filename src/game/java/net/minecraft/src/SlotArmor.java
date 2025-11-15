@@ -1,20 +1,44 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-class SlotArmor extends Slot {
-	final int field_1124_c;
-	final CraftingInventoryPlayerCB field_1123_d;
 
-	SlotArmor(CraftingInventoryPlayerCB var1, IInventory var2, int var3, int var4, int var5, int var6) {
-		super(var2, var3, var4, var5);
-		this.field_1123_d = var1;
-		this.field_1124_c = var6;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Slot, ItemStack, ItemArmor, Item, 
+//            Block, ContainerPlayer, IInventory
 
-	public int getSlotStackLimit() {
-		return 1;
-	}
+class SlotArmor extends Slot
+{
 
-	public boolean isItemValid(ItemStack var1) {
-		return var1.getItem() instanceof ItemArmor ? ((ItemArmor)var1.getItem()).armorType == this.field_1124_c : (var1.getItem().shiftedIndex == Block.pumpkin.blockID ? this.field_1124_c == 0 : false);
-	}
+    final int armorType; /* synthetic field */
+    final ContainerPlayer inventory; /* synthetic field */
+
+    SlotArmor(ContainerPlayer containerplayer, IInventory iinventory, int i, int j, int k, int l)
+    {
+        super(iinventory, i, j, k);
+        inventory = containerplayer;
+        armorType = l;
+    }
+
+    public int getSlotStackLimit()
+    {
+        return 1;
+    }
+
+    public boolean isItemValid(ItemStack itemstack)
+    {
+        if(itemstack.getItem() instanceof ItemArmor)
+        {
+            return ((ItemArmor)itemstack.getItem()).armorType == armorType;
+        }
+        if(itemstack.getItem().shiftedIndex == Block.pumpkin.blockID)
+        {
+            return armorType == 0;
+        } else
+        {
+            return false;
+        }
+    }
 }

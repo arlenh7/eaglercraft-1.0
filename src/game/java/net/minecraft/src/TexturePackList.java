@@ -1,122 +1,119 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import net.lax1dude.eaglercraft.internal.vfs2.VFile2;
+import java.util.*;
 import net.minecraft.client.Minecraft;
-import net.peyton.eagler.minecraft.ResourcePack;
 
-public class TexturePackList {
-	private List<TexturePackBase> availableTexturePacks = new ArrayList<>();
-	private TexturePackBase defaultTexturePack = new TexturePackDefault();
-	public TexturePackBase selectedTexturePack;
-	private Map<String, TexturePackBase> field_6538_d = new HashMap<>();
-	private Minecraft mc;
-	private String currentTexturePack;
+// Referenced classes of package net.minecraft.src:
+//            TexturePackDefault, GameSettings, TexturePackBase, TexturePackCustom
 
-	public TexturePackList(Minecraft var1, VFile2 var2) {
-		this.mc = var1;
-		this.currentTexturePack = var1.gameSettings.skin;
-		this.func_6532_a();
-		this.selectedTexturePack.func_6482_a();
-	}
+public class TexturePackList
+{
 
-	public boolean setTexturePack(TexturePackBase var1) {
-		if (var1 == this.selectedTexturePack) {
-			return false;
-		} else {
-			this.selectedTexturePack.closeTexturePackFile();
-			this.currentTexturePack = var1.texturePackFileName;
-			this.selectedTexturePack = var1;
-			this.mc.gameSettings.skin = this.currentTexturePack;
-			this.mc.gameSettings.saveOptions();
-			this.selectedTexturePack.func_6482_a();
-			return true;
-		}
-	}
+    private List availableTexturePacks;
+    private TexturePackBase defaultTexturePack;
+    public TexturePackBase selectedTexturePack;
+    private Map field_6538_d;
+    private Minecraft mc;
+    private File texturePackDir;
+    private String currentTexturePack;
 
-	public void func_6532_a() {
-		ArrayList<TexturePackBase> var1 = new ArrayList<>();
-		this.selectedTexturePack = null;
-		var1.add(this.defaultTexturePack);
-		List<ResourcePack> packs = ResourcePack.getExistingResourcePacks();
-		
-		for(int i = 0, j = packs.size(); i < j; ++i) {
-			ResourcePack rp = packs.get(i);
-			String var7 = rp.getName();
-			
-			try {
-				if (!this.field_6538_d.containsKey(var7)) {
-					TexturePackCustom var8 = new TexturePackCustom(rp);
-					var8.field_6488_d = var7;
-					this.field_6538_d.put(var7, var8);
-					var8.func_6485_a(this.mc);
-				}
-				
-				TexturePackBase var12 = (TexturePackBase) this.field_6538_d.get(var7);
-				if (var12.texturePackFileName.equals(this.currentTexturePack)) {
-					this.selectedTexturePack = var12;
-				}
-				
-				var1.add(var12);
-			} catch (IOException var9) {
-				var9.printStackTrace();
-			}
-		}
-		
-//		if (this.texturePackDir.exists() && this.texturePackDir.isDirectory()) {
-//			File[] var2 = this.texturePackDir.listFiles();
-//			File[] var3 = var2;
-//			int var4 = var2.length;
-//
-//			for (int var5 = 0; var5 < var4; ++var5) {
-//				File var6 = var3[var5];
-//				if (var6.isFile() && var6.getName().toLowerCase().endsWith(".zip")) {
-//					String var7 = var6.getName() + ":" + var6.length() + ":" + var6.lastModified();
-//
-//					try {
-//						if (!this.field_6538_d.containsKey(var7)) {
-//							TexturePackCustom var8 = new TexturePackCustom(var6);
-//							var8.field_6488_d = var7;
-//							this.field_6538_d.put(var7, var8);
-//							var8.func_6485_a(this.mc);
-//						}
-//
-//						TexturePackBase var12 = (TexturePackBase) this.field_6538_d.get(var7);
-//						if (var12.texturePackFileName.equals(this.currentTexturePack)) {
-//							this.selectedTexturePack = var12;
-//						}
-//
-//						var1.add(var12);
-//					} catch (IOException var9) {
-//						var9.printStackTrace();
-//					}
-//				}
-//			}
-//		}
+    public TexturePackList(Minecraft minecraft, File file)
+    {
+        availableTexturePacks = new ArrayList();
+        defaultTexturePack = new TexturePackDefault();
+        field_6538_d = new HashMap();
+        mc = minecraft;
+        texturePackDir = new File(file, "texturepacks");
+        if(!texturePackDir.exists())
+        {
+            texturePackDir.mkdirs();
+        }
+        currentTexturePack = minecraft.gameSettings.skin;
+        updateAvaliableTexturePacks();
+        selectedTexturePack.func_6482_a();
+    }
 
-		if (this.selectedTexturePack == null) {
-			this.selectedTexturePack = this.defaultTexturePack;
-		}
+    public boolean setTexturePack(TexturePackBase texturepackbase)
+    {
+        if(texturepackbase == selectedTexturePack)
+        {
+            return false;
+        } else
+        {
+            selectedTexturePack.closeTexturePackFile();
+            currentTexturePack = texturepackbase.texturePackFileName;
+            selectedTexturePack = texturepackbase;
+            mc.gameSettings.skin = currentTexturePack;
+            mc.gameSettings.saveOptions();
+            selectedTexturePack.func_6482_a();
+            return true;
+        }
+    }
 
-		this.availableTexturePacks.removeAll(var1);
-		Iterator<TexturePackBase> var10 = this.availableTexturePacks.iterator();
+    public void updateAvaliableTexturePacks()
+    {
+        ArrayList arraylist = new ArrayList();
+        selectedTexturePack = null;
+        arraylist.add(defaultTexturePack);
+        if(texturePackDir.exists() && texturePackDir.isDirectory())
+        {
+            File afile[] = texturePackDir.listFiles();
+            File afile1[] = afile;
+            int i = afile1.length;
+            for(int j = 0; j < i; j++)
+            {
+                File file = afile1[j];
+                if(!file.isFile() || !file.getName().toLowerCase().endsWith(".zip"))
+                {
+                    continue;
+                }
+                String s = (new StringBuilder()).append(file.getName()).append(":").append(file.length()).append(":").append(file.lastModified()).toString();
+                try
+                {
+                    if(!field_6538_d.containsKey(s))
+                    {
+                        TexturePackCustom texturepackcustom = new TexturePackCustom(file);
+                        texturepackcustom.field_6488_d = s;
+                        field_6538_d.put(s, texturepackcustom);
+                        texturepackcustom.func_6485_a(mc);
+                    }
+                    TexturePackBase texturepackbase1 = (TexturePackBase)field_6538_d.get(s);
+                    if(texturepackbase1.texturePackFileName.equals(currentTexturePack))
+                    {
+                        selectedTexturePack = texturepackbase1;
+                    }
+                    arraylist.add(texturepackbase1);
+                }
+                catch(IOException ioexception)
+                {
+                    ioexception.printStackTrace();
+                }
+            }
 
-		while (var10.hasNext()) {
-			TexturePackBase var11 = var10.next();
-			var11.func_6484_b(this.mc);
-			this.field_6538_d.remove(var11.field_6488_d);
-		}
+        }
+        if(selectedTexturePack == null)
+        {
+            selectedTexturePack = defaultTexturePack;
+        }
+        availableTexturePacks.removeAll(arraylist);
+        TexturePackBase texturepackbase;
+        for(Iterator iterator = availableTexturePacks.iterator(); iterator.hasNext(); field_6538_d.remove(texturepackbase.field_6488_d))
+        {
+            texturepackbase = (TexturePackBase)iterator.next();
+            texturepackbase.func_6484_b(mc);
+        }
 
-		this.availableTexturePacks = var1;
-	}
+        availableTexturePacks = arraylist;
+    }
 
-	public List<TexturePackBase> availableTexturePacks() {
-		return new ArrayList<>(this.availableTexturePacks);
-	}
+    public List availableTexturePacks()
+    {
+        return new ArrayList(availableTexturePacks);
+    }
 }

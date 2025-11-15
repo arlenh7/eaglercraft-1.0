@@ -1,18 +1,35 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemEgg extends Item {
-	public ItemEgg(int var1) {
-		super(var1);
-		this.maxStackSize = 16;
-	}
+import java.util.Random;
 
-	public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3) {
-		--var1.stackSize;
-		var2.playSoundAtEntity(var3, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
-		if(!var2.multiplayerWorld) {
-			var2.entityJoinedWorld(new EntityEgg(var2, var3));
-		}
+// Referenced classes of package net.minecraft.src:
+//            Item, EntityPlayer, PlayerCapabilities, ItemStack, 
+//            World, EntityEgg
 
-		return var1;
-	}
+public class ItemEgg extends Item
+{
+
+    public ItemEgg(int i)
+    {
+        super(i);
+        maxStackSize = 16;
+    }
+
+    public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer)
+    {
+        if(!entityplayer.capabilities.depleteBuckets)
+        {
+            itemstack.stackSize--;
+        }
+        world.playSoundAtEntity(entityplayer, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
+        if(!world.multiplayerWorld)
+        {
+            world.entityJoinedWorld(new EntityEgg(world, entityplayer));
+        }
+        return itemstack;
+    }
 }

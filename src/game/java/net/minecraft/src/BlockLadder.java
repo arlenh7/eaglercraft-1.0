@@ -1,121 +1,152 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockLadder extends Block {
-	protected BlockLadder(int var1, int var2) {
-		super(var1, var2, Material.circuits);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, AxisAlignedBB
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4);
-		float var6 = 2.0F / 16.0F;
-		if(var5 == 2) {
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F, 1.0F);
-		}
+public class BlockLadder extends Block
+{
 
-		if(var5 == 3) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, var6);
-		}
+    protected BlockLadder(int i, int j)
+    {
+        super(i, j, Material.circuits);
+    }
 
-		if(var5 == 4) {
-			this.setBlockBounds(1.0F - var6, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        float f = 0.125F;
+        if(l == 2)
+        {
+            setBlockBounds(0.0F, 0.0F, 1.0F - f, 1.0F, 1.0F, 1.0F);
+        }
+        if(l == 3)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, f);
+        }
+        if(l == 4)
+        {
+            setBlockBounds(1.0F - f, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+        }
+        if(l == 5)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
+        }
+        return super.getCollisionBoundingBoxFromPool(world, i, j, k);
+    }
 
-		if(var5 == 5) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, var6, 1.0F, 1.0F);
-		}
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        float f = 0.125F;
+        if(l == 2)
+        {
+            setBlockBounds(0.0F, 0.0F, 1.0F - f, 1.0F, 1.0F, 1.0F);
+        }
+        if(l == 3)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, f);
+        }
+        if(l == 4)
+        {
+            setBlockBounds(1.0F - f, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+        }
+        if(l == 5)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
+        }
+        return super.getSelectedBoundingBoxFromPool(world, i, j, k);
+    }
 
-		return super.getCollisionBoundingBoxFromPool(var1, var2, var3, var4);
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4);
-		float var6 = 2.0F / 16.0F;
-		if(var5 == 2) {
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F, 1.0F);
-		}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-		if(var5 == 3) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, var6);
-		}
+    public int getRenderType()
+    {
+        return 8;
+    }
 
-		if(var5 == 4) {
-			this.setBlockBounds(1.0F - var6, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        if(world.isBlockNormalCube(i - 1, j, k))
+        {
+            return true;
+        }
+        if(world.isBlockNormalCube(i + 1, j, k))
+        {
+            return true;
+        }
+        if(world.isBlockNormalCube(i, j, k - 1))
+        {
+            return true;
+        }
+        return world.isBlockNormalCube(i, j, k + 1);
+    }
 
-		if(var5 == 5) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, var6, 1.0F, 1.0F);
-		}
+    public void onBlockPlaced(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        if((i1 == 0 || l == 2) && world.isBlockNormalCube(i, j, k + 1))
+        {
+            i1 = 2;
+        }
+        if((i1 == 0 || l == 3) && world.isBlockNormalCube(i, j, k - 1))
+        {
+            i1 = 3;
+        }
+        if((i1 == 0 || l == 4) && world.isBlockNormalCube(i + 1, j, k))
+        {
+            i1 = 4;
+        }
+        if((i1 == 0 || l == 5) && world.isBlockNormalCube(i - 1, j, k))
+        {
+            i1 = 5;
+        }
+        world.setBlockMetadataWithNotify(i, j, k, i1);
+    }
 
-		return super.getSelectedBoundingBoxFromPool(var1, var2, var3, var4);
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        boolean flag = false;
+        if(i1 == 2 && world.isBlockNormalCube(i, j, k + 1))
+        {
+            flag = true;
+        }
+        if(i1 == 3 && world.isBlockNormalCube(i, j, k - 1))
+        {
+            flag = true;
+        }
+        if(i1 == 4 && world.isBlockNormalCube(i + 1, j, k))
+        {
+            flag = true;
+        }
+        if(i1 == 5 && world.isBlockNormalCube(i - 1, j, k))
+        {
+            flag = true;
+        }
+        if(!flag)
+        {
+            dropBlockAsItem(world, i, j, k, i1, 0);
+            world.setBlockWithNotify(i, j, k, 0);
+        }
+        super.onNeighborBlockChange(world, i, j, k, l);
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	public int getRenderType() {
-		return 8;
-	}
-
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var1.isBlockOpaqueCube(var2 - 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2 + 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2, var3, var4 - 1) ? true : var1.isBlockOpaqueCube(var2, var3, var4 + 1)));
-	}
-
-	public void onBlockPlaced(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if((var6 == 0 || var5 == 2) && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var6 = 2;
-		}
-
-		if((var6 == 0 || var5 == 3) && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var6 = 3;
-		}
-
-		if((var6 == 0 || var5 == 4) && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var6 = 4;
-		}
-
-		if((var6 == 0 || var5 == 5) && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var6 = 5;
-		}
-
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var6);
-	}
-
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		boolean var7 = false;
-		if(var6 == 2 && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var7 = true;
-		}
-
-		if(var6 == 3 && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var7 = true;
-		}
-
-		if(var6 == 4 && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var7 = true;
-		}
-
-		if(var6 == 5 && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var7 = true;
-		}
-
-		if(!var7) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var6);
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-		}
-
-		super.onNeighborBlockChange(var1, var2, var3, var4, var5);
-	}
-
-	public int quantityDropped(Random var1) {
-		return 1;
-	}
+    public int quantityDropped(Random random)
+    {
+        return 1;
+    }
 }

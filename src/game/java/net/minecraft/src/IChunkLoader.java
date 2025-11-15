@@ -1,15 +1,27 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.io.IOException;
 
-public interface IChunkLoader {
-	Chunk loadChunk(World var1, int var2, int var3) throws IOException;
+// Referenced classes of package net.minecraft.src:
+//            World, Chunk
 
-	void saveChunk(World var1, Chunk var2) throws IOException;
+public interface IChunkLoader
+{
 
-	void saveExtraChunkData(World var1, Chunk var2) throws IOException;
+    public abstract Chunk loadChunk(World world, int i, int j)
+        throws IOException;
 
-	void func_814_a();
+    public abstract void saveChunk(World world, Chunk chunk)
+        throws IOException;
 
-	void saveExtraData();
+    public abstract void saveExtraChunkData(World world, Chunk chunk)
+        throws IOException;
+
+    public abstract void func_814_a();
+
+    public abstract void saveExtraData();
 }

@@ -1,52 +1,67 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet34EntityTeleport extends Packet {
-	public int entityId;
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
-	public byte yaw;
-	public byte pitch;
+// Referenced classes of package net.minecraft.src:
+//            Packet, Entity, MathHelper, NetHandler
 
-	public Packet34EntityTeleport() {
-	}
+public class Packet34EntityTeleport extends Packet
+{
 
-	public Packet34EntityTeleport(Entity var1) {
-		this.entityId = var1.field_620_ab;
-		this.xPosition = MathHelper.floor_double(var1.posX * 32.0D);
-		this.yPosition = MathHelper.floor_double(var1.posY * 32.0D);
-		this.zPosition = MathHelper.floor_double(var1.posZ * 32.0D);
-		this.yaw = (byte)((int)(var1.rotationYaw * 256.0F / 360.0F));
-		this.pitch = (byte)((int)(var1.rotationPitch * 256.0F / 360.0F));
-	}
+    public int entityId;
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
+    public byte yaw;
+    public byte pitch;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.entityId = var1.readInt();
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.readInt();
-		this.zPosition = var1.readInt();
-		this.yaw = (byte)var1.read();
-		this.pitch = (byte)var1.read();
-	}
+    public Packet34EntityTeleport()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.entityId);
-		var1.writeInt(this.xPosition);
-		var1.writeInt(this.yPosition);
-		var1.writeInt(this.zPosition);
-		var1.write(this.yaw);
-		var1.write(this.pitch);
-	}
+    public Packet34EntityTeleport(Entity entity)
+    {
+        entityId = entity.entityId;
+        xPosition = MathHelper.floor_double(entity.posX * 32D);
+        yPosition = MathHelper.floor_double(entity.posY * 32D);
+        zPosition = MathHelper.floor_double(entity.posZ * 32D);
+        yaw = (byte)(int)((entity.rotationYaw * 256F) / 360F);
+        pitch = (byte)(int)((entity.rotationPitch * 256F) / 360F);
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleEntityTeleport(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        entityId = datainputstream.readInt();
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.readInt();
+        zPosition = datainputstream.readInt();
+        yaw = (byte)datainputstream.read();
+        pitch = (byte)datainputstream.read();
+    }
 
-	public int getPacketSize() {
-		return 34;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(entityId);
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeInt(yPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.write(yaw);
+        dataoutputstream.write(pitch);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleEntityTeleport(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 34;
+    }
 }

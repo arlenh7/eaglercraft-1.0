@@ -1,51 +1,104 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class InventoryLargeChest implements IInventory {
-	private String name;
-	private IInventory upperChest;
-	private IInventory lowerChest;
 
-	public InventoryLargeChest(String var1, IInventory var2, IInventory var3) {
-		this.name = var1;
-		this.upperChest = var2;
-		this.lowerChest = var3;
-	}
+// Referenced classes of package net.minecraft.src:
+//            IInventory, ItemStack, EntityPlayer
 
-	public int getSizeInventory() {
-		return this.upperChest.getSizeInventory() + this.lowerChest.getSizeInventory();
-	}
+public class InventoryLargeChest
+    implements IInventory
+{
 
-	public String getInvName() {
-		return this.name;
-	}
+    private String name;
+    private IInventory upperChest;
+    private IInventory lowerChest;
 
-	public ItemStack getStackInSlot(int var1) {
-		return var1 >= this.upperChest.getSizeInventory() ? this.lowerChest.getStackInSlot(var1 - this.upperChest.getSizeInventory()) : this.upperChest.getStackInSlot(var1);
-	}
+    public InventoryLargeChest(String s, IInventory iinventory, IInventory iinventory1)
+    {
+        name = s;
+        if(iinventory == null)
+        {
+            iinventory = iinventory1;
+        }
+        if(iinventory1 == null)
+        {
+            iinventory1 = iinventory;
+        }
+        upperChest = iinventory;
+        lowerChest = iinventory1;
+    }
 
-	public ItemStack decrStackSize(int var1, int var2) {
-		return var1 >= this.upperChest.getSizeInventory() ? this.lowerChest.decrStackSize(var1 - this.upperChest.getSizeInventory(), var2) : this.upperChest.decrStackSize(var1, var2);
-	}
+    public int getSizeInventory()
+    {
+        return upperChest.getSizeInventory() + lowerChest.getSizeInventory();
+    }
 
-	public void setInventorySlotContents(int var1, ItemStack var2) {
-		if(var1 >= this.upperChest.getSizeInventory()) {
-			this.lowerChest.setInventorySlotContents(var1 - this.upperChest.getSizeInventory(), var2);
-		} else {
-			this.upperChest.setInventorySlotContents(var1, var2);
-		}
+    public String getInvName()
+    {
+        return name;
+    }
 
-	}
+    public ItemStack getStackInSlot(int i)
+    {
+        if(i >= upperChest.getSizeInventory())
+        {
+            return lowerChest.getStackInSlot(i - upperChest.getSizeInventory());
+        } else
+        {
+            return upperChest.getStackInSlot(i);
+        }
+    }
 
-	public int getInventoryStackLimit() {
-		return this.upperChest.getInventoryStackLimit();
-	}
+    public ItemStack decrStackSize(int i, int j)
+    {
+        if(i >= upperChest.getSizeInventory())
+        {
+            return lowerChest.decrStackSize(i - upperChest.getSizeInventory(), j);
+        } else
+        {
+            return upperChest.decrStackSize(i, j);
+        }
+    }
 
-	public void onInventoryChanged() {
-		this.upperChest.onInventoryChanged();
-		this.lowerChest.onInventoryChanged();
-	}
+    public void setInventorySlotContents(int i, ItemStack itemstack)
+    {
+        if(i >= upperChest.getSizeInventory())
+        {
+            lowerChest.setInventorySlotContents(i - upperChest.getSizeInventory(), itemstack);
+        } else
+        {
+            upperChest.setInventorySlotContents(i, itemstack);
+        }
+    }
 
-	public boolean func_20070_a_(EntityPlayer var1) {
-		return this.upperChest.func_20070_a_(var1) && this.lowerChest.func_20070_a_(var1);
-	}
+    public int getInventoryStackLimit()
+    {
+        return upperChest.getInventoryStackLimit();
+    }
+
+    public void onInventoryChanged()
+    {
+        upperChest.onInventoryChanged();
+        lowerChest.onInventoryChanged();
+    }
+
+    public boolean isUseableByPlayer(EntityPlayer entityplayer)
+    {
+        return upperChest.isUseableByPlayer(entityplayer) && lowerChest.isUseableByPlayer(entityplayer);
+    }
+
+    public void openChest()
+    {
+        upperChest.openChest();
+        lowerChest.openChest();
+    }
+
+    public void closeChest()
+    {
+        upperChest.closeChest();
+        lowerChest.closeChest();
+    }
 }

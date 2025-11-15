@@ -1,29 +1,119 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.util.ArrayList;
 
-public class BlockFence extends Block {
-	public BlockFence(int var1, int var2) {
-		super(var1, var2, Material.wood);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, AxisAlignedBB, IBlockAccess, 
+//            World
 
-	public void getCollidingBoundingBoxes(World var1, int var2, int var3, int var4, AxisAlignedBB var5, ArrayList<AxisAlignedBB> var6) {
-		var6.add(AxisAlignedBB.getBoundingBoxFromPool((double)var2, (double)var3, (double)var4, (double)(var2 + 1), (double)var3 + 1.5D, (double)(var4 + 1)));
-	}
+public class BlockFence extends Block
+{
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var1.getBlockId(var2, var3 - 1, var4) == this.blockID ? false : (!var1.getBlockMaterial(var2, var3 - 1, var4).func_878_a() ? false : super.canPlaceBlockAt(var1, var2, var3, var4));
-	}
+    public BlockFence(int i, int j)
+    {
+        super(i, j, Material.wood);
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public BlockFence(int i, int j, Material material)
+    {
+        super(i, j, material);
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        return super.canPlaceBlockAt(world, i, j, k);
+    }
 
-	public int getRenderType() {
-		return 11;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        boolean flag = isFenceAt(world, i, j, k - 1);
+        boolean flag1 = isFenceAt(world, i, j, k + 1);
+        boolean flag2 = isFenceAt(world, i - 1, j, k);
+        boolean flag3 = isFenceAt(world, i + 1, j, k);
+        float f = 0.375F;
+        float f1 = 0.625F;
+        float f2 = 0.375F;
+        float f3 = 0.625F;
+        if(flag)
+        {
+            f2 = 0.0F;
+        }
+        if(flag1)
+        {
+            f3 = 1.0F;
+        }
+        if(flag2)
+        {
+            f = 0.0F;
+        }
+        if(flag3)
+        {
+            f1 = 1.0F;
+        }
+        return AxisAlignedBB.getBoundingBoxFromPool((float)i + f, j, (float)k + f2, (float)i + f1, (float)j + 1.5F, (float)k + f3);
+    }
+
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        boolean flag = isFenceAt(iblockaccess, i, j, k - 1);
+        boolean flag1 = isFenceAt(iblockaccess, i, j, k + 1);
+        boolean flag2 = isFenceAt(iblockaccess, i - 1, j, k);
+        boolean flag3 = isFenceAt(iblockaccess, i + 1, j, k);
+        float f = 0.375F;
+        float f1 = 0.625F;
+        float f2 = 0.375F;
+        float f3 = 0.625F;
+        if(flag)
+        {
+            f2 = 0.0F;
+        }
+        if(flag1)
+        {
+            f3 = 1.0F;
+        }
+        if(flag2)
+        {
+            f = 0.0F;
+        }
+        if(flag3)
+        {
+            f1 = 1.0F;
+        }
+        setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
+    }
+
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+
+    public int getRenderType()
+    {
+        return 11;
+    }
+
+    public boolean isFenceAt(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        int l = iblockaccess.getBlockId(i, j, k);
+        if(l == blockID || l == Block.fenceGate.blockID)
+        {
+            return true;
+        }
+        Block block = Block.blocksList[l];
+        if(block != null && block.blockMaterial.getIsOpaque() && block.renderAsNormalBlock())
+        {
+            return block.blockMaterial != Material.pumpkin;
+        } else
+        {
+            return false;
+        }
+    }
 }

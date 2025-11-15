@@ -1,17 +1,30 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class SignModel {
-	public ModelRenderer field_1346_a = new ModelRenderer(0, 0);
-	public ModelRenderer field_1345_b;
 
-	public SignModel() {
-		this.field_1346_a.addBox(-12.0F, -14.0F, -1.0F, 24, 12, 2, 0.0F);
-		this.field_1345_b = new ModelRenderer(0, 14);
-		this.field_1345_b.addBox(-1.0F, -2.0F, -1.0F, 2, 14, 2, 0.0F);
-	}
+// Referenced classes of package net.minecraft.src:
+//            ModelBase, ModelRenderer
 
-	public void func_887_a() {
-		this.field_1346_a.render(1.0F / 16.0F);
-		this.field_1345_b.render(1.0F / 16.0F);
-	}
+public class SignModel extends ModelBase
+{
+
+    public ModelRenderer signBoard;
+    public ModelRenderer signStick;
+
+    public SignModel()
+    {
+        signBoard = new ModelRenderer(this, 0, 0);
+        signBoard.addBox(-12F, -14F, -1F, 24, 12, 2, 0.0F);
+        signStick = new ModelRenderer(this, 0, 14);
+        signStick.addBox(-1F, -2F, -1F, 2, 14, 2, 0.0F);
+    }
+
+    public void renderSign()
+    {
+        signBoard.render(0.0625F);
+        signStick.render(0.0625F);
+    }
 }

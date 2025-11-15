@@ -1,40 +1,55 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet10Flying extends Packet {
-	public double xPosition;
-	public double yPosition;
-	public double zPosition;
-	public double stance;
-	public float yaw;
-	public float pitch;
-	public boolean onGround;
-	public boolean moving;
-	public boolean rotating;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet10Flying() {
-	}
+public class Packet10Flying extends Packet
+{
 
-	public Packet10Flying(boolean var1) {
-		this.onGround = var1;
-	}
+    public double xPosition;
+    public double yPosition;
+    public double zPosition;
+    public double stance;
+    public float yaw;
+    public float pitch;
+    public boolean onGround;
+    public boolean moving;
+    public boolean rotating;
 
-	public void processPacket(NetHandler var1) {
-		var1.handleFlying(this);
-	}
+    public Packet10Flying()
+    {
+    }
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.onGround = var1.read() != 0;
-	}
+    public Packet10Flying(boolean flag)
+    {
+        onGround = flag;
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.write(this.onGround ? 1 : 0);
-	}
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleFlying(this);
+    }
 
-	public int getPacketSize() {
-		return 1;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        onGround = datainputstream.read() != 0;
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.write(onGround ? 1 : 0);
+    }
+
+    public int getPacketSize()
+    {
+        return 1;
+    }
 }

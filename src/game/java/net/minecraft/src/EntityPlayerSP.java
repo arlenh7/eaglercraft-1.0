@@ -1,161 +1,486 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.util.Random;
 import net.minecraft.client.Minecraft;
 
-public class EntityPlayerSP extends EntityPlayer {
-	public MovementInput movementInput;
-	protected Minecraft mc;
-	public int field_9373_b = 20;
-	private boolean inPortal = false;
-	public float timeInPortal;
-	public float prevTimeInPortal;
+// Referenced classes of package net.minecraft.src:
+//            EntityPlayer, MouseFilter, Session, MovementInput, 
+//            PlayerController, AchievementList, StatFileWriter, GuiAchievement, 
+//            World, SoundManager, Potion, PotionEffect, 
+//            AxisAlignedBB, FoodStats, PlayerCapabilities, GuiWinGame, 
+//            ItemStack, Item, NBTTagCompound, GuiEditSign, 
+//            GuiChest, GuiCrafting, GuiEnchantment, GuiFurnace, 
+//            GuiBrewingStand, GuiDispenser, EntityCrit2FX, EffectRenderer, 
+//            EntityPickupFX, InventoryPlayer, DamageSource, GuiIngame, 
+//            StatBase, Achievement, MathHelper, TileEntitySign, 
+//            IInventory, TileEntityFurnace, TileEntityBrewingStand, TileEntityDispenser, 
+//            Entity
 
-	public EntityPlayerSP(Minecraft var1, World var2, Session var3, int var4) {
-		super(var2);
-		this.mc = var1;
-		this.dimension = var4;
-		this.field_771_i = var3.playerName;
-	}
+public class EntityPlayerSP extends EntityPlayer
+{
 
-	public void updatePlayerActionState() {
-		super.updatePlayerActionState();
-		this.moveStrafing = this.movementInput.moveStrafe;
-		this.moveForward = this.movementInput.moveForward;
-		this.isJumping = this.movementInput.jump;
-	}
+    public MovementInput movementInput;
+    protected Minecraft mc;
+    protected int sprintToggleTimer;
+    public int sprintingTicksLeft;
+    public float renderArmYaw;
+    public float renderArmPitch;
+    public float prevRenderArmYaw;
+    public float prevRenderArmPitch;
+    private MouseFilter field_21903_bJ;
+    private MouseFilter field_21904_bK;
+    private MouseFilter field_21902_bL;
 
-	public void onLivingUpdate() {
-		this.prevTimeInPortal = this.timeInPortal;
-		if(this.inPortal) {
-			if(this.timeInPortal == 0.0F) {
-				this.mc.sndManager.func_337_a("portal.trigger", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
-			}
+    public EntityPlayerSP(Minecraft minecraft, World world, Session session, int i)
+    {
+        super(world);
+        sprintToggleTimer = 0;
+        sprintingTicksLeft = 0;
+        field_21903_bJ = new MouseFilter();
+        field_21904_bK = new MouseFilter();
+        field_21902_bL = new MouseFilter();
+        mc = minecraft;
+        dimension = i;
+        if(session != null && session.username != null && session.username.length() > 0)
+        {
+            skinUrl = (new StringBuilder()).append("http://s3.amazonaws.com/MinecraftSkins/").append(session.username).append(".png").toString();
+        }
+        username = session.username;
+    }
 
-			this.timeInPortal += 0.0125F;
-			if(this.timeInPortal >= 1.0F) {
-				this.timeInPortal = 1.0F;
-				this.field_9373_b = 10;
-				this.mc.sndManager.func_337_a("portal.travel", 1.0F, this.rand.nextFloat() * 0.4F + 0.8F);
-				this.mc.usePortal();
-			}
+    public void moveEntity(double d, double d1, double d2)
+    {
+        super.moveEntity(d, d1, d2);
+    }
 
-			this.inPortal = false;
-		} else {
-			if(this.timeInPortal > 0.0F) {
-				this.timeInPortal -= 0.05F;
-			}
+    public void updateEntityActionState()
+    {
+        super.updateEntityActionState();
+        moveStrafing = movementInput.moveStrafe;
+        moveForward = movementInput.moveForward;
+        isJumping = movementInput.jump;
+        prevRenderArmYaw = renderArmYaw;
+        prevRenderArmPitch = renderArmPitch;
+        renderArmPitch += (double)(rotationPitch - renderArmPitch) * 0.5D;
+        renderArmYaw += (double)(rotationYaw - renderArmYaw) * 0.5D;
+    }
 
-			if(this.timeInPortal < 0.0F) {
-				this.timeInPortal = 0.0F;
-			}
-		}
+    public void onLivingUpdate()
+    {
+        if(sprintingTicksLeft > 0)
+        {
+            sprintingTicksLeft--;
+            if(sprintingTicksLeft == 0)
+            {
+                setSprinting(false);
+            }
+        }
+        if(sprintToggleTimer > 0)
+        {
+            sprintToggleTimer--;
+        }
+        if(mc.playerController.func_35643_e())
+        {
+            posX = posZ = 0.5D;
+            posX = 0.0D;
+            posZ = 0.0D;
+            rotationYaw = (float)ticksExisted / 12F;
+            rotationPitch = 10F;
+            posY = 68.5D;
+            return;
+        }
+        if(!mc.statFileWriter.hasAchievementUnlocked(AchievementList.openInventory))
+        {
+            mc.guiAchievement.queueAchievementInformation(AchievementList.openInventory);
+        }
+        prevTimeInPortal = timeInPortal;
+        if(inPortal)
+        {
+            if(!worldObj.multiplayerWorld && ridingEntity != null)
+            {
+                mountEntity(null);
+            }
+            if(mc.currentScreen != null)
+            {
+                mc.displayGuiScreen(null);
+            }
+            if(timeInPortal == 0.0F)
+            {
+                mc.sndManager.playSoundFX("portal.trigger", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+            }
+            timeInPortal += 0.0125F;
+            if(timeInPortal >= 1.0F)
+            {
+                timeInPortal = 1.0F;
+                if(!worldObj.multiplayerWorld)
+                {
+                    timeUntilPortal = 10;
+                    mc.sndManager.playSoundFX("portal.travel", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+                    byte byte0 = 0;
+                    if(dimension == -1)
+                    {
+                        byte0 = 0;
+                    } else
+                    {
+                        byte0 = -1;
+                    }
+                    mc.usePortal(byte0);
+                    triggerAchievement(AchievementList.portal);
+                }
+            }
+            inPortal = false;
+        } else
+        if(isPotionActive(Potion.potionConfusion) && getActivePotionEffect(Potion.potionConfusion).getDuration() > 60)
+        {
+            timeInPortal += 0.006666667F;
+            if(timeInPortal > 1.0F)
+            {
+                timeInPortal = 1.0F;
+            }
+        } else
+        {
+            if(timeInPortal > 0.0F)
+            {
+                timeInPortal -= 0.05F;
+            }
+            if(timeInPortal < 0.0F)
+            {
+                timeInPortal = 0.0F;
+            }
+        }
+        if(timeUntilPortal > 0)
+        {
+            timeUntilPortal--;
+        }
+        boolean flag = movementInput.jump;
+        float f = 0.8F;
+        boolean flag1 = movementInput.moveForward >= f;
+        movementInput.updatePlayerMoveState(this);
+        if(isUsingItem())
+        {
+            movementInput.moveStrafe *= 0.2F;
+            movementInput.moveForward *= 0.2F;
+            sprintToggleTimer = 0;
+        }
+        if(movementInput.sneak && ySize < 0.2F)
+        {
+            ySize = 0.2F;
+        }
+        pushOutOfBlocks(posX - (double)width * 0.34999999999999998D, boundingBox.minY + 0.5D, posZ + (double)width * 0.34999999999999998D);
+        pushOutOfBlocks(posX - (double)width * 0.34999999999999998D, boundingBox.minY + 0.5D, posZ - (double)width * 0.34999999999999998D);
+        pushOutOfBlocks(posX + (double)width * 0.34999999999999998D, boundingBox.minY + 0.5D, posZ - (double)width * 0.34999999999999998D);
+        pushOutOfBlocks(posX + (double)width * 0.34999999999999998D, boundingBox.minY + 0.5D, posZ + (double)width * 0.34999999999999998D);
+        boolean flag2 = (float)getFoodStats().getFoodLevel() > 6F;
+        if(onGround && !flag1 && movementInput.moveForward >= f && !isSprinting() && flag2 && !isUsingItem() && !isPotionActive(Potion.potionBlindness))
+        {
+            if(sprintToggleTimer == 0)
+            {
+                sprintToggleTimer = 7;
+            } else
+            {
+                setSprinting(true);
+                sprintToggleTimer = 0;
+            }
+        }
+        if(isSneaking())
+        {
+            sprintToggleTimer = 0;
+        }
+        if(isSprinting() && (movementInput.moveForward < f || isCollidedHorizontally || !flag2))
+        {
+            setSprinting(false);
+        }
+        if(capabilities.allowFlying && !flag && movementInput.jump)
+        {
+            if(flyToggleTimer == 0)
+            {
+                flyToggleTimer = 7;
+            } else
+            {
+                capabilities.isFlying = !capabilities.isFlying;
+                flyToggleTimer = 0;
+            }
+        }
+        if(capabilities.isFlying)
+        {
+            if(movementInput.sneak)
+            {
+                motionY -= 0.14999999999999999D;
+            }
+            if(movementInput.jump)
+            {
+                motionY += 0.14999999999999999D;
+            }
+        }
+        super.onLivingUpdate();
+        if(onGround && capabilities.isFlying)
+        {
+            capabilities.isFlying = false;
+        }
+    }
 
-		if(this.field_9373_b > 0) {
-			--this.field_9373_b;
-		}
+    public void func_40182_b(int i)
+    {
+        if(!worldObj.multiplayerWorld)
+        {
+            if(dimension == 1 && i == 1)
+            {
+                triggerAchievement(AchievementList.theEnd2);
+                mc.displayGuiScreen(new GuiWinGame());
+            } else
+            {
+                triggerAchievement(AchievementList.theEnd);
+                mc.sndManager.playSoundFX("portal.travel", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+                mc.usePortal(1);
+            }
+        }
+    }
 
-		this.movementInput.updatePlayerMoveState(this);
-		if(this.movementInput.sneak && this.field_9287_aY < 0.2F) {
-			this.field_9287_aY = 0.2F;
-		}
+    public float getFOVMultiplier()
+    {
+        float f = 1.0F;
+        if(capabilities.isFlying)
+        {
+            f *= 1.1F;
+        }
+        f *= ((landMovementFactor * func_35166_t_()) / speedOnGround + 1.0F) / 2.0F;
+        if(isUsingItem() && getItemInUse().itemID == Item.bow.shiftedIndex)
+        {
+            int i = getItemInUseDuration();
+            float f1 = (float)i / 20F;
+            if(f1 > 1.0F)
+            {
+                f1 = 1.0F;
+            } else
+            {
+                f1 *= f1;
+            }
+            f *= 1.0F - f1 * 0.15F;
+        }
+        return f;
+    }
 
-		super.onLivingUpdate();
-	}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+        nbttagcompound.setInteger("Score", score);
+    }
 
-	public void resetPlayerKeyState() {
-		this.movementInput.resetKeyState();
-	}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+        score = nbttagcompound.getInteger("Score");
+    }
 
-	public void handleKeyPress(int var1, boolean var2) {
-		this.movementInput.checkKeyForMovementInput(var1, var2);
-	}
+    public void closeScreen()
+    {
+        super.closeScreen();
+        mc.displayGuiScreen(null);
+    }
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-		var1.setInteger("Score", this.score);
-	}
+    public void displayGUIEditSign(TileEntitySign tileentitysign)
+    {
+        mc.displayGuiScreen(new GuiEditSign(tileentitysign));
+    }
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-		this.score = var1.getInteger("Score");
-	}
+    public void displayGUIChest(IInventory iinventory)
+    {
+        mc.displayGuiScreen(new GuiChest(inventory, iinventory));
+    }
 
-	public void func_20059_m() {
-		super.func_20059_m();
-		this.mc.displayGuiScreen((GuiScreen)null);
-	}
+    public void displayWorkbenchGUI(int i, int j, int k)
+    {
+        mc.displayGuiScreen(new GuiCrafting(inventory, worldObj, i, j, k));
+    }
 
-	public void displayGUIEditSign(TileEntitySign var1) {
-		this.mc.displayGuiScreen(new GuiEditSign(var1));
-	}
+    public void func_40181_c(int i, int j, int k)
+    {
+        mc.displayGuiScreen(new GuiEnchantment(inventory, worldObj, i, j, k));
+    }
 
-	public void displayGUIChest(IInventory var1) {
-		this.mc.displayGuiScreen(new GuiChest(this.inventory, var1));
-	}
+    public void displayGUIFurnace(TileEntityFurnace tileentityfurnace)
+    {
+        mc.displayGuiScreen(new GuiFurnace(inventory, tileentityfurnace));
+    }
 
-	public void displayWorkbenchGUI(int var1, int var2, int var3) {
-		this.mc.displayGuiScreen(new GuiCrafting(this.inventory, this.worldObj, var1, var2, var3));
-	}
+    public void func_40180_a(TileEntityBrewingStand tileentitybrewingstand)
+    {
+        mc.displayGuiScreen(new GuiBrewingStand(inventory, tileentitybrewingstand));
+    }
 
-	public void displayGUIFurnace(TileEntityFurnace var1) {
-		this.mc.displayGuiScreen(new GuiFurnace(this.inventory, var1));
-	}
+    public void displayGUIDispenser(TileEntityDispenser tileentitydispenser)
+    {
+        mc.displayGuiScreen(new GuiDispenser(inventory, tileentitydispenser));
+    }
 
-	public void onItemPickup(Entity var1, int var2) {
-		this.mc.effectRenderer.func_1192_a(new EntityPickupFX(this.mc.theWorld, var1, this, -0.5F));
-	}
+    public void onCriticalHit(Entity entity)
+    {
+        mc.effectRenderer.addEffect(new EntityCrit2FX(mc.theWorld, entity));
+    }
 
-	public int getPlayerArmorValue() {
-		return this.inventory.getTotalArmorValue();
-	}
+    public void func_40183_c(Entity entity)
+    {
+        EntityCrit2FX entitycrit2fx = new EntityCrit2FX(mc.theWorld, entity, "magicCrit");
+        mc.effectRenderer.addEffect(entitycrit2fx);
+    }
 
-	public void useCurrentItemOnEntity(Entity var1) {
-		if(!var1.interact(this)) {
-			ItemStack var2 = this.getCurrentEquippedItem();
-			if(var2 != null && var1 instanceof EntityLiving) {
-				var2.useItemOnEntity((EntityLiving)var1);
-				if(var2.stackSize <= 0) {
-					var2.func_1097_a(this);
-					this.destroyCurrentEquippedItem();
-				}
-			}
+    public void onItemPickup(Entity entity, int i)
+    {
+        mc.effectRenderer.addEffect(new EntityPickupFX(mc.theWorld, entity, this, -0.5F));
+    }
 
-		}
-	}
+    public int getPlayerArmorValue()
+    {
+        return inventory.getTotalArmorValue();
+    }
 
-	public void sendChatMessage(String var1) {
-	}
+    public void sendChatMessage(String s)
+    {
+    }
 
-	public void func_6420_o() {
-	}
+    public boolean isSneaking()
+    {
+        return movementInput.sneak && !sleeping;
+    }
 
-	public boolean isSneaking() {
-		return this.movementInput.sneak;
-	}
+    public void setHealth(int i)
+    {
+        int j = getEntityHealth() - i;
+        if(j <= 0)
+        {
+            setEntityHealth(i);
+            if(j < 0)
+            {
+                heartsLife = heartsHalvesLife / 2;
+            }
+        } else
+        {
+            naturalArmorRating = j;
+            setEntityHealth(getEntityHealth());
+            heartsLife = heartsHalvesLife;
+            damageEntity(DamageSource.generic, j);
+            hurtTime = maxHurtTime = 10;
+        }
+    }
 
-	public void setInPortal() {
-		if(this.field_9373_b > 0) {
-			this.field_9373_b = 10;
-		} else {
-			this.inPortal = true;
-		}
-	}
+    public void respawnPlayer()
+    {
+        mc.respawn(false, 0, false);
+    }
 
-	public void setHealth(int var1) {
-		int var2 = this.health - var1;
-		if(var2 <= 0) {
-			this.health = var1;
-		} else {
-			this.field_9346_af = var2;
-			this.prevHealth = this.health;
-			this.field_9306_bj = this.field_9366_o;
-			this.damageEntity(var2);
-			this.hurtTime = this.maxHurtTime = 10;
-		}
+    public void func_6420_o()
+    {
+    }
 
-	}
+    public void addChatMessage(String s)
+    {
+        mc.ingameGUI.addChatMessageTranslate(s);
+    }
 
-	public void respawnPlayer() {
-		this.mc.respawn();
-	}
+    public void addStat(StatBase statbase, int i)
+    {
+        if(statbase == null)
+        {
+            return;
+        }
+        if(statbase.isAchievement())
+        {
+            Achievement achievement = (Achievement)statbase;
+            if(achievement.parentAchievement == null || mc.statFileWriter.hasAchievementUnlocked(achievement.parentAchievement))
+            {
+                if(!mc.statFileWriter.hasAchievementUnlocked(achievement))
+                {
+                    mc.guiAchievement.queueTakenAchievement(achievement);
+                }
+                mc.statFileWriter.readStat(statbase, i);
+            }
+        } else
+        {
+            mc.statFileWriter.readStat(statbase, i);
+        }
+    }
+
+    private boolean isBlockTranslucent(int i, int j, int k)
+    {
+        return worldObj.isBlockNormalCube(i, j, k);
+    }
+
+    protected boolean pushOutOfBlocks(double d, double d1, double d2)
+    {
+        int i = MathHelper.floor_double(d);
+        int j = MathHelper.floor_double(d1);
+        int k = MathHelper.floor_double(d2);
+        double d3 = d - (double)i;
+        double d4 = d2 - (double)k;
+        if(isBlockTranslucent(i, j, k) || isBlockTranslucent(i, j + 1, k))
+        {
+            boolean flag = !isBlockTranslucent(i - 1, j, k) && !isBlockTranslucent(i - 1, j + 1, k);
+            boolean flag1 = !isBlockTranslucent(i + 1, j, k) && !isBlockTranslucent(i + 1, j + 1, k);
+            boolean flag2 = !isBlockTranslucent(i, j, k - 1) && !isBlockTranslucent(i, j + 1, k - 1);
+            boolean flag3 = !isBlockTranslucent(i, j, k + 1) && !isBlockTranslucent(i, j + 1, k + 1);
+            byte byte0 = -1;
+            double d5 = 9999D;
+            if(flag && d3 < d5)
+            {
+                d5 = d3;
+                byte0 = 0;
+            }
+            if(flag1 && 1.0D - d3 < d5)
+            {
+                d5 = 1.0D - d3;
+                byte0 = 1;
+            }
+            if(flag2 && d4 < d5)
+            {
+                d5 = d4;
+                byte0 = 4;
+            }
+            if(flag3 && 1.0D - d4 < d5)
+            {
+                double d6 = 1.0D - d4;
+                byte0 = 5;
+            }
+            float f = 0.1F;
+            if(byte0 == 0)
+            {
+                motionX = -f;
+            }
+            if(byte0 == 1)
+            {
+                motionX = f;
+            }
+            if(byte0 == 4)
+            {
+                motionZ = -f;
+            }
+            if(byte0 == 5)
+            {
+                motionZ = f;
+            }
+        }
+        return false;
+    }
+
+    public void setSprinting(boolean flag)
+    {
+        super.setSprinting(flag);
+        if(!flag)
+        {
+            sprintingTicksLeft = 0;
+        } else
+        {
+            sprintingTicksLeft = 600;
+        }
+    }
+
+    public void setXPStats(float f, int i, int j)
+    {
+        currentXP = f;
+        totalXP = i;
+        playerLevel = j;
+    }
 }

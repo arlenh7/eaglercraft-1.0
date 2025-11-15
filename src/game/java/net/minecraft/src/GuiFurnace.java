@@ -1,36 +1,47 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            GuiContainer, ContainerFurnace, FontRenderer, RenderEngine, 
+//            TileEntityFurnace, InventoryPlayer
 
-public class GuiFurnace extends GuiContainer {
-	private TileEntityFurnace furnaceInventory;
+public class GuiFurnace extends GuiContainer
+{
 
-	public GuiFurnace(InventoryPlayer var1, TileEntityFurnace var2) {
-		super(new CraftingInventoryFurnaceCB(var1, var2));
-		this.furnaceInventory = var2;
-	}
+    private TileEntityFurnace furnaceInventory;
 
-	protected void drawGuiContainerForegroundLayer() {
-		this.fontRenderer.drawString("Furnace", 60, 6, 4210752);
-		this.fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 2, 4210752);
-	}
+    public GuiFurnace(InventoryPlayer inventoryplayer, TileEntityFurnace tileentityfurnace)
+    {
+        super(new ContainerFurnace(inventoryplayer, tileentityfurnace));
+        furnaceInventory = tileentityfurnace;
+    }
 
-	private static final TextureLocation furnace = new TextureLocation("/gui/furnace.png");
-	protected void drawGuiContainerBackgroundLayer(float var1) {
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		furnace.bindTexture();
-		int var3 = (this.width - this.xSize) / 2;
-		int var4 = (this.height - this.ySize) / 2;
-		this.drawTexturedModalRect(var3, var4, 0, 0, this.xSize, this.ySize);
-		int var5;
-		if(this.furnaceInventory.isBurning()) {
-			var5 = this.furnaceInventory.getBurnTimeRemainingScaled(12);
-			this.drawTexturedModalRect(var3 + 56, var4 + 36 + 12 - var5, 176, 12 - var5, 14, var5 + 2);
-		}
+    protected void drawGuiContainerForegroundLayer()
+    {
+        fontRenderer.drawString("Furnace", 60, 6, 0x404040);
+        fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
+    }
 
-		var5 = this.furnaceInventory.getCookProgressScaled(24);
-		this.drawTexturedModalRect(var3 + 79, var4 + 34, 176, 14, var5 + 1, 16);
-	}
+    protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
+    {
+        int k = mc.renderEngine.getTexture("/gui/furnace.png");
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(k);
+        int l = (width - xSize) / 2;
+        int i1 = (height - ySize) / 2;
+        drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+        if(furnaceInventory.isBurning())
+        {
+            int j1 = furnaceInventory.getBurnTimeRemainingScaled(12);
+            drawTexturedModalRect(l + 56, (i1 + 36 + 12) - j1, 176, 12 - j1, 14, j1 + 2);
+        }
+        int k1 = furnaceInventory.getCookProgressScaled(24);
+        drawTexturedModalRect(l + 79, i1 + 34, 176, 14, k1 + 1, 16);
+    }
 }

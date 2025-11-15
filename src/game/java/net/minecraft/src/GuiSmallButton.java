@@ -1,23 +1,37 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class GuiSmallButton extends GuiButton {
-	private final EnumOptions field_20079_i;
 
-	public GuiSmallButton(int var1, int var2, int var3, String var4) {
-		this(var1, var2, var3, (EnumOptions)null, var4);
-	}
+// Referenced classes of package net.minecraft.src:
+//            GuiButton, EnumOptions
 
-	public GuiSmallButton(int var1, int var2, int var3, int var4, int var5, String var6) {
-		super(var1, var2, var3, var4, var5, var6);
-		this.field_20079_i = null;
-	}
+public class GuiSmallButton extends GuiButton
+{
 
-	public GuiSmallButton(int var1, int var2, int var3, EnumOptions var4, String var5) {
-		super(var1, var2, var3, 150, 20, var5);
-		this.field_20079_i = var4;
-	}
+    private final EnumOptions enumOptions;
 
-	public EnumOptions func_20078_a() {
-		return this.field_20079_i;
-	}
+    public GuiSmallButton(int i, int j, int k, String s)
+    {
+        this(i, j, k, null, s);
+    }
+
+    public GuiSmallButton(int i, int j, int k, int l, int i1, String s)
+    {
+        super(i, j, k, l, i1, s);
+        enumOptions = null;
+    }
+
+    public GuiSmallButton(int i, int j, int k, EnumOptions enumoptions, String s)
+    {
+        super(i, j, k, 150, 20, s);
+        enumOptions = enumoptions;
+    }
+
+    public EnumOptions returnEnumOptions()
+    {
+        return enumOptions;
+    }
 }

@@ -1,55 +1,81 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemReed extends Item {
-	private int field_320_a;
 
-	public ItemReed(int var1, Block var2) {
-		super(var1);
-		this.field_320_a = var2.blockID;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, Block, World, EntityPlayer, 
+//            ItemStack, StepSound
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var3.getBlockId(var4, var5, var6) == Block.snow.blockID) {
-			var7 = 0;
-		} else {
-			if(var7 == 0) {
-				--var5;
-			}
+public class ItemReed extends Item
+{
 
-			if(var7 == 1) {
-				++var5;
-			}
+    private int spawnID;
 
-			if(var7 == 2) {
-				--var6;
-			}
+    public ItemReed(int i, Block block)
+    {
+        super(i);
+        spawnID = block.blockID;
+    }
 
-			if(var7 == 3) {
-				++var6;
-			}
-
-			if(var7 == 4) {
-				--var4;
-			}
-
-			if(var7 == 5) {
-				++var4;
-			}
-		}
-
-		if(var1.stackSize == 0) {
-			return false;
-		} else {
-			if(var3.canBlockBePlacedAt(this.field_320_a, var4, var5, var6, false)) {
-				Block var8 = Block.blocksList[this.field_320_a];
-				if(var3.setBlockWithNotify(var4, var5, var6, this.field_320_a)) {
-					Block.blocksList[this.field_320_a].onBlockPlaced(var3, var4, var5, var6, var7);
-					var3.playSoundEffect((double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), var8.stepSound.func_1145_d(), (var8.stepSound.func_1147_b() + 1.0F) / 2.0F, var8.stepSound.func_1144_c() * 0.8F);
-					--var1.stackSize;
-				}
-			}
-
-			return true;
-		}
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 == Block.snow.blockID)
+        {
+            l = 0;
+        } else
+        if(i1 != Block.vine.blockID)
+        {
+            if(l == 0)
+            {
+                j--;
+            }
+            if(l == 1)
+            {
+                j++;
+            }
+            if(l == 2)
+            {
+                k--;
+            }
+            if(l == 3)
+            {
+                k++;
+            }
+            if(l == 4)
+            {
+                i--;
+            }
+            if(l == 5)
+            {
+                i++;
+            }
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        if(itemstack.stackSize == 0)
+        {
+            return false;
+        }
+        if(world.canBlockBePlacedAt(spawnID, i, j, k, false, l))
+        {
+            Block block = Block.blocksList[spawnID];
+            if(world.setBlockWithNotify(i, j, k, spawnID))
+            {
+                if(world.getBlockId(i, j, k) == spawnID)
+                {
+                    Block.blocksList[spawnID].onBlockPlaced(world, i, j, k, l);
+                    Block.blocksList[spawnID].onBlockPlacedBy(world, i, j, k, entityplayer);
+                }
+                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.stepSoundDir2(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+                itemstack.stackSize--;
+            }
+        }
+        return true;
+    }
 }

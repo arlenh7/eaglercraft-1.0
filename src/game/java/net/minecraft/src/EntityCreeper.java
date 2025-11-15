@@ -1,130 +1,189 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import java.util.Random;
 
-public class EntityCreeper extends EntityMobs {
-	int timeSinceIgnited;
-	int lastActiveTime;
-	int fuseTime = 30;
-	int creeperState = -1;
-	int field_12241_e = -1;
-	
-	private static final TextureLocation creeper = new TextureLocation("/mob/creeper.png");
+// Referenced classes of package net.minecraft.src:
+//            EntityMob, DataWatcher, NBTTagCompound, World, 
+//            DamageSource, EntitySkeleton, Item, Entity, 
+//            EntityLightningBolt
 
-	public EntityCreeper(World var1) {
-		super(var1);
-		this.texture = creeper;
-	}
+public class EntityCreeper extends EntityMob
+{
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-	}
+    int timeSinceIgnited;
+    int lastActiveTime;
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-	}
+    public EntityCreeper(World world)
+    {
+        super(world);
+        texture = "/mob/creeper.png";
+    }
 
-	public void func_9282_a(byte var1) {
-		super.func_9282_a(var1);
-		if(var1 == 4) {
-			if(this.timeSinceIgnited == 0) {
-				this.worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
-			}
+    public int getMaxHealth()
+    {
+        return 20;
+    }
 
-			this.creeperState = 1;
-		}
+    protected void entityInit()
+    {
+        super.entityInit();
+        dataWatcher.addObject(16, Byte.valueOf((byte)-1));
+        dataWatcher.addObject(17, Byte.valueOf((byte)0));
+    }
 
-		if(var1 == 5) {
-			this.creeperState = -1;
-		}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+        if(dataWatcher.getWatchableObjectByte(17) == 1)
+        {
+            nbttagcompound.setBoolean("powered", true);
+        }
+    }
 
-	}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+        dataWatcher.updateObject(17, Byte.valueOf((byte)(nbttagcompound.getBoolean("powered") ? 1 : 0)));
+    }
 
-	public void onUpdate() {
-		this.lastActiveTime = this.timeSinceIgnited;
-		if(this.worldObj.multiplayerWorld) {
-			this.timeSinceIgnited += this.creeperState;
-			if(this.timeSinceIgnited < 0) {
-				this.timeSinceIgnited = 0;
-			}
+    protected void attackBlockedEntity(Entity entity, float f)
+    {
+        if(worldObj.multiplayerWorld)
+        {
+            return;
+        }
+        if(timeSinceIgnited > 0)
+        {
+            setCreeperState(-1);
+            timeSinceIgnited--;
+            if(timeSinceIgnited < 0)
+            {
+                timeSinceIgnited = 0;
+            }
+        }
+    }
 
-			if(this.timeSinceIgnited >= this.fuseTime) {
-				this.timeSinceIgnited = this.fuseTime;
-			}
-		}
+    public void onUpdate()
+    {
+        lastActiveTime = timeSinceIgnited;
+        if(worldObj.multiplayerWorld)
+        {
+            int i = getCreeperState();
+            if(i > 0 && timeSinceIgnited == 0)
+            {
+                worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
+            }
+            timeSinceIgnited += i;
+            if(timeSinceIgnited < 0)
+            {
+                timeSinceIgnited = 0;
+            }
+            if(timeSinceIgnited >= 30)
+            {
+                timeSinceIgnited = 30;
+            }
+        }
+        super.onUpdate();
+        if(entityToAttack == null && timeSinceIgnited > 0)
+        {
+            setCreeperState(-1);
+            timeSinceIgnited--;
+            if(timeSinceIgnited < 0)
+            {
+                timeSinceIgnited = 0;
+            }
+        }
+    }
 
-		super.onUpdate();
-	}
+    protected String getHurtSound()
+    {
+        return "mob.creeper";
+    }
 
-	protected void updatePlayerActionState() {
-		if(this.field_12241_e != this.creeperState) {
-			this.field_12241_e = this.creeperState;
-			if(this.creeperState > 0) {
-				this.worldObj.func_9425_a(this, (byte)4);
-			} else {
-				this.worldObj.func_9425_a(this, (byte)5);
-			}
-		}
+    protected String getDeathSound()
+    {
+        return "mob.creeperdeath";
+    }
 
-		this.lastActiveTime = this.timeSinceIgnited;
-		if(this.worldObj.multiplayerWorld) {
-			super.updatePlayerActionState();
-		} else {
-			if(this.timeSinceIgnited > 0 && this.creeperState < 0) {
-				--this.timeSinceIgnited;
-			}
+    public void onDeath(DamageSource damagesource)
+    {
+        super.onDeath(damagesource);
+        if(damagesource.getEntity() instanceof EntitySkeleton)
+        {
+            dropItem(Item.record13.shiftedIndex + rand.nextInt(2), 1);
+        }
+    }
 
-			if(this.creeperState >= 0) {
-				this.creeperState = 2;
-			}
+    protected void attackEntity(Entity entity, float f)
+    {
+        if(worldObj.multiplayerWorld)
+        {
+            return;
+        }
+        int i = getCreeperState();
+        if(i <= 0 && f < 3F || i > 0 && f < 7F)
+        {
+            if(timeSinceIgnited == 0)
+            {
+                worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
+            }
+            setCreeperState(1);
+            timeSinceIgnited++;
+            if(timeSinceIgnited >= 30)
+            {
+                if(getPowered())
+                {
+                    worldObj.createExplosion(this, posX, posY, posZ, 6F);
+                } else
+                {
+                    worldObj.createExplosion(this, posX, posY, posZ, 3F);
+                }
+                setEntityDead();
+            }
+            hasAttacked = true;
+        } else
+        {
+            setCreeperState(-1);
+            timeSinceIgnited--;
+            if(timeSinceIgnited < 0)
+            {
+                timeSinceIgnited = 0;
+            }
+        }
+    }
 
-			super.updatePlayerActionState();
-			if(this.creeperState != 1) {
-				this.creeperState = -1;
-			}
-		}
+    public boolean getPowered()
+    {
+        return dataWatcher.getWatchableObjectByte(17) == 1;
+    }
 
-	}
+    public float setCreeperFlashTime(float f)
+    {
+        return ((float)lastActiveTime + (float)(timeSinceIgnited - lastActiveTime) * f) / 28F;
+    }
 
-	protected String getHurtSound() {
-		return "mob.creeper";
-	}
+    protected int getDropItemId()
+    {
+        return Item.gunpowder.shiftedIndex;
+    }
 
-	protected String getDeathSound() {
-		return "mob.creeperdeath";
-	}
+    private int getCreeperState()
+    {
+        return dataWatcher.getWatchableObjectByte(16);
+    }
 
-	public void onDeath(Entity var1) {
-		super.onDeath(var1);
-		if(var1 instanceof EntitySkeleton) {
-			this.dropItem(Item.record13.shiftedIndex + this.rand.nextInt(2), 1);
-		}
+    private void setCreeperState(int i)
+    {
+        dataWatcher.updateObject(16, Byte.valueOf((byte)i));
+    }
 
-	}
-
-	protected void attackEntity(Entity var1, float var2) {
-		if(this.creeperState <= 0 && var2 < 3.0F || this.creeperState > 0 && var2 < 7.0F) {
-			if(this.timeSinceIgnited == 0) {
-				this.worldObj.playSoundAtEntity(this, "random.fuse", 1.0F, 0.5F);
-			}
-
-			this.creeperState = 1;
-			++this.timeSinceIgnited;
-			if(this.timeSinceIgnited == this.fuseTime) {
-				this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F);
-				this.setEntityDead();
-			}
-
-			this.hasAttacked = true;
-		}
-
-	}
-
-	public float func_440_b(float var1) {
-		return ((float)this.lastActiveTime + (float)(this.timeSinceIgnited - this.lastActiveTime) * var1) / (float)(this.fuseTime - 2);
-	}
-
-	protected int getDropItemId() {
-		return Item.gunpowder.shiftedIndex;
-	}
+    public void onStruckByLightning(EntityLightningBolt entitylightningbolt)
+    {
+        super.onStruckByLightning(entitylightningbolt);
+        dataWatcher.updateObject(17, Byte.valueOf((byte)1));
+    }
 }

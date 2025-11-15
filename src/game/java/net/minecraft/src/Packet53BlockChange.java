@@ -1,41 +1,55 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet53BlockChange extends Packet {
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
-	public int type;
-	public int metadata;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet53BlockChange() {
-		this.isChunkDataPacket = true;
-	}
+public class Packet53BlockChange extends Packet
+{
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.read();
-		this.zPosition = var1.readInt();
-		this.type = var1.read();
-		this.metadata = var1.read();
-	}
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
+    public int type;
+    public int metadata;
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.xPosition);
-		var1.write(this.yPosition);
-		var1.writeInt(this.zPosition);
-		var1.write(this.type);
-		var1.write(this.metadata);
-	}
+    public Packet53BlockChange()
+    {
+        isChunkDataPacket = true;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleBlockChange(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.read();
+        zPosition = datainputstream.readInt();
+        type = datainputstream.read();
+        metadata = datainputstream.read();
+    }
 
-	public int getPacketSize() {
-		return 11;
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.write(yPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.write(type);
+        dataoutputstream.write(metadata);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleBlockChange(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 11;
+    }
 }

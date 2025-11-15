@@ -1,139 +1,235 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
 
-public class EntityClientPlayerMP extends EntityPlayerSP {
-	public NetClientHandler field_797_bg;
-	private int field_9380_bx = 0;
-	private double field_9379_by;
-	private double field_9378_bz;
-	private double field_9377_bA;
-	private double field_9376_bB;
-	private float field_9385_bC;
-	private float field_9384_bD;
-	private boolean field_9382_bF = false;
-	private boolean field_9381_bG = false;
-	private int field_12242_bI = 0;
+// Referenced classes of package net.minecraft.src:
+//            EntityPlayerSP, MathHelper, World, Packet19EntityAction, 
+//            NetClientHandler, AxisAlignedBB, Packet11PlayerPosition, Packet13PlayerLookMove, 
+//            Packet12PlayerLook, Packet10Flying, Packet14BlockDig, Packet3Chat, 
+//            Packet18Animation, Packet9Respawn, Packet101CloseWindow, Container, 
+//            InventoryPlayer, StatBase, Session, DamageSource, 
+//            EntityItem
 
-	public EntityClientPlayerMP(Minecraft var1, World var2, Session var3, NetClientHandler var4) {
-		super(var1, var2, var3, 0);
-		this.field_797_bg = var4;
-	}
+public class EntityClientPlayerMP extends EntityPlayerSP
+{
 
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		return false;
-	}
+    public NetClientHandler sendQueue;
+    private int inventoryUpdateTickCounter;
+    private boolean field_21093_bH;
+    private double oldPosX;
+    private double field_9378_bz;
+    private double oldPosY;
+    private double oldPosZ;
+    private float oldRotationYaw;
+    private float oldRotationPitch;
+    private boolean field_9382_bF;
+    private boolean field_35227_cs;
+    private boolean wasSneaking;
+    private int field_12242_bI;
 
-	public void heal(int var1) {
-	}
+    public EntityClientPlayerMP(Minecraft minecraft, World world, Session session, NetClientHandler netclienthandler)
+    {
+        super(minecraft, world, session, 0);
+        inventoryUpdateTickCounter = 0;
+        field_21093_bH = false;
+        field_9382_bF = false;
+        field_35227_cs = false;
+        wasSneaking = false;
+        field_12242_bI = 0;
+        sendQueue = netclienthandler;
+    }
 
-	public void onUpdate() {
-		if(this.worldObj.blockExists(MathHelper.floor_double(this.posX), 64, MathHelper.floor_double(this.posZ))) {
-			super.onUpdate();
-			this.func_4056_N();
-		}
-	}
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        return false;
+    }
 
-	public void func_6420_o() {
-	}
+    public void heal(int i)
+    {
+    }
 
-	public void func_4056_N() {
-		if(this.field_9380_bx++ == 20) {
-			this.sendInventoryChanged();
-			this.field_9380_bx = 0;
-		}
+    public void onUpdate()
+    {
+        if(!worldObj.blockExists(MathHelper.floor_double(posX), worldObj.field_35472_c / 2, MathHelper.floor_double(posZ)))
+        {
+            return;
+        } else
+        {
+            super.onUpdate();
+            onUpdate2();
+            return;
+        }
+    }
 
-		boolean var1 = this.isSneaking();
-		if(var1 != this.field_9381_bG) {
-			if(var1) {
-				this.field_797_bg.addToSendQueue(new Packet18ArmAnimation(this, 104));
-			} else {
-				this.field_797_bg.addToSendQueue(new Packet18ArmAnimation(this, 105));
-			}
+    public void onUpdate2()
+    {
+        if(inventoryUpdateTickCounter++ == 20)
+        {
+            sendInventoryChanged();
+            inventoryUpdateTickCounter = 0;
+        }
+        boolean flag = isSprinting();
+        if(flag != wasSneaking)
+        {
+            if(flag)
+            {
+                sendQueue.addToSendQueue(new Packet19EntityAction(this, 4));
+            } else
+            {
+                sendQueue.addToSendQueue(new Packet19EntityAction(this, 5));
+            }
+            wasSneaking = flag;
+        }
+        boolean flag1 = isSneaking();
+        if(flag1 != field_35227_cs)
+        {
+            if(flag1)
+            {
+                sendQueue.addToSendQueue(new Packet19EntityAction(this, 1));
+            } else
+            {
+                sendQueue.addToSendQueue(new Packet19EntityAction(this, 2));
+            }
+            field_35227_cs = flag1;
+        }
+        double d = posX - oldPosX;
+        double d1 = boundingBox.minY - field_9378_bz;
+        double d2 = posY - oldPosY;
+        double d3 = posZ - oldPosZ;
+        double d4 = rotationYaw - oldRotationYaw;
+        double d5 = rotationPitch - oldRotationPitch;
+        boolean flag2 = d1 != 0.0D || d2 != 0.0D || d != 0.0D || d3 != 0.0D;
+        boolean flag3 = d4 != 0.0D || d5 != 0.0D;
+        if(ridingEntity != null)
+        {
+            if(flag3)
+            {
+                sendQueue.addToSendQueue(new Packet11PlayerPosition(motionX, -999D, -999D, motionZ, onGround));
+            } else
+            {
+                sendQueue.addToSendQueue(new Packet13PlayerLookMove(motionX, -999D, -999D, motionZ, rotationYaw, rotationPitch, onGround));
+            }
+            flag2 = false;
+        } else
+        if(flag2 && flag3)
+        {
+            sendQueue.addToSendQueue(new Packet13PlayerLookMove(posX, boundingBox.minY, posY, posZ, rotationYaw, rotationPitch, onGround));
+            field_12242_bI = 0;
+        } else
+        if(flag2)
+        {
+            sendQueue.addToSendQueue(new Packet11PlayerPosition(posX, boundingBox.minY, posY, posZ, onGround));
+            field_12242_bI = 0;
+        } else
+        if(flag3)
+        {
+            sendQueue.addToSendQueue(new Packet12PlayerLook(rotationYaw, rotationPitch, onGround));
+            field_12242_bI = 0;
+        } else
+        {
+            sendQueue.addToSendQueue(new Packet10Flying(onGround));
+            if(field_9382_bF != onGround || field_12242_bI > 200)
+            {
+                field_12242_bI = 0;
+            } else
+            {
+                field_12242_bI++;
+            }
+        }
+        field_9382_bF = onGround;
+        if(flag2)
+        {
+            oldPosX = posX;
+            field_9378_bz = boundingBox.minY;
+            oldPosY = posY;
+            oldPosZ = posZ;
+        }
+        if(flag3)
+        {
+            oldRotationYaw = rotationYaw;
+            oldRotationPitch = rotationPitch;
+        }
+    }
 
-			this.field_9381_bG = var1;
-		}
+    public void dropCurrentItem()
+    {
+        sendQueue.addToSendQueue(new Packet14BlockDig(4, 0, 0, 0, 0));
+    }
 
-		double var2 = this.posX - this.field_9379_by;
-		double var4 = this.boundingBox.minY - this.field_9378_bz;
-		double var6 = this.posY - this.field_9377_bA;
-		double var8 = this.posZ - this.field_9376_bB;
-		double var10 = (double)(this.rotationYaw - this.field_9385_bC);
-		double var12 = (double)(this.rotationPitch - this.field_9384_bD);
-		boolean var14 = var4 != 0.0D || var6 != 0.0D || var2 != 0.0D || var8 != 0.0D;
-		boolean var15 = var10 != 0.0D || var12 != 0.0D;
-		if(this.ridingEntity != null) {
-			if(var15) {
-				this.field_797_bg.addToSendQueue(new Packet11PlayerPosition(this.motionX, -999.0D, -999.0D, this.motionZ, this.onGround));
-			} else {
-				this.field_797_bg.addToSendQueue(new Packet13PlayerLookMove(this.motionX, -999.0D, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
-			}
+    public void sendInventoryChanged()
+    {
+    }
 
-			var14 = false;
-		} else if(var14 && var15) {
-			this.field_797_bg.addToSendQueue(new Packet13PlayerLookMove(this.posX, this.boundingBox.minY, this.posY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
-			this.field_12242_bI = 0;
-		} else if(var14) {
-			this.field_797_bg.addToSendQueue(new Packet11PlayerPosition(this.posX, this.boundingBox.minY, this.posY, this.posZ, this.onGround));
-			this.field_12242_bI = 0;
-		} else if(var15) {
-			this.field_797_bg.addToSendQueue(new Packet12PlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
-			this.field_12242_bI = 0;
-		} else {
-			this.field_797_bg.addToSendQueue(new Packet10Flying(this.onGround));
-			if(this.field_9382_bF == this.onGround && this.field_12242_bI <= 20) {
-				++this.field_12242_bI;
-			} else {
-				this.field_12242_bI = 0;
-			}
-		}
+    protected void joinEntityItemWithWorld(EntityItem entityitem)
+    {
+    }
 
-		this.field_9382_bF = this.onGround;
-		if(var14) {
-			this.field_9379_by = this.posX;
-			this.field_9378_bz = this.boundingBox.minY;
-			this.field_9377_bA = this.posY;
-			this.field_9376_bB = this.posZ;
-		}
+    public void sendChatMessage(String s)
+    {
+        sendQueue.addToSendQueue(new Packet3Chat(s));
+    }
 
-		if(var15) {
-			this.field_9385_bC = this.rotationYaw;
-			this.field_9384_bD = this.rotationPitch;
-		}
+    public void swingItem()
+    {
+        super.swingItem();
+        sendQueue.addToSendQueue(new Packet18Animation(this, 1));
+    }
 
-	}
+    public void respawnPlayer()
+    {
+        sendInventoryChanged();
+        sendQueue.addToSendQueue(new Packet9Respawn((byte)dimension, (byte)worldObj.difficultySetting, worldObj.getWorldSeed(), worldObj.field_35472_c, 0));
+    }
 
-	public void func_20060_w() {
-		this.field_797_bg.addToSendQueue(new Packet14BlockDig(4, 0, 0, 0, 0));
-	}
+    protected void damageEntity(DamageSource damagesource, int i)
+    {
+        setEntityHealth(getEntityHealth() - i);
+    }
 
-	private void sendInventoryChanged() {
-	}
+    public void closeScreen()
+    {
+        sendQueue.addToSendQueue(new Packet101CloseWindow(craftingInventory.windowId));
+        inventory.setItemStack(null);
+        super.closeScreen();
+    }
 
-	protected void joinEntityItemWithWorld(EntityItem var1) {
-	}
+    public void setHealth(int i)
+    {
+        if(field_21093_bH)
+        {
+            super.setHealth(i);
+        } else
+        {
+            setEntityHealth(i);
+            field_21093_bH = true;
+        }
+    }
 
-	public void sendChatMessage(String var1) {
-		this.field_797_bg.addToSendQueue(new Packet3Chat(var1));
-	}
+    public void addStat(StatBase statbase, int i)
+    {
+        if(statbase == null)
+        {
+            return;
+        }
+        if(statbase.isIndependent)
+        {
+            super.addStat(statbase, i);
+        }
+    }
 
-	public void swingItem() {
-		super.swingItem();
-		this.field_797_bg.addToSendQueue(new Packet18ArmAnimation(this, 1));
-	}
-
-	public void respawnPlayer() {
-		this.sendInventoryChanged();
-		this.field_797_bg.addToSendQueue(new Packet9());
-	}
-
-	protected void damageEntity(int var1) {
-		this.health -= var1;
-	}
-
-	public void func_20059_m() {
-		this.field_797_bg.addToSendQueue(new Packet101(this.field_20068_h.unusedList));
-		this.inventory.func_20076_b((ItemStack)null);
-		super.func_20059_m();
-	}
+    public void func_27027_b(StatBase statbase, int i)
+    {
+        if(statbase == null)
+        {
+            return;
+        }
+        if(!statbase.isIndependent)
+        {
+            super.addStat(statbase, i);
+        }
+    }
 }

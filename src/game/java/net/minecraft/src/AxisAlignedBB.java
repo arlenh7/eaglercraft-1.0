@@ -1,317 +1,409 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AxisAlignedBB {
-	private static List<AxisAlignedBB> boundingBoxes = new ArrayList<>();
-	private static int numBoundingBoxesInUse = 0;
-	public double minX;
-	public double minY;
-	public double minZ;
-	public double maxX;
-	public double maxY;
-	public double maxZ;
+// Referenced classes of package net.minecraft.src:
+//            Vec3D, MovingObjectPosition
 
-	public static AxisAlignedBB getBoundingBox(double var0, double var2, double var4, double var6, double var8, double var10) {
-		return new AxisAlignedBB(var0, var2, var4, var6, var8, var10);
-	}
+public class AxisAlignedBB
+{
 
-	public static void clearBoundingBoxPool() {
-		numBoundingBoxesInUse = 0;
-	}
+    private static List boundingBoxes = new ArrayList();
+    private static int numBoundingBoxesInUse = 0;
+    public double minX;
+    public double minY;
+    public double minZ;
+    public double maxX;
+    public double maxY;
+    public double maxZ;
 
-	public static AxisAlignedBB getBoundingBoxFromPool(double var0, double var2, double var4, double var6, double var8, double var10) {
-		if(numBoundingBoxesInUse >= boundingBoxes.size()) {
-			boundingBoxes.add(getBoundingBox(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D));
-		}
+    public static AxisAlignedBB getBoundingBox(double d, double d1, double d2, double d3, 
+            double d4, double d5)
+    {
+        return new AxisAlignedBB(d, d1, d2, d3, d4, d5);
+    }
 
-		return ((AxisAlignedBB)boundingBoxes.get(numBoundingBoxesInUse++)).setBounds(var0, var2, var4, var6, var8, var10);
-	}
+    public static void clearBoundingBoxes()
+    {
+        boundingBoxes.clear();
+        numBoundingBoxesInUse = 0;
+    }
 
-	private AxisAlignedBB(double var1, double var3, double var5, double var7, double var9, double var11) {
-		this.minX = var1;
-		this.minY = var3;
-		this.minZ = var5;
-		this.maxX = var7;
-		this.maxY = var9;
-		this.maxZ = var11;
-	}
+    public static void clearBoundingBoxPool()
+    {
+        numBoundingBoxesInUse = 0;
+    }
 
-	public AxisAlignedBB setBounds(double var1, double var3, double var5, double var7, double var9, double var11) {
-		this.minX = var1;
-		this.minY = var3;
-		this.minZ = var5;
-		this.maxX = var7;
-		this.maxY = var9;
-		this.maxZ = var11;
-		return this;
-	}
+    public static AxisAlignedBB getBoundingBoxFromPool(double d, double d1, double d2, double d3, 
+            double d4, double d5)
+    {
+        if(numBoundingBoxesInUse >= boundingBoxes.size())
+        {
+            boundingBoxes.add(getBoundingBox(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D));
+        }
+        return ((AxisAlignedBB)boundingBoxes.get(numBoundingBoxesInUse++)).setBounds(d, d1, d2, d3, d4, d5);
+    }
 
-	public AxisAlignedBB addCoord(double var1, double var3, double var5) {
-		double var7 = this.minX;
-		double var9 = this.minY;
-		double var11 = this.minZ;
-		double var13 = this.maxX;
-		double var15 = this.maxY;
-		double var17 = this.maxZ;
-		if(var1 < 0.0D) {
-			var7 += var1;
-		}
+    private AxisAlignedBB(double d, double d1, double d2, double d3, double d4, double d5)
+    {
+        minX = d;
+        minY = d1;
+        minZ = d2;
+        maxX = d3;
+        maxY = d4;
+        maxZ = d5;
+    }
 
-		if(var1 > 0.0D) {
-			var13 += var1;
-		}
+    public AxisAlignedBB setBounds(double d, double d1, double d2, double d3, double d4, double d5)
+    {
+        minX = d;
+        minY = d1;
+        minZ = d2;
+        maxX = d3;
+        maxY = d4;
+        maxZ = d5;
+        return this;
+    }
 
-		if(var3 < 0.0D) {
-			var9 += var3;
-		}
+    public AxisAlignedBB addCoord(double d, double d1, double d2)
+    {
+        double d3 = minX;
+        double d4 = minY;
+        double d5 = minZ;
+        double d6 = maxX;
+        double d7 = maxY;
+        double d8 = maxZ;
+        if(d < 0.0D)
+        {
+            d3 += d;
+        }
+        if(d > 0.0D)
+        {
+            d6 += d;
+        }
+        if(d1 < 0.0D)
+        {
+            d4 += d1;
+        }
+        if(d1 > 0.0D)
+        {
+            d7 += d1;
+        }
+        if(d2 < 0.0D)
+        {
+            d5 += d2;
+        }
+        if(d2 > 0.0D)
+        {
+            d8 += d2;
+        }
+        return getBoundingBoxFromPool(d3, d4, d5, d6, d7, d8);
+    }
 
-		if(var3 > 0.0D) {
-			var15 += var3;
-		}
+    public AxisAlignedBB expand(double d, double d1, double d2)
+    {
+        double d3 = minX - d;
+        double d4 = minY - d1;
+        double d5 = minZ - d2;
+        double d6 = maxX + d;
+        double d7 = maxY + d1;
+        double d8 = maxZ + d2;
+        return getBoundingBoxFromPool(d3, d4, d5, d6, d7, d8);
+    }
 
-		if(var5 < 0.0D) {
-			var11 += var5;
-		}
+    public AxisAlignedBB getOffsetBoundingBox(double d, double d1, double d2)
+    {
+        return getBoundingBoxFromPool(minX + d, minY + d1, minZ + d2, maxX + d, maxY + d1, maxZ + d2);
+    }
 
-		if(var5 > 0.0D) {
-			var17 += var5;
-		}
+    public double calculateXOffset(AxisAlignedBB axisalignedbb, double d)
+    {
+        if(axisalignedbb.maxY <= minY || axisalignedbb.minY >= maxY)
+        {
+            return d;
+        }
+        if(axisalignedbb.maxZ <= minZ || axisalignedbb.minZ >= maxZ)
+        {
+            return d;
+        }
+        if(d > 0.0D && axisalignedbb.maxX <= minX)
+        {
+            double d1 = minX - axisalignedbb.maxX;
+            if(d1 < d)
+            {
+                d = d1;
+            }
+        }
+        if(d < 0.0D && axisalignedbb.minX >= maxX)
+        {
+            double d2 = maxX - axisalignedbb.minX;
+            if(d2 > d)
+            {
+                d = d2;
+            }
+        }
+        return d;
+    }
 
-		return getBoundingBoxFromPool(var7, var9, var11, var13, var15, var17);
-	}
+    public double calculateYOffset(AxisAlignedBB axisalignedbb, double d)
+    {
+        if(axisalignedbb.maxX <= minX || axisalignedbb.minX >= maxX)
+        {
+            return d;
+        }
+        if(axisalignedbb.maxZ <= minZ || axisalignedbb.minZ >= maxZ)
+        {
+            return d;
+        }
+        if(d > 0.0D && axisalignedbb.maxY <= minY)
+        {
+            double d1 = minY - axisalignedbb.maxY;
+            if(d1 < d)
+            {
+                d = d1;
+            }
+        }
+        if(d < 0.0D && axisalignedbb.minY >= maxY)
+        {
+            double d2 = maxY - axisalignedbb.minY;
+            if(d2 > d)
+            {
+                d = d2;
+            }
+        }
+        return d;
+    }
 
-	public AxisAlignedBB expand(double var1, double var3, double var5) {
-		double var7 = this.minX - var1;
-		double var9 = this.minY - var3;
-		double var11 = this.minZ - var5;
-		double var13 = this.maxX + var1;
-		double var15 = this.maxY + var3;
-		double var17 = this.maxZ + var5;
-		return getBoundingBoxFromPool(var7, var9, var11, var13, var15, var17);
-	}
+    public double calculateZOffset(AxisAlignedBB axisalignedbb, double d)
+    {
+        if(axisalignedbb.maxX <= minX || axisalignedbb.minX >= maxX)
+        {
+            return d;
+        }
+        if(axisalignedbb.maxY <= minY || axisalignedbb.minY >= maxY)
+        {
+            return d;
+        }
+        if(d > 0.0D && axisalignedbb.maxZ <= minZ)
+        {
+            double d1 = minZ - axisalignedbb.maxZ;
+            if(d1 < d)
+            {
+                d = d1;
+            }
+        }
+        if(d < 0.0D && axisalignedbb.minZ >= maxZ)
+        {
+            double d2 = maxZ - axisalignedbb.minZ;
+            if(d2 > d)
+            {
+                d = d2;
+            }
+        }
+        return d;
+    }
 
-	public AxisAlignedBB getOffsetBoundingBox(double var1, double var3, double var5) {
-		return getBoundingBoxFromPool(this.minX + var1, this.minY + var3, this.minZ + var5, this.maxX + var1, this.maxY + var3, this.maxZ + var5);
-	}
+    public boolean intersectsWith(AxisAlignedBB axisalignedbb)
+    {
+        if(axisalignedbb.maxX <= minX || axisalignedbb.minX >= maxX)
+        {
+            return false;
+        }
+        if(axisalignedbb.maxY <= minY || axisalignedbb.minY >= maxY)
+        {
+            return false;
+        }
+        return axisalignedbb.maxZ > minZ && axisalignedbb.minZ < maxZ;
+    }
 
-	public double func_1163_a(AxisAlignedBB var1, double var2) {
-		if(var1.maxY > this.minY && var1.minY < this.maxY) {
-			if(var1.maxZ > this.minZ && var1.minZ < this.maxZ) {
-				double var4;
-				if(var2 > 0.0D && var1.maxX <= this.minX) {
-					var4 = this.minX - var1.maxX;
-					if(var4 < var2) {
-						var2 = var4;
-					}
-				}
+    public AxisAlignedBB offset(double d, double d1, double d2)
+    {
+        minX += d;
+        minY += d1;
+        minZ += d2;
+        maxX += d;
+        maxY += d1;
+        maxZ += d2;
+        return this;
+    }
 
-				if(var2 < 0.0D && var1.minX >= this.maxX) {
-					var4 = this.maxX - var1.minX;
-					if(var4 > var2) {
-						var2 = var4;
-					}
-				}
+    public boolean isVecInside(Vec3D vec3d)
+    {
+        if(vec3d.xCoord <= minX || vec3d.xCoord >= maxX)
+        {
+            return false;
+        }
+        if(vec3d.yCoord <= minY || vec3d.yCoord >= maxY)
+        {
+            return false;
+        }
+        return vec3d.zCoord > minZ && vec3d.zCoord < maxZ;
+    }
 
-				return var2;
-			} else {
-				return var2;
-			}
-		} else {
-			return var2;
-		}
-	}
+    public double getAverageEdgeLength()
+    {
+        double d = maxX - minX;
+        double d1 = maxY - minY;
+        double d2 = maxZ - minZ;
+        return (d + d1 + d2) / 3D;
+    }
 
-	public double func_1172_b(AxisAlignedBB var1, double var2) {
-		if(var1.maxX > this.minX && var1.minX < this.maxX) {
-			if(var1.maxZ > this.minZ && var1.minZ < this.maxZ) {
-				double var4;
-				if(var2 > 0.0D && var1.maxY <= this.minY) {
-					var4 = this.minY - var1.maxY;
-					if(var4 < var2) {
-						var2 = var4;
-					}
-				}
+    public AxisAlignedBB contract(double d, double d1, double d2)
+    {
+        double d3 = minX + d;
+        double d4 = minY + d1;
+        double d5 = minZ + d2;
+        double d6 = maxX - d;
+        double d7 = maxY - d1;
+        double d8 = maxZ - d2;
+        return getBoundingBoxFromPool(d3, d4, d5, d6, d7, d8);
+    }
 
-				if(var2 < 0.0D && var1.minY >= this.maxY) {
-					var4 = this.maxY - var1.minY;
-					if(var4 > var2) {
-						var2 = var4;
-					}
-				}
+    public AxisAlignedBB copy()
+    {
+        return getBoundingBoxFromPool(minX, minY, minZ, maxX, maxY, maxZ);
+    }
 
-				return var2;
-			} else {
-				return var2;
-			}
-		} else {
-			return var2;
-		}
-	}
+    public MovingObjectPosition func_1169_a(Vec3D vec3d, Vec3D vec3d1)
+    {
+        Vec3D vec3d2 = vec3d.getIntermediateWithXValue(vec3d1, minX);
+        Vec3D vec3d3 = vec3d.getIntermediateWithXValue(vec3d1, maxX);
+        Vec3D vec3d4 = vec3d.getIntermediateWithYValue(vec3d1, minY);
+        Vec3D vec3d5 = vec3d.getIntermediateWithYValue(vec3d1, maxY);
+        Vec3D vec3d6 = vec3d.getIntermediateWithZValue(vec3d1, minZ);
+        Vec3D vec3d7 = vec3d.getIntermediateWithZValue(vec3d1, maxZ);
+        if(!isVecInYZ(vec3d2))
+        {
+            vec3d2 = null;
+        }
+        if(!isVecInYZ(vec3d3))
+        {
+            vec3d3 = null;
+        }
+        if(!isVecInXZ(vec3d4))
+        {
+            vec3d4 = null;
+        }
+        if(!isVecInXZ(vec3d5))
+        {
+            vec3d5 = null;
+        }
+        if(!isVecInXY(vec3d6))
+        {
+            vec3d6 = null;
+        }
+        if(!isVecInXY(vec3d7))
+        {
+            vec3d7 = null;
+        }
+        Vec3D vec3d8 = null;
+        if(vec3d2 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d2) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d2;
+        }
+        if(vec3d3 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d3) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d3;
+        }
+        if(vec3d4 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d4) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d4;
+        }
+        if(vec3d5 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d5) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d5;
+        }
+        if(vec3d6 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d6) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d6;
+        }
+        if(vec3d7 != null && (vec3d8 == null || vec3d.squareDistanceTo(vec3d7) < vec3d.squareDistanceTo(vec3d8)))
+        {
+            vec3d8 = vec3d7;
+        }
+        if(vec3d8 == null)
+        {
+            return null;
+        }
+        byte byte0 = -1;
+        if(vec3d8 == vec3d2)
+        {
+            byte0 = 4;
+        }
+        if(vec3d8 == vec3d3)
+        {
+            byte0 = 5;
+        }
+        if(vec3d8 == vec3d4)
+        {
+            byte0 = 0;
+        }
+        if(vec3d8 == vec3d5)
+        {
+            byte0 = 1;
+        }
+        if(vec3d8 == vec3d6)
+        {
+            byte0 = 2;
+        }
+        if(vec3d8 == vec3d7)
+        {
+            byte0 = 3;
+        }
+        return new MovingObjectPosition(0, 0, 0, byte0, vec3d8);
+    }
 
-	public double func_1162_c(AxisAlignedBB var1, double var2) {
-		if(var1.maxX > this.minX && var1.minX < this.maxX) {
-			if(var1.maxY > this.minY && var1.minY < this.maxY) {
-				double var4;
-				if(var2 > 0.0D && var1.maxZ <= this.minZ) {
-					var4 = this.minZ - var1.maxZ;
-					if(var4 < var2) {
-						var2 = var4;
-					}
-				}
+    private boolean isVecInYZ(Vec3D vec3d)
+    {
+        if(vec3d == null)
+        {
+            return false;
+        } else
+        {
+            return vec3d.yCoord >= minY && vec3d.yCoord <= maxY && vec3d.zCoord >= minZ && vec3d.zCoord <= maxZ;
+        }
+    }
 
-				if(var2 < 0.0D && var1.minZ >= this.maxZ) {
-					var4 = this.maxZ - var1.minZ;
-					if(var4 > var2) {
-						var2 = var4;
-					}
-				}
+    private boolean isVecInXZ(Vec3D vec3d)
+    {
+        if(vec3d == null)
+        {
+            return false;
+        } else
+        {
+            return vec3d.xCoord >= minX && vec3d.xCoord <= maxX && vec3d.zCoord >= minZ && vec3d.zCoord <= maxZ;
+        }
+    }
 
-				return var2;
-			} else {
-				return var2;
-			}
-		} else {
-			return var2;
-		}
-	}
+    private boolean isVecInXY(Vec3D vec3d)
+    {
+        if(vec3d == null)
+        {
+            return false;
+        } else
+        {
+            return vec3d.xCoord >= minX && vec3d.xCoord <= maxX && vec3d.yCoord >= minY && vec3d.yCoord <= maxY;
+        }
+    }
 
-	public boolean intersectsWith(AxisAlignedBB var1) {
-		return var1.maxX > this.minX && var1.minX < this.maxX ? (var1.maxY > this.minY && var1.minY < this.maxY ? var1.maxZ > this.minZ && var1.minZ < this.maxZ : false) : false;
-	}
+    public void setBB(AxisAlignedBB axisalignedbb)
+    {
+        minX = axisalignedbb.minX;
+        minY = axisalignedbb.minY;
+        minZ = axisalignedbb.minZ;
+        maxX = axisalignedbb.maxX;
+        maxY = axisalignedbb.maxY;
+        maxZ = axisalignedbb.maxZ;
+    }
 
-	public AxisAlignedBB offset(double var1, double var3, double var5) {
-		this.minX += var1;
-		this.minY += var3;
-		this.minZ += var5;
-		this.maxX += var1;
-		this.maxY += var3;
-		this.maxZ += var5;
-		return this;
-	}
+    public String toString()
+    {
+        return (new StringBuilder()).append("box[").append(minX).append(", ").append(minY).append(", ").append(minZ).append(" -> ").append(maxX).append(", ").append(maxY).append(", ").append(maxZ).append("]").toString();
+    }
 
-	public boolean isVecInside(Vec3D var1) {
-		return var1.xCoord > this.minX && var1.xCoord < this.maxX ? (var1.yCoord > this.minY && var1.yCoord < this.maxY ? var1.zCoord > this.minZ && var1.zCoord < this.maxZ : false) : false;
-	}
-
-	public double getAverageEdgeLength() {
-		double var1 = this.maxX - this.minX;
-		double var3 = this.maxY - this.minY;
-		double var5 = this.maxZ - this.minZ;
-		return (var1 + var3 + var5) / 3.0D;
-	}
-
-	public AxisAlignedBB copy() {
-		return getBoundingBoxFromPool(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
-	}
-
-	public MovingObjectPosition func_1169_a(Vec3D var1, Vec3D var2) {
-		Vec3D var3 = var1.getIntermediateWithXValue(var2, this.minX);
-		Vec3D var4 = var1.getIntermediateWithXValue(var2, this.maxX);
-		Vec3D var5 = var1.getIntermediateWithYValue(var2, this.minY);
-		Vec3D var6 = var1.getIntermediateWithYValue(var2, this.maxY);
-		Vec3D var7 = var1.getIntermediateWithZValue(var2, this.minZ);
-		Vec3D var8 = var1.getIntermediateWithZValue(var2, this.maxZ);
-		if(!this.isVecInYZ(var3)) {
-			var3 = null;
-		}
-
-		if(!this.isVecInYZ(var4)) {
-			var4 = null;
-		}
-
-		if(!this.isVecInXZ(var5)) {
-			var5 = null;
-		}
-
-		if(!this.isVecInXZ(var6)) {
-			var6 = null;
-		}
-
-		if(!this.isVecInXY(var7)) {
-			var7 = null;
-		}
-
-		if(!this.isVecInXY(var8)) {
-			var8 = null;
-		}
-
-		Vec3D var9 = null;
-		if(var3 != null && (var9 == null || var1.squareDistanceTo(var3) < var1.squareDistanceTo(var9))) {
-			var9 = var3;
-		}
-
-		if(var4 != null && (var9 == null || var1.squareDistanceTo(var4) < var1.squareDistanceTo(var9))) {
-			var9 = var4;
-		}
-
-		if(var5 != null && (var9 == null || var1.squareDistanceTo(var5) < var1.squareDistanceTo(var9))) {
-			var9 = var5;
-		}
-
-		if(var6 != null && (var9 == null || var1.squareDistanceTo(var6) < var1.squareDistanceTo(var9))) {
-			var9 = var6;
-		}
-
-		if(var7 != null && (var9 == null || var1.squareDistanceTo(var7) < var1.squareDistanceTo(var9))) {
-			var9 = var7;
-		}
-
-		if(var8 != null && (var9 == null || var1.squareDistanceTo(var8) < var1.squareDistanceTo(var9))) {
-			var9 = var8;
-		}
-
-		if(var9 == null) {
-			return null;
-		} else {
-			byte var10 = -1;
-			if(var9 == var3) {
-				var10 = 4;
-			}
-
-			if(var9 == var4) {
-				var10 = 5;
-			}
-
-			if(var9 == var5) {
-				var10 = 0;
-			}
-
-			if(var9 == var6) {
-				var10 = 1;
-			}
-
-			if(var9 == var7) {
-				var10 = 2;
-			}
-
-			if(var9 == var8) {
-				var10 = 3;
-			}
-
-			return new MovingObjectPosition(0, 0, 0, var10, var9);
-		}
-	}
-
-	private boolean isVecInYZ(Vec3D var1) {
-		return var1 == null ? false : var1.yCoord >= this.minY && var1.yCoord <= this.maxY && var1.zCoord >= this.minZ && var1.zCoord <= this.maxZ;
-	}
-
-	private boolean isVecInXZ(Vec3D var1) {
-		return var1 == null ? false : var1.xCoord >= this.minX && var1.xCoord <= this.maxX && var1.zCoord >= this.minZ && var1.zCoord <= this.maxZ;
-	}
-
-	private boolean isVecInXY(Vec3D var1) {
-		return var1 == null ? false : var1.xCoord >= this.minX && var1.xCoord <= this.maxX && var1.yCoord >= this.minY && var1.yCoord <= this.maxY;
-	}
-
-	public void setBB(AxisAlignedBB var1) {
-		this.minX = var1.minX;
-		this.minY = var1.minY;
-		this.minZ = var1.minZ;
-		this.maxX = var1.maxX;
-		this.maxY = var1.maxY;
-		this.maxZ = var1.maxZ;
-	}
 }

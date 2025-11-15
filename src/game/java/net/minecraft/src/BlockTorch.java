@@ -1,166 +1,245 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockTorch extends Block {
-	protected BlockTorch(int var1, int var2) {
-		super(var1, var2, Material.circuits);
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, AxisAlignedBB, 
+//            Vec3D, MovingObjectPosition
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		return null;
-	}
+public class BlockTorch extends Block
+{
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    protected BlockTorch(int i, int j)
+    {
+        super(i, j, Material.circuits);
+        setTickOnLoad(true);
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        return null;
+    }
 
-	public int getRenderType() {
-		return 2;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var1.isBlockOpaqueCube(var2 - 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2 + 1, var3, var4) ? true : (var1.isBlockOpaqueCube(var2, var3, var4 - 1) ? true : (var1.isBlockOpaqueCube(var2, var3, var4 + 1) ? true : var1.isBlockOpaqueCube(var2, var3 - 1, var4))));
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	public void onBlockPlaced(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if(var5 == 1 && var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-			var6 = 5;
-		}
+    public int getRenderType()
+    {
+        return 2;
+    }
 
-		if(var5 == 2 && var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var6 = 4;
-		}
+    private boolean func_31032_h(World world, int i, int j, int k)
+    {
+        if(world.func_41082_b(i, j, k, true))
+        {
+            return true;
+        } else
+        {
+            int l = world.getBlockId(i, j, k);
+            return l == Block.fence.blockID || l == Block.netherFence.blockID;
+        }
+    }
 
-		if(var5 == 3 && var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var6 = 3;
-		}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        if(world.func_41082_b(i - 1, j, k, true))
+        {
+            return true;
+        }
+        if(world.func_41082_b(i + 1, j, k, true))
+        {
+            return true;
+        }
+        if(world.func_41082_b(i, j, k - 1, true))
+        {
+            return true;
+        }
+        if(world.func_41082_b(i, j, k + 1, true))
+        {
+            return true;
+        }
+        return func_31032_h(world, i, j - 1, k);
+    }
 
-		if(var5 == 4 && var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var6 = 2;
-		}
+    public void onBlockPlaced(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        if(l == 1 && func_31032_h(world, i, j - 1, k))
+        {
+            i1 = 5;
+        }
+        if(l == 2 && world.func_41082_b(i, j, k + 1, true))
+        {
+            i1 = 4;
+        }
+        if(l == 3 && world.func_41082_b(i, j, k - 1, true))
+        {
+            i1 = 3;
+        }
+        if(l == 4 && world.func_41082_b(i + 1, j, k, true))
+        {
+            i1 = 2;
+        }
+        if(l == 5 && world.func_41082_b(i - 1, j, k, true))
+        {
+            i1 = 1;
+        }
+        world.setBlockMetadataWithNotify(i, j, k, i1);
+    }
 
-		if(var5 == 5 && var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var6 = 1;
-		}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        super.updateTick(world, i, j, k, random);
+        if(world.getBlockMetadata(i, j, k) == 0)
+        {
+            onBlockAdded(world, i, j, k);
+        }
+    }
 
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var6);
-	}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+        if(world.func_41082_b(i - 1, j, k, true))
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 1);
+        } else
+        if(world.func_41082_b(i + 1, j, k, true))
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 2);
+        } else
+        if(world.func_41082_b(i, j, k - 1, true))
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 3);
+        } else
+        if(world.func_41082_b(i, j, k + 1, true))
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 4);
+        } else
+        if(func_31032_h(world, i, j - 1, k))
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 5);
+        }
+        dropTorchIfCantStay(world, i, j, k);
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		super.updateTick(var1, var2, var3, var4, var5);
-		if(var1.getBlockMetadata(var2, var3, var4) == 0) {
-			this.onBlockAdded(var1, var2, var3, var4);
-		}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        if(dropTorchIfCantStay(world, i, j, k))
+        {
+            int i1 = world.getBlockMetadata(i, j, k);
+            boolean flag = false;
+            if(!world.func_41082_b(i - 1, j, k, true) && i1 == 1)
+            {
+                flag = true;
+            }
+            if(!world.func_41082_b(i + 1, j, k, true) && i1 == 2)
+            {
+                flag = true;
+            }
+            if(!world.func_41082_b(i, j, k - 1, true) && i1 == 3)
+            {
+                flag = true;
+            }
+            if(!world.func_41082_b(i, j, k + 1, true) && i1 == 4)
+            {
+                flag = true;
+            }
+            if(!func_31032_h(world, i, j - 1, k) && i1 == 5)
+            {
+                flag = true;
+            }
+            if(flag)
+            {
+                dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+                world.setBlockWithNotify(i, j, k, 0);
+            }
+        }
+    }
 
-	}
+    private boolean dropTorchIfCantStay(World world, int i, int j, int k)
+    {
+        if(!canPlaceBlockAt(world, i, j, k))
+        {
+            if(world.getBlockId(i, j, k) == blockID)
+            {
+                dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k), 0);
+                world.setBlockWithNotify(i, j, k, 0);
+            }
+            return false;
+        } else
+        {
+            return true;
+        }
+    }
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		if(var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 1);
-		} else if(var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
-		} else if(var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
-		} else if(var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 4);
-		} else if(var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 5);
-		}
+    public MovingObjectPosition collisionRayTrace(World world, int i, int j, int k, Vec3D vec3d, Vec3D vec3d1)
+    {
+        int l = world.getBlockMetadata(i, j, k) & 7;
+        float f = 0.15F;
+        if(l == 1)
+        {
+            setBlockBounds(0.0F, 0.2F, 0.5F - f, f * 2.0F, 0.8F, 0.5F + f);
+        } else
+        if(l == 2)
+        {
+            setBlockBounds(1.0F - f * 2.0F, 0.2F, 0.5F - f, 1.0F, 0.8F, 0.5F + f);
+        } else
+        if(l == 3)
+        {
+            setBlockBounds(0.5F - f, 0.2F, 0.0F, 0.5F + f, 0.8F, f * 2.0F);
+        } else
+        if(l == 4)
+        {
+            setBlockBounds(0.5F - f, 0.2F, 1.0F - f * 2.0F, 0.5F + f, 0.8F, 1.0F);
+        } else
+        {
+            float f1 = 0.1F;
+            setBlockBounds(0.5F - f1, 0.0F, 0.5F - f1, 0.5F + f1, 0.6F, 0.5F + f1);
+        }
+        return super.collisionRayTrace(world, i, j, k, vec3d, vec3d1);
+    }
 
-		this.dropTorchIfCantStay(var1, var2, var3, var4);
-	}
-
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		if(this.dropTorchIfCantStay(var1, var2, var3, var4)) {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			boolean var7 = false;
-			if(!var1.isBlockOpaqueCube(var2 - 1, var3, var4) && var6 == 1) {
-				var7 = true;
-			}
-
-			if(!var1.isBlockOpaqueCube(var2 + 1, var3, var4) && var6 == 2) {
-				var7 = true;
-			}
-
-			if(!var1.isBlockOpaqueCube(var2, var3, var4 - 1) && var6 == 3) {
-				var7 = true;
-			}
-
-			if(!var1.isBlockOpaqueCube(var2, var3, var4 + 1) && var6 == 4) {
-				var7 = true;
-			}
-
-			if(!var1.isBlockOpaqueCube(var2, var3 - 1, var4) && var6 == 5) {
-				var7 = true;
-			}
-
-			if(var7) {
-				this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-				var1.setBlockWithNotify(var2, var3, var4, 0);
-			}
-		}
-
-	}
-
-	private boolean dropTorchIfCantStay(World var1, int var2, int var3, int var4) {
-		if(!this.canPlaceBlockAt(var1, var2, var3, var4)) {
-			this.dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
-			var1.setBlockWithNotify(var2, var3, var4, 0);
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public MovingObjectPosition collisionRayTrace(World var1, int var2, int var3, int var4, Vec3D var5, Vec3D var6) {
-		int var7 = var1.getBlockMetadata(var2, var3, var4) & 7;
-		float var8 = 0.15F;
-		if(var7 == 1) {
-			this.setBlockBounds(0.0F, 0.2F, 0.5F - var8, var8 * 2.0F, 0.8F, 0.5F + var8);
-		} else if(var7 == 2) {
-			this.setBlockBounds(1.0F - var8 * 2.0F, 0.2F, 0.5F - var8, 1.0F, 0.8F, 0.5F + var8);
-		} else if(var7 == 3) {
-			this.setBlockBounds(0.5F - var8, 0.2F, 0.0F, 0.5F + var8, 0.8F, var8 * 2.0F);
-		} else if(var7 == 4) {
-			this.setBlockBounds(0.5F - var8, 0.2F, 1.0F - var8 * 2.0F, 0.5F + var8, 0.8F, 1.0F);
-		} else {
-			var8 = 0.1F;
-			this.setBlockBounds(0.5F - var8, 0.0F, 0.5F - var8, 0.5F + var8, 0.6F, 0.5F + var8);
-		}
-
-		return super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
-	}
-
-	public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		double var7 = (double)((float)var2 + 0.5F);
-		double var9 = (double)((float)var3 + 0.7F);
-		double var11 = (double)((float)var4 + 0.5F);
-		double var13 = (double)0.22F;
-		double var15 = (double)0.27F;
-		if(var6 == 1) {
-			var1.spawnParticle("smoke", var7 - var15, var9 + var13, var11, 0.0D, 0.0D, 0.0D);
-			var1.spawnParticle("flame", var7 - var15, var9 + var13, var11, 0.0D, 0.0D, 0.0D);
-		} else if(var6 == 2) {
-			var1.spawnParticle("smoke", var7 + var15, var9 + var13, var11, 0.0D, 0.0D, 0.0D);
-			var1.spawnParticle("flame", var7 + var15, var9 + var13, var11, 0.0D, 0.0D, 0.0D);
-		} else if(var6 == 3) {
-			var1.spawnParticle("smoke", var7, var9 + var13, var11 - var15, 0.0D, 0.0D, 0.0D);
-			var1.spawnParticle("flame", var7, var9 + var13, var11 - var15, 0.0D, 0.0D, 0.0D);
-		} else if(var6 == 4) {
-			var1.spawnParticle("smoke", var7, var9 + var13, var11 + var15, 0.0D, 0.0D, 0.0D);
-			var1.spawnParticle("flame", var7, var9 + var13, var11 + var15, 0.0D, 0.0D, 0.0D);
-		} else {
-			var1.spawnParticle("smoke", var7, var9, var11, 0.0D, 0.0D, 0.0D);
-			var1.spawnParticle("flame", var7, var9, var11, 0.0D, 0.0D, 0.0D);
-		}
-
-	}
+    public void randomDisplayTick(World world, int i, int j, int k, Random random)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        double d = (float)i + 0.5F;
+        double d1 = (float)j + 0.7F;
+        double d2 = (float)k + 0.5F;
+        double d3 = 0.2199999988079071D;
+        double d4 = 0.27000001072883606D;
+        if(l == 1)
+        {
+            world.spawnParticle("smoke", d - d4, d1 + d3, d2, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", d - d4, d1 + d3, d2, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 2)
+        {
+            world.spawnParticle("smoke", d + d4, d1 + d3, d2, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", d + d4, d1 + d3, d2, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 3)
+        {
+            world.spawnParticle("smoke", d, d1 + d3, d2 - d4, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", d, d1 + d3, d2 - d4, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 4)
+        {
+            world.spawnParticle("smoke", d, d1 + d3, d2 + d4, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", d, d1 + d3, d2 + d4, 0.0D, 0.0D, 0.0D);
+        } else
+        {
+            world.spawnParticle("smoke", d, d1, d2, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", d, d1, d2, 0.0D, 0.0D, 0.0D);
+        }
+    }
 }

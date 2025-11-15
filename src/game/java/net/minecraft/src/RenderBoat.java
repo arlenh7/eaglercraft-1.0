@@ -1,40 +1,55 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderBoat extends Render {
-	protected ModelBase field_198_d;
+// Referenced classes of package net.minecraft.src:
+//            Render, ModelBoat, EntityBoat, MathHelper, 
+//            ModelBase, Entity
 
-	public RenderBoat() {
-		this.shadowSize = 0.5F;
-		this.field_198_d = new ModelBoat();
-	}
+public class RenderBoat extends Render
+{
 
-	public void a(EntityBoat var1, double var2, double var4, double var6, float var8, float var9) {
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float)var2, (float)var4, (float)var6);
-		GL11.glRotatef(180.0F - var8, 0.0F, 1.0F, 0.0F);
-		float var10 = (float)var1.field_806_b - var9;
-		float var11 = (float)var1.field_807_a - var9;
-		if(var11 < 0.0F) {
-			var11 = 0.0F;
-		}
+    protected ModelBase modelBoat;
 
-		if(var10 > 0.0F) {
-			GL11.glRotatef(MathHelper.sin(var10) * var10 * var11 / 10.0F * (float)var1.field_808_c, 1.0F, 0.0F, 0.0F);
-		}
+    public RenderBoat()
+    {
+        shadowSize = 0.5F;
+        modelBoat = new ModelBoat();
+    }
 
-		this.loadTexture("/terrain.png");
-		float var12 = 12.0F / 16.0F;
-		GL11.glScalef(var12, var12, var12);
-		GL11.glScalef(1.0F / var12, 1.0F / var12, 1.0F / var12);
-		this.loadTexture("/item/boat.png");
-		GL11.glScalef(-1.0F, -1.0F, 1.0F);
-		this.field_198_d.render(0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 1.0F / 16.0F);
-		GL11.glPopMatrix();
-	}
+    public void renderBoat(EntityBoat entityboat, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d, (float)d1, (float)d2);
+        GL11.glRotatef(180F - f, 0.0F, 1.0F, 0.0F);
+        float f2 = (float)entityboat.func_41018_h() - f1;
+        float f3 = (float)entityboat.func_41020_g() - f1;
+        if(f3 < 0.0F)
+        {
+            f3 = 0.0F;
+        }
+        if(f2 > 0.0F)
+        {
+            GL11.glRotatef(((MathHelper.sin(f2) * f2 * f3) / 10F) * (float)entityboat.func_41016_i(), 1.0F, 0.0F, 0.0F);
+        }
+        loadTexture("/terrain.png");
+        float f4 = 0.75F;
+        GL11.glScalef(f4, f4, f4);
+        GL11.glScalef(1.0F / f4, 1.0F / f4, 1.0F / f4);
+        loadTexture("/item/boat.png");
+        GL11.glScalef(-1F, -1F, 1.0F);
+        modelBoat.render(entityboat, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+        GL11.glPopMatrix();
+    }
 
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityBoat)var1, var2, var4, var6, var8, var9);
-	}
+    public void doRender(Entity entity, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        renderBoat((EntityBoat)entity, d, d1, d2, f, f1);
+    }
 }

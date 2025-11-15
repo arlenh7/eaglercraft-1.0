@@ -1,82 +1,123 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityFallingSand extends Entity {
-	public int entityID;
-	public int fallTime = 0;
 
-	public EntityFallingSand(World var1) {
-		super(var1);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Entity, MathHelper, World, Block, 
+//            BlockPistonMoving, BlockSand, NBTTagCompound
 
-	public EntityFallingSand(World var1, double var2, double var4, double var6, int var8) {
-		super(var1);
-		this.entityID = var8;
-		this.preventEntitySpawning = true;
-		this.setSize(0.98F, 0.98F);
-		this.yOffset = this.height / 2.0F;
-		this.setPosition(var2, var4, var6);
-		this.motionX = 0.0D;
-		this.motionY = 0.0D;
-		this.motionZ = 0.0D;
-		this.entityWalks = false;
-		this.prevPosX = var2;
-		this.prevPosY = var4;
-		this.prevPosZ = var6;
-	}
+public class EntityFallingSand extends Entity
+{
 
-	public boolean canBeCollidedWith() {
-		return !this.isDead;
-	}
+    public int blockID;
+    public int fallTime;
 
-	public void onUpdate() {
-		if(this.entityID == 0) {
-			this.setEntityDead();
-		} else {
-			this.prevPosX = this.posX;
-			this.prevPosY = this.posY;
-			this.prevPosZ = this.posZ;
-			++this.fallTime;
-			this.motionY -= (double)0.04F;
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)0.98F;
-			this.motionY *= (double)0.98F;
-			this.motionZ *= (double)0.98F;
-			int var1 = MathHelper.floor_double(this.posX);
-			int var2 = MathHelper.floor_double(this.posY);
-			int var3 = MathHelper.floor_double(this.posZ);
-			if(this.worldObj.getBlockId(var1, var2, var3) == this.entityID) {
-				this.worldObj.setBlockWithNotify(var1, var2, var3, 0);
-			}
+    public EntityFallingSand(World world)
+    {
+        super(world);
+        fallTime = 0;
+    }
 
-			if(this.onGround) {
-				this.motionX *= (double)0.7F;
-				this.motionZ *= (double)0.7F;
-				this.motionY *= -0.5D;
-				this.setEntityDead();
-				if(!this.worldObj.canBlockBePlacedAt(this.entityID, var1, var2, var3, true) || !this.worldObj.setBlockWithNotify(var1, var2, var3, this.entityID)) {
-					this.dropItem(this.entityID, 1);
-				}
-			} else if(this.fallTime > 100) {
-				this.dropItem(this.entityID, 1);
-				this.setEntityDead();
-			}
+    public EntityFallingSand(World world, double d, double d1, double d2, 
+            int i)
+    {
+        super(world);
+        fallTime = 0;
+        blockID = i;
+        preventEntitySpawning = true;
+        setSize(0.98F, 0.98F);
+        yOffset = height / 2.0F;
+        setPosition(d, d1, d2);
+        motionX = 0.0D;
+        motionY = 0.0D;
+        motionZ = 0.0D;
+        prevPosX = d;
+        prevPosY = d1;
+        prevPosZ = d2;
+    }
 
-		}
-	}
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
 
-	protected void writeEntityToNBT(NBTTagCompound var1) {
-		var1.setByte("Tile", (byte)this.entityID);
-	}
+    protected void entityInit()
+    {
+    }
 
-	protected void readEntityFromNBT(NBTTagCompound var1) {
-		this.entityID = var1.getByte("Tile") & 255;
-	}
+    public boolean canBeCollidedWith()
+    {
+        return !isDead;
+    }
 
-	public float func_392_h_() {
-		return 0.0F;
-	}
+    public void onUpdate()
+    {
+        if(blockID == 0)
+        {
+            setEntityDead();
+            return;
+        }
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        fallTime++;
+        motionY -= 0.039999999105930328D;
+        moveEntity(motionX, motionY, motionZ);
+        motionX *= 0.98000001907348633D;
+        motionY *= 0.98000001907348633D;
+        motionZ *= 0.98000001907348633D;
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_double(posY);
+        int k = MathHelper.floor_double(posZ);
+        if(fallTime == 1 && worldObj.getBlockId(i, j, k) == blockID)
+        {
+            worldObj.setBlockWithNotify(i, j, k, 0);
+        } else
+        if(!worldObj.multiplayerWorld && fallTime == 1)
+        {
+            setEntityDead();
+        }
+        if(onGround)
+        {
+            motionX *= 0.69999998807907104D;
+            motionZ *= 0.69999998807907104D;
+            motionY *= -0.5D;
+            if(worldObj.getBlockId(i, j, k) != Block.pistonMoving.blockID)
+            {
+                setEntityDead();
+                if((!worldObj.canBlockBePlacedAt(blockID, i, j, k, true, 1) || BlockSand.canFallBelow(worldObj, i, j - 1, k) || !worldObj.setBlockWithNotify(i, j, k, blockID)) && !worldObj.multiplayerWorld)
+                {
+                    dropItem(blockID, 1);
+                }
+            }
+        } else
+        if(fallTime > 100 && !worldObj.multiplayerWorld)
+        {
+            dropItem(blockID, 1);
+            setEntityDead();
+        }
+    }
 
-	public World func_465_i() {
-		return this.worldObj;
-	}
+    protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setByte("Tile", (byte)blockID);
+    }
+
+    protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        blockID = nbttagcompound.getByte("Tile") & 0xff;
+    }
+
+    public float getShadowSize()
+    {
+        return 0.0F;
+    }
+
+    public World getWorld()
+    {
+        return worldObj;
+    }
 }

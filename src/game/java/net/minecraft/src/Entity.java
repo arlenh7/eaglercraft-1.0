@@ -1,910 +1,1415 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.Random;
-import net.peyton.eagler.minecraft.TextureLocation;
-
-public abstract class Entity {
-	private static int field_864_a = 0;
-	public int field_620_ab = field_864_a++;
-	public double renderDistanceWeight = 1.0D;
-	public boolean preventEntitySpawning = false;
-	public Entity riddenByEntity;
-	public Entity ridingEntity;
-	public World worldObj;
-	public double prevPosX;
-	public double prevPosY;
-	public double prevPosZ;
-	public double posX;
-	public double posY;
-	public double posZ;
-	public double motionX;
-	public double motionY;
-	public double motionZ;
-	public float rotationYaw;
-	public float rotationPitch;
-	public float prevRotationYaw;
-	public float prevRotationPitch;
-	public final AxisAlignedBB boundingBox = AxisAlignedBB.getBoundingBox(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-	public boolean onGround = false;
-	public boolean isCollidedHorizontally;
-	public boolean isCollidedVertically;
-	public boolean isCollided = false;
-	public boolean beenAttacked = false;
-	public boolean field_9293_aM = true;
-	public boolean isDead = false;
-	public float yOffset = 0.0F;
-	public float width = 0.6F;
-	public float height = 1.8F;
-	public float prevDistanceWalkedModified = 0.0F;
-	public float distanceWalkedModified = 0.0F;
-	protected boolean entityWalks = true;
-	protected float fallDistance = 0.0F;
-	private int nextStepDistance = 1;
-	public double lastTickPosX;
-	public double lastTickPosY;
-	public double lastTickPosZ;
-	public float field_9287_aY = 0.0F;
-	public float stepHeight = 0.0F;
-	public boolean noClip = false;
-	public float entityCollisionReduction = 0.0F;
-	public boolean unusedEntityBoolean = false;
-	protected Random rand = new Random();
-	public int ticksExisted = 0;
-	public int fireResistance = 1;
-	public int fire = 0;
-	protected int maxAir = 300;
-	protected boolean inWater = false;
-	public int field_9306_bj = 0;
-	public int air = 300;
-	private boolean field_862_c = true;
-	public String skinUrl;
-	protected boolean isImmuneToFire = false;
-	private double minecartType;
-	private double field_667_e;
-	public boolean addedToChunk = false;
-	public int chunkCoordX;
-	public int chunkCoordY;
-	public int chunkCoordZ;
-	public int serverPosX;
-	public int serverPosY;
-	public int serverPosZ;
-	public boolean field_9300_bu;
-	public boolean field_9299_bv;
-	public boolean field_12240_bw;
-
-	public Entity(World var1) {
-		this.worldObj = var1;
-		this.setPosition(0.0D, 0.0D, 0.0D);
-	}
-
-	public boolean equals(Object var1) {
-		return var1 instanceof Entity ? ((Entity)var1).field_620_ab == this.field_620_ab : false;
-	}
-
-	public int hashCode() {
-		return this.field_620_ab;
-	}
-
-	protected void preparePlayerToSpawn() {
-		if(this.worldObj != null) {
-			while(this.posY > 0.0D) {
-				this.setPosition(this.posX, this.posY, this.posZ);
-				if(this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() == 0) {
-					break;
-				}
-
-				++this.posY;
-			}
-
-			this.motionX = this.motionY = this.motionZ = 0.0D;
-			this.rotationPitch = 0.0F;
-		}
-	}
-
-	public void setEntityDead() {
-		this.isDead = true;
-	}
-
-	protected void setSize(float var1, float var2) {
-		this.width = var1;
-		this.height = var2;
-	}
-
-	protected void setRotation(float var1, float var2) {
-		this.rotationYaw = var1;
-		this.rotationPitch = var2;
-	}
-
-	public void setPosition(double var1, double var3, double var5) {
-		this.posX = var1;
-		this.posY = var3;
-		this.posZ = var5;
-		float var7 = this.width / 2.0F;
-		float var8 = this.height;
-		this.boundingBox.setBounds(var1 - (double)var7, var3 - (double)this.yOffset + (double)this.field_9287_aY, var5 - (double)var7, var1 + (double)var7, var3 - (double)this.yOffset + (double)this.field_9287_aY + (double)var8, var5 + (double)var7);
-	}
-
-	public void func_346_d(float var1, float var2) {
-		float var3 = this.rotationPitch;
-		float var4 = this.rotationYaw;
-		this.rotationYaw = (float)((double)this.rotationYaw + (double)var1 * 0.15D);
-		this.rotationPitch = (float)((double)this.rotationPitch - (double)var2 * 0.15D);
-		if(this.rotationPitch < -90.0F) {
-			this.rotationPitch = -90.0F;
-		}
-
-		if(this.rotationPitch > 90.0F) {
-			this.rotationPitch = 90.0F;
-		}
-
-		this.prevRotationPitch += this.rotationPitch - var3;
-		this.prevRotationYaw += this.rotationYaw - var4;
-	}
-
-	public void onUpdate() {
-		this.func_391_y();
-	}
-
-	public void func_391_y() {
-		if(this.ridingEntity != null && this.ridingEntity.isDead) {
-			this.ridingEntity = null;
-		}
-
-		++this.ticksExisted;
-		this.prevDistanceWalkedModified = this.distanceWalkedModified;
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.prevRotationPitch = this.rotationPitch;
-		this.prevRotationYaw = this.rotationYaw;
-		if(this.handleWaterMovement()) {
-			if(!this.inWater && !this.field_862_c) {
-				float var1 = MathHelper.sqrt_double(this.motionX * this.motionX * (double)0.2F + this.motionY * this.motionY + this.motionZ * this.motionZ * (double)0.2F) * 0.2F;
-				if(var1 > 1.0F) {
-					var1 = 1.0F;
-				}
-
-				this.worldObj.playSoundAtEntity(this, "random.splash", var1, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
-				float var2 = (float)MathHelper.floor_double(this.boundingBox.minY);
-
-				int var3;
-				float var4;
-				float var5;
-				for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
-					var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-					var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-					this.worldObj.spawnParticle("bubble", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
-				}
-
-				for(var3 = 0; (float)var3 < 1.0F + this.width * 20.0F; ++var3) {
-					var4 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-					var5 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-					this.worldObj.spawnParticle("splash", this.posX + (double)var4, (double)(var2 + 1.0F), this.posZ + (double)var5, this.motionX, this.motionY, this.motionZ);
-				}
-			}
-
-			this.fallDistance = 0.0F;
-			this.inWater = true;
-			this.fire = 0;
-		} else {
-			this.inWater = false;
-		}
-
-		if(this.worldObj.multiplayerWorld) {
-			this.fire = 0;
-		} else if(this.fire > 0) {
-			if(this.isImmuneToFire) {
-				this.fire -= 4;
-				if(this.fire < 0) {
-					this.fire = 0;
-				}
-			} else {
-				if(this.fire % 20 == 0) {
-					this.attackEntityFrom((Entity)null, 1);
-				}
-
-				--this.fire;
-			}
-		}
-
-		if(this.handleLavaMovement()) {
-			this.setOnFireFromLava();
-		}
-
-		if(this.posY < -64.0D) {
-			this.func_4034_G();
-		}
-
-		this.field_862_c = false;
-	}
-
-	protected void setOnFireFromLava() {
-		if(!this.isImmuneToFire) {
-			this.attackEntityFrom((Entity)null, 4);
-			this.fire = 600;
-		}
-
-	}
-
-	protected void func_4034_G() {
-		this.setEntityDead();
-	}
-
-	public boolean isOffsetPositionInLiquid(double var1, double var3, double var5) {
-		AxisAlignedBB var7 = this.boundingBox.getOffsetBoundingBox(var1, var3, var5);
-		List<AxisAlignedBB> var8 = this.worldObj.getCollidingBoundingBoxes(this, var7);
-		return var8.size() > 0 ? false : !this.worldObj.getIsAnyLiquid(var7);
-	}
-
-	public void moveEntity(double var1, double var3, double var5) {
-		if(this.noClip) {
-			this.boundingBox.offset(var1, var3, var5);
-			this.posX = (this.boundingBox.minX + this.boundingBox.maxX) / 2.0D;
-			this.posY = this.boundingBox.minY + (double)this.yOffset - (double)this.field_9287_aY;
-			this.posZ = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2.0D;
-		} else {
-			double var7 = this.posX;
-			double var9 = this.posZ;
-			double var11 = var1;
-			double var13 = var3;
-			double var15 = var5;
-			AxisAlignedBB var17 = this.boundingBox.copy();
-			boolean var18 = this.onGround && this.isSneaking();
-			if(var18) {
-				double var19;
-				for(var19 = 0.05D; var1 != 0.0D && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.getOffsetBoundingBox(var1, -1.0D, 0.0D)).size() == 0; var11 = var1) {
-					if(var1 < var19 && var1 >= -var19) {
-						var1 = 0.0D;
-					} else if(var1 > 0.0D) {
-						var1 -= var19;
-					} else {
-						var1 += var19;
-					}
-				}
-
-				for(; var5 != 0.0D && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.getOffsetBoundingBox(0.0D, -1.0D, var5)).size() == 0; var15 = var5) {
-					if(var5 < var19 && var5 >= -var19) {
-						var5 = 0.0D;
-					} else if(var5 > 0.0D) {
-						var5 -= var19;
-					} else {
-						var5 += var19;
-					}
-				}
-			}
-
-			List<AxisAlignedBB> var35 = this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.addCoord(var1, var3, var5));
-
-			for(int var20 = 0; var20 < var35.size(); ++var20) {
-				var3 = ((AxisAlignedBB)var35.get(var20)).func_1172_b(this.boundingBox, var3);
-			}
-
-			this.boundingBox.offset(0.0D, var3, 0.0D);
-			if(!this.field_9293_aM && var13 != var3) {
-				var5 = 0.0D;
-				var3 = var5;
-				var1 = var5;
-			}
-
-			boolean var36 = this.onGround || var13 != var3 && var13 < 0.0D;
-
-			int var21;
-			for(var21 = 0; var21 < var35.size(); ++var21) {
-				var1 = ((AxisAlignedBB)var35.get(var21)).func_1163_a(this.boundingBox, var1);
-			}
-
-			this.boundingBox.offset(var1, 0.0D, 0.0D);
-			if(!this.field_9293_aM && var11 != var1) {
-				var5 = 0.0D;
-				var3 = var5;
-				var1 = var5;
-			}
-
-			for(var21 = 0; var21 < var35.size(); ++var21) {
-				var5 = ((AxisAlignedBB)var35.get(var21)).func_1162_c(this.boundingBox, var5);
-			}
-
-			this.boundingBox.offset(0.0D, 0.0D, var5);
-			if(!this.field_9293_aM && var15 != var5) {
-				var5 = 0.0D;
-				var3 = var5;
-				var1 = var5;
-			}
-
-			double var23;
-			int var28;
-			double var37;
-			if(this.stepHeight > 0.0F && var36 && this.field_9287_aY < 0.05F && (var11 != var1 || var15 != var5)) {
-				var37 = var1;
-				var23 = var3;
-				double var25 = var5;
-				var1 = var11;
-				var3 = (double)this.stepHeight;
-				var5 = var15;
-				AxisAlignedBB var27 = this.boundingBox.copy();
-				this.boundingBox.setBB(var17);
-				var35 = this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox.addCoord(var11, var3, var15));
-
-				for(var28 = 0; var28 < var35.size(); ++var28) {
-					var3 = ((AxisAlignedBB)var35.get(var28)).func_1172_b(this.boundingBox, var3);
-				}
-
-				this.boundingBox.offset(0.0D, var3, 0.0D);
-				if(!this.field_9293_aM && var13 != var3) {
-					var5 = 0.0D;
-					var3 = var5;
-					var1 = var5;
-				}
-
-				for(var28 = 0; var28 < var35.size(); ++var28) {
-					var1 = ((AxisAlignedBB)var35.get(var28)).func_1163_a(this.boundingBox, var1);
-				}
-
-				this.boundingBox.offset(var1, 0.0D, 0.0D);
-				if(!this.field_9293_aM && var11 != var1) {
-					var5 = 0.0D;
-					var3 = var5;
-					var1 = var5;
-				}
-
-				for(var28 = 0; var28 < var35.size(); ++var28) {
-					var5 = ((AxisAlignedBB)var35.get(var28)).func_1162_c(this.boundingBox, var5);
-				}
-
-				this.boundingBox.offset(0.0D, 0.0D, var5);
-				if(!this.field_9293_aM && var15 != var5) {
-					var5 = 0.0D;
-					var3 = var5;
-					var1 = var5;
-				}
-
-				if(var37 * var37 + var25 * var25 >= var1 * var1 + var5 * var5) {
-					var1 = var37;
-					var3 = var23;
-					var5 = var25;
-					this.boundingBox.setBB(var27);
-				} else {
-					this.field_9287_aY = (float)((double)this.field_9287_aY + 0.5D);
-				}
-			}
-
-			this.posX = (this.boundingBox.minX + this.boundingBox.maxX) / 2.0D;
-			this.posY = this.boundingBox.minY + (double)this.yOffset - (double)this.field_9287_aY;
-			this.posZ = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2.0D;
-			this.isCollidedHorizontally = var11 != var1 || var15 != var5;
-			this.isCollidedVertically = var13 != var3;
-			this.onGround = var13 != var3 && var13 < 0.0D;
-			this.isCollided = this.isCollidedHorizontally || this.isCollidedVertically;
-			this.updateFallState(var3, this.onGround);
-			if(var11 != var1) {
-				this.motionX = 0.0D;
-			}
-
-			if(var13 != var3) {
-				this.motionY = 0.0D;
-			}
-
-			if(var15 != var5) {
-				this.motionZ = 0.0D;
-			}
-
-			var37 = this.posX - var7;
-			var23 = this.posZ - var9;
-			int var26;
-			int var38;
-			int var40;
-			if(this.entityWalks && !var18) {
-				this.distanceWalkedModified = (float)((double)this.distanceWalkedModified + (double)MathHelper.sqrt_double(var37 * var37 + var23 * var23) * 0.6D);
-				var38 = MathHelper.floor_double(this.posX);
-				var26 = MathHelper.floor_double(this.posY - (double)0.2F - (double)this.yOffset);
-				var40 = MathHelper.floor_double(this.posZ);
-				var28 = this.worldObj.getBlockId(var38, var26, var40);
-				if(this.distanceWalkedModified > (float)this.nextStepDistance && var28 > 0) {
-					++this.nextStepDistance;
-					StepSound var29 = Block.blocksList[var28].stepSound;
-					if(this.worldObj.getBlockId(var38, var26 + 1, var40) == Block.snow.blockID) {
-						var29 = Block.snow.stepSound;
-						this.worldObj.playSoundAtEntity(this, var29.func_1145_d(), var29.func_1147_b() * 0.15F, var29.func_1144_c());
-					} else if(!Block.blocksList[var28].blockMaterial.getIsLiquid()) {
-						this.worldObj.playSoundAtEntity(this, var29.func_1145_d(), var29.func_1147_b() * 0.15F, var29.func_1144_c());
-					}
-
-					Block.blocksList[var28].onEntityWalking(this.worldObj, var38, var26, var40, this);
-				}
-			}
-
-			var38 = MathHelper.floor_double(this.boundingBox.minX);
-			var26 = MathHelper.floor_double(this.boundingBox.minY);
-			var40 = MathHelper.floor_double(this.boundingBox.minZ);
-			var28 = MathHelper.floor_double(this.boundingBox.maxX);
-			int var41 = MathHelper.floor_double(this.boundingBox.maxY);
-			int var30 = MathHelper.floor_double(this.boundingBox.maxZ);
-
-			for(int var31 = var38; var31 <= var28; ++var31) {
-				for(int var32 = var26; var32 <= var41; ++var32) {
-					for(int var33 = var40; var33 <= var30; ++var33) {
-						int var34 = this.worldObj.getBlockId(var31, var32, var33);
-						if(var34 > 0) {
-							Block.blocksList[var34].onEntityCollidedWithBlock(this.worldObj, var31, var32, var33, this);
-						}
-					}
-				}
-			}
-
-			this.field_9287_aY *= 0.4F;
-			boolean var39 = this.handleWaterMovement();
-			if(this.worldObj.isBoundingBoxBurning(this.boundingBox)) {
-				this.dealFireDamage(1);
-				if(!var39) {
-					++this.fire;
-					if(this.fire == 0) {
-						this.fire = 300;
-					}
-				}
-			} else if(this.fire <= 0) {
-				this.fire = -this.fireResistance;
-			}
-
-			if(var39 && this.fire > 0) {
-				this.worldObj.playSoundAtEntity(this, "random.fizz", 0.7F, 1.6F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
-				this.fire = -this.fireResistance;
-			}
-
-		}
-	}
-
-	protected void updateFallState(double var1, boolean var3) {
-		if(var3) {
-			if(this.fallDistance > 0.0F) {
-				this.fall(this.fallDistance);
-				this.fallDistance = 0.0F;
-			}
-		} else if(var1 < 0.0D) {
-			this.fallDistance = (float)((double)this.fallDistance - var1);
-		}
-
-	}
-
-	public boolean isSneaking() {
-		return false;
-	}
-
-	public AxisAlignedBB func_372_f_() {
-		return null;
-	}
-
-	protected void dealFireDamage(int var1) {
-		if(!this.isImmuneToFire) {
-			this.attackEntityFrom((Entity)null, var1);
-		}
-
-	}
-
-	protected void fall(float var1) {
-	}
-
-	public boolean handleWaterMovement() {
-		return this.worldObj.func_682_a(this.boundingBox.expand(0.0D, (double)-0.4F, 0.0D), Material.water, this);
-	}
-
-	public boolean isInsideOfMaterial(Material var1) {
-		double var2 = this.posY + (double)this.func_373_s();
-		int var4 = MathHelper.floor_double(this.posX);
-		int var5 = MathHelper.floor_float((float)MathHelper.floor_double(var2));
-		int var6 = MathHelper.floor_double(this.posZ);
-		int var7 = this.worldObj.getBlockId(var4, var5, var6);
-		if(var7 != 0 && Block.blocksList[var7].blockMaterial == var1) {
-			float var8 = BlockFluids.setFluidHeight(this.worldObj.getBlockMetadata(var4, var5, var6)) - 1.0F / 9.0F;
-			float var9 = (float)(var5 + 1) - var8;
-			return var2 < (double)var9;
-		} else {
-			return false;
-		}
-	}
-
-	public float func_373_s() {
-		return 0.0F;
-	}
-
-	public boolean handleLavaMovement() {
-		return this.worldObj.isMaterialInBB(this.boundingBox.expand(0.0D, (double)-0.4F, 0.0D), Material.lava);
-	}
-
-	public void func_351_a(float var1, float var2, float var3) {
-		float var4 = MathHelper.sqrt_float(var1 * var1 + var2 * var2);
-		if(var4 >= 0.01F) {
-			if(var4 < 1.0F) {
-				var4 = 1.0F;
-			}
-
-			var4 = var3 / var4;
-			var1 *= var4;
-			var2 *= var4;
-			float var5 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
-			float var6 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
-			this.motionX += (double)(var1 * var6 - var2 * var5);
-			this.motionZ += (double)(var2 * var6 + var1 * var5);
-		}
-	}
-
-	public float getEntityBrightness(float var1) {
-		int var2 = MathHelper.floor_double(this.posX);
-		double var3 = (this.boundingBox.maxY - this.boundingBox.minY) * 0.66D;
-		int var5 = MathHelper.floor_double(this.posY - (double)this.yOffset + var3);
-		int var6 = MathHelper.floor_double(this.posZ);
-		return this.worldObj.getLightBrightness(var2, var5, var6);
-	}
-
-	public void setWorld(World var1) {
-		this.worldObj = var1;
-	}
-
-	public void setPositionAndRotation(double var1, double var3, double var5, float var7, float var8) {
-		this.prevPosX = this.posX = var1;
-		this.prevPosY = this.posY = var3;
-		this.prevPosZ = this.posZ = var5;
-		this.prevRotationYaw = this.rotationYaw = var7;
-		this.prevRotationPitch = this.rotationPitch = var8;
-		this.field_9287_aY = 0.0F;
-		double var9 = (double)(this.prevRotationYaw - var7);
-		if(var9 < -180.0D) {
-			this.prevRotationYaw += 360.0F;
-		}
-
-		if(var9 >= 180.0D) {
-			this.prevRotationYaw -= 360.0F;
-		}
-
-		this.setPosition(this.posX, this.posY, this.posZ);
-		this.setRotation(var7, var8);
-	}
-
-	public void setLocationAndAngles(double var1, double var3, double var5, float var7, float var8) {
-		this.prevPosX = this.posX = var1;
-		this.prevPosY = this.posY = var3 + (double)this.yOffset;
-		this.prevPosZ = this.posZ = var5;
-		this.rotationYaw = var7;
-		this.rotationPitch = var8;
-		this.setPosition(this.posX, this.posY, this.posZ);
-	}
-
-	public float getDistanceToEntity(Entity var1) {
-		float var2 = (float)(this.posX - var1.posX);
-		float var3 = (float)(this.posY - var1.posY);
-		float var4 = (float)(this.posZ - var1.posZ);
-		return MathHelper.sqrt_float(var2 * var2 + var3 * var3 + var4 * var4);
-	}
-
-	public double getDistanceSq(double var1, double var3, double var5) {
-		double var7 = this.posX - var1;
-		double var9 = this.posY - var3;
-		double var11 = this.posZ - var5;
-		return var7 * var7 + var9 * var9 + var11 * var11;
-	}
-
-	public double getDistance(double var1, double var3, double var5) {
-		double var7 = this.posX - var1;
-		double var9 = this.posY - var3;
-		double var11 = this.posZ - var5;
-		return (double)MathHelper.sqrt_double(var7 * var7 + var9 * var9 + var11 * var11);
-	}
-
-	public double getDistanceSqToEntity(Entity var1) {
-		double var2 = this.posX - var1.posX;
-		double var4 = this.posY - var1.posY;
-		double var6 = this.posZ - var1.posZ;
-		return var2 * var2 + var4 * var4 + var6 * var6;
-	}
-
-	public void onCollideWithPlayer(EntityPlayer var1) {
-	}
-
-	public void applyEntityCollision(Entity var1) {
-		if(var1.riddenByEntity != this && var1.ridingEntity != this) {
-			double var2 = var1.posX - this.posX;
-			double var4 = var1.posZ - this.posZ;
-			double var6 = MathHelper.abs_max(var2, var4);
-			if(var6 >= (double)0.01F) {
-				var6 = (double)MathHelper.sqrt_double(var6);
-				var2 /= var6;
-				var4 /= var6;
-				double var8 = 1.0D / var6;
-				if(var8 > 1.0D) {
-					var8 = 1.0D;
-				}
-
-				var2 *= var8;
-				var4 *= var8;
-				var2 *= (double)0.05F;
-				var4 *= (double)0.05F;
-				var2 *= (double)(1.0F - this.entityCollisionReduction);
-				var4 *= (double)(1.0F - this.entityCollisionReduction);
-				this.addVelocity(-var2, 0.0D, -var4);
-				var1.addVelocity(var2, 0.0D, var4);
-			}
-
-		}
-	}
-
-	public void addVelocity(double var1, double var3, double var5) {
-		this.motionX += var1;
-		this.motionY += var3;
-		this.motionZ += var5;
-	}
-
-	protected void setBeenAttacked() {
-		this.beenAttacked = true;
-	}
-
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		this.setBeenAttacked();
-		return false;
-	}
-
-	public boolean canBeCollidedWith() {
-		return false;
-	}
-
-	public boolean canBePushed() {
-		return false;
-	}
-
-	public void addToPlayerScore(Entity var1, int var2) {
-	}
-
-	public boolean isInRangeToRenderVec3D(Vec3D var1) {
-		double var2 = this.posX - var1.xCoord;
-		double var4 = this.posY - var1.yCoord;
-		double var6 = this.posZ - var1.zCoord;
-		double var8 = var2 * var2 + var4 * var4 + var6 * var6;
-		return this.isInRangeToRenderDist(var8);
-	}
-
-	public boolean isInRangeToRenderDist(double var1) {
-		double var3 = this.boundingBox.getAverageEdgeLength();
-		var3 *= 64.0D * this.renderDistanceWeight;
-		return var1 < var3 * var3;
-	}
-
-	public TextureLocation getEntityTexture() {
-		return null;
-	}
-
-	public boolean func_358_c(NBTTagCompound var1) {
-		String var2 = this.getEntityString();
-		if(!this.isDead && var2 != null) {
-			var1.setString("id", var2);
-			this.writeToNBT(var1);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public void writeToNBT(NBTTagCompound var1) {
-		var1.setTag("Pos", this.func_375_a(new double[]{this.posX, this.posY, this.posZ}));
-		var1.setTag("Motion", this.func_375_a(new double[]{this.motionX, this.motionY, this.motionZ}));
-		var1.setTag("Rotation", this.func_377_a(new float[]{this.rotationYaw, this.rotationPitch}));
-		var1.setFloat("FallDistance", this.fallDistance);
-		var1.setShort("Fire", (short)this.fire);
-		var1.setShort("Air", (short)this.air);
-		var1.setBoolean("OnGround", this.onGround);
-		this.writeEntityToNBT(var1);
-	}
-
-	public void readFromNBT(NBTTagCompound var1) {
-		NBTTagList var2 = var1.getTagList("Pos");
-		NBTTagList var3 = var1.getTagList("Motion");
-		NBTTagList var4 = var1.getTagList("Rotation");
-		this.setPosition(0.0D, 0.0D, 0.0D);
-		this.motionX = ((NBTTagDouble)var3.tagAt(0)).doubleValue;
-		this.motionY = ((NBTTagDouble)var3.tagAt(1)).doubleValue;
-		this.motionZ = ((NBTTagDouble)var3.tagAt(2)).doubleValue;
-		this.prevPosX = this.lastTickPosX = this.posX = ((NBTTagDouble)var2.tagAt(0)).doubleValue;
-		this.prevPosY = this.lastTickPosY = this.posY = ((NBTTagDouble)var2.tagAt(1)).doubleValue;
-		this.prevPosZ = this.lastTickPosZ = this.posZ = ((NBTTagDouble)var2.tagAt(2)).doubleValue;
-		this.prevRotationYaw = this.rotationYaw = ((NBTTagFloat)var4.tagAt(0)).floatValue;
-		this.prevRotationPitch = this.rotationPitch = ((NBTTagFloat)var4.tagAt(1)).floatValue;
-		this.fallDistance = var1.getFloat("FallDistance");
-		this.fire = var1.getShort("Fire");
-		this.air = var1.getShort("Air");
-		this.onGround = var1.getBoolean("OnGround");
-		this.setPosition(this.posX, this.posY, this.posZ);
-		this.readEntityFromNBT(var1);
-	}
-
-	protected final String getEntityString() {
-		return EntityList.getEntityString(this);
-	}
-
-	protected abstract void readEntityFromNBT(NBTTagCompound var1);
-
-	protected abstract void writeEntityToNBT(NBTTagCompound var1);
-
-	protected NBTTagList func_375_a(double... var1) {
-		NBTTagList var2 = new NBTTagList();
-		double[] var3 = var1;
-		int var4 = var1.length;
-
-		for(int var5 = 0; var5 < var4; ++var5) {
-			double var6 = var3[var5];
-			var2.setTag(new NBTTagDouble(var6));
-		}
-
-		return var2;
-	}
-
-	protected NBTTagList func_377_a(float... var1) {
-		NBTTagList var2 = new NBTTagList();
-		float[] var3 = var1;
-		int var4 = var1.length;
-
-		for(int var5 = 0; var5 < var4; ++var5) {
-			float var6 = var3[var5];
-			var2.setTag(new NBTTagFloat(var6));
-		}
-
-		return var2;
-	}
-
-	public float func_392_h_() {
-		return this.height / 2.0F;
-	}
-
-	public EntityItem dropItem(int var1, int var2) {
-		return this.dropItemWithOffset(var1, var2, 0.0F);
-	}
-
-	public EntityItem dropItemWithOffset(int var1, int var2, float var3) {
-		EntityItem var4 = new EntityItem(this.worldObj, this.posX, this.posY + (double)var3, this.posZ, new ItemStack(var1, var2));
-		var4.delayBeforeCanPickup = 10;
-		this.worldObj.entityJoinedWorld(var4);
-		return var4;
-	}
-
-	public boolean isEntityAlive() {
-		return !this.isDead;
-	}
-
-	public boolean func_345_I() {
-		int var1 = MathHelper.floor_double(this.posX);
-		int var2 = MathHelper.floor_double(this.posY + (double)this.func_373_s());
-		int var3 = MathHelper.floor_double(this.posZ);
-		return this.worldObj.isBlockOpaqueCube(var1, var2, var3);
-	}
-
-	public boolean interact(EntityPlayer var1) {
-		return false;
-	}
-
-	public AxisAlignedBB func_383_b_(Entity var1) {
-		return null;
-	}
-
-	public void func_350_p() {
-		if(this.ridingEntity.isDead) {
-			this.ridingEntity = null;
-		} else {
-			this.motionX = 0.0D;
-			this.motionY = 0.0D;
-			this.motionZ = 0.0D;
-			this.onUpdate();
-			this.ridingEntity.func_366_i_();
-			this.field_667_e += (double)(this.ridingEntity.rotationYaw - this.ridingEntity.prevRotationYaw);
-
-			for(this.minecartType += (double)(this.ridingEntity.rotationPitch - this.ridingEntity.prevRotationPitch); this.field_667_e >= 180.0D; this.field_667_e -= 360.0D) {
-			}
-
-			while(this.field_667_e < -180.0D) {
-				this.field_667_e += 360.0D;
-			}
-
-			while(this.minecartType >= 180.0D) {
-				this.minecartType -= 360.0D;
-			}
-
-			while(this.minecartType < -180.0D) {
-				this.minecartType += 360.0D;
-			}
-
-			double var1 = this.field_667_e * 0.5D;
-			double var3 = this.minecartType * 0.5D;
-			float var5 = 10.0F;
-			if(var1 > (double)var5) {
-				var1 = (double)var5;
-			}
-
-			if(var1 < (double)(-var5)) {
-				var1 = (double)(-var5);
-			}
-
-			if(var3 > (double)var5) {
-				var3 = (double)var5;
-			}
-
-			if(var3 < (double)(-var5)) {
-				var3 = (double)(-var5);
-			}
-
-			this.field_667_e -= var1;
-			this.minecartType -= var3;
-			this.rotationYaw = (float)((double)this.rotationYaw + var1);
-			this.rotationPitch = (float)((double)this.rotationPitch + var3);
-		}
-	}
-
-	public void func_366_i_() {
-		this.riddenByEntity.setPosition(this.posX, this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ);
-	}
-
-	public double getYOffset() {
-		return (double)this.yOffset;
-	}
-
-	public double getMountedYOffset() {
-		return (double)this.height * 0.75D;
-	}
-
-	public void mountEntity(Entity var1) {
-		this.minecartType = 0.0D;
-		this.field_667_e = 0.0D;
-		if(var1 == null) {
-			if(this.ridingEntity != null) {
-				this.setLocationAndAngles(this.ridingEntity.posX, this.ridingEntity.boundingBox.minY + (double)this.ridingEntity.height, this.ridingEntity.posZ, this.rotationYaw, this.rotationPitch);
-				this.ridingEntity.riddenByEntity = null;
-			}
-
-			this.ridingEntity = null;
-		} else if(this.ridingEntity == var1) {
-			this.ridingEntity.riddenByEntity = null;
-			this.ridingEntity = null;
-			this.setLocationAndAngles(var1.posX, var1.boundingBox.minY + (double)var1.height, var1.posZ, this.rotationYaw, this.rotationPitch);
-		} else {
-			if(this.ridingEntity != null) {
-				this.ridingEntity.riddenByEntity = null;
-			}
-
-			if(var1.riddenByEntity != null) {
-				var1.riddenByEntity.ridingEntity = null;
-			}
-
-			this.ridingEntity = var1;
-			var1.riddenByEntity = this;
-		}
-	}
-
-	public void setPositionAndRotation2(double var1, double var3, double var5, float var7, float var8, int var9) {
-		this.setPosition(var1, var3, var5);
-		this.setRotation(var7, var8);
-	}
-
-	public float func_4035_j_() {
-		return 0.1F;
-	}
-
-	public Vec3D func_4037_H() {
-		return null;
-	}
-
-	public void setInPortal() {
-	}
-
-	public void setVelocity(double var1, double var3, double var5) {
-		this.motionX = var1;
-		this.motionY = var3;
-		this.motionZ = var5;
-	}
-
-	public void func_9282_a(byte var1) {
-	}
-
-	public void performHurtAnimation() {
-	}
-
-	public void func_20046_s() {
-	}
-
-	public void func_20045_c(int var1, int var2) {
-	}
+import java.util.Random;
+
+// Referenced classes of package net.minecraft.src:
+//            AxisAlignedBB, DataWatcher, World, Profiler, 
+//            MathHelper, DamageSource, Block, StepSound, 
+//            Material, BlockFluid, Vec3D, NBTTagCompound, 
+//            NBTTagList, NBTTagDouble, NBTTagFloat, EntityList, 
+//            ItemStack, EntityItem, EntityPlayer, EntityLightningBolt, 
+//            EntityLiving
+
+public abstract class Entity
+{
+
+    private static int nextEntityID = 0;
+    public int entityId;
+    public double renderDistanceWeight;
+    public boolean preventEntitySpawning;
+    public Entity riddenByEntity;
+    public Entity ridingEntity;
+    public World worldObj;
+    public double prevPosX;
+    public double prevPosY;
+    public double prevPosZ;
+    public double posX;
+    public double posY;
+    public double posZ;
+    public double motionX;
+    public double motionY;
+    public double motionZ;
+    public float rotationYaw;
+    public float rotationPitch;
+    public float prevRotationYaw;
+    public float prevRotationPitch;
+    public final AxisAlignedBB boundingBox = AxisAlignedBB.getBoundingBox(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+    public boolean onGround;
+    public boolean isCollidedHorizontally;
+    public boolean isCollidedVertically;
+    public boolean isCollided;
+    public boolean beenAttacked;
+    protected boolean isInWeb;
+    public boolean field_9293_aM;
+    public boolean isDead;
+    public float yOffset;
+    public float width;
+    public float height;
+    public float prevDistanceWalkedModified;
+    public float distanceWalkedModified;
+    public float fallDistance;
+    private int nextStepDistance;
+    public double lastTickPosX;
+    public double lastTickPosY;
+    public double lastTickPosZ;
+    public float ySize;
+    public float stepHeight;
+    public boolean noClip;
+    public float entityCollisionReduction;
+    protected Random rand;
+    public int ticksExisted;
+    public int fireResistance;
+    private int fire;
+    protected boolean inWater;
+    public int heartsLife;
+    private boolean firstUpdate;
+    public String skinUrl;
+    public String cloakUrl;
+    protected boolean isImmuneToFire;
+    protected DataWatcher dataWatcher;
+    private double entityRiderPitchDelta;
+    private double entityRiderYawDelta;
+    public boolean addedToChunk;
+    public int chunkCoordX;
+    public int chunkCoordY;
+    public int chunkCoordZ;
+    public int serverPosX;
+    public int serverPosY;
+    public int serverPosZ;
+    public boolean ignoreFrustumCheck;
+    public boolean isAirBorne;
+
+    public Entity(World world)
+    {
+        entityId = nextEntityID++;
+        renderDistanceWeight = 1.0D;
+        preventEntitySpawning = false;
+        onGround = false;
+        isCollided = false;
+        beenAttacked = false;
+        field_9293_aM = true;
+        isDead = false;
+        yOffset = 0.0F;
+        width = 0.6F;
+        height = 1.8F;
+        prevDistanceWalkedModified = 0.0F;
+        distanceWalkedModified = 0.0F;
+        fallDistance = 0.0F;
+        nextStepDistance = 1;
+        ySize = 0.0F;
+        stepHeight = 0.0F;
+        noClip = false;
+        entityCollisionReduction = 0.0F;
+        rand = new Random();
+        ticksExisted = 0;
+        fireResistance = 1;
+        fire = 0;
+        inWater = false;
+        heartsLife = 0;
+        firstUpdate = true;
+        isImmuneToFire = false;
+        dataWatcher = new DataWatcher();
+        addedToChunk = false;
+        worldObj = world;
+        setPosition(0.0D, 0.0D, 0.0D);
+        dataWatcher.addObject(0, Byte.valueOf((byte)0));
+        dataWatcher.addObject(1, Short.valueOf((short)300));
+        entityInit();
+    }
+
+    protected abstract void entityInit();
+
+    public DataWatcher getDataWatcher()
+    {
+        return dataWatcher;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof Entity)
+        {
+            return ((Entity)obj).entityId == entityId;
+        } else
+        {
+            return false;
+        }
+    }
+
+    public int hashCode()
+    {
+        return entityId;
+    }
+
+    protected void preparePlayerToSpawn()
+    {
+        if(worldObj == null)
+        {
+            return;
+        }
+        do
+        {
+            if(posY <= 0.0D)
+            {
+                break;
+            }
+            setPosition(posX, posY, posZ);
+            if(worldObj.getCollidingBoundingBoxes(this, boundingBox).size() == 0)
+            {
+                break;
+            }
+            posY++;
+        } while(true);
+        motionX = motionY = motionZ = 0.0D;
+        rotationPitch = 0.0F;
+    }
+
+    public void setEntityDead()
+    {
+        isDead = true;
+    }
+
+    protected void setSize(float f, float f1)
+    {
+        width = f;
+        height = f1;
+    }
+
+    protected void setRotation(float f, float f1)
+    {
+        rotationYaw = f % 360F;
+        rotationPitch = f1 % 360F;
+    }
+
+    public void setPosition(double d, double d1, double d2)
+    {
+        posX = d;
+        posY = d1;
+        posZ = d2;
+        float f = width / 2.0F;
+        float f1 = height;
+        boundingBox.setBounds(d - (double)f, (d1 - (double)yOffset) + (double)ySize, d2 - (double)f, d + (double)f, (d1 - (double)yOffset) + (double)ySize + (double)f1, d2 + (double)f);
+    }
+
+    public void setAngles(float f, float f1)
+    {
+        float f2 = rotationPitch;
+        float f3 = rotationYaw;
+        rotationYaw += (double)f * 0.14999999999999999D;
+        rotationPitch -= (double)f1 * 0.14999999999999999D;
+        if(rotationPitch < -90F)
+        {
+            rotationPitch = -90F;
+        }
+        if(rotationPitch > 90F)
+        {
+            rotationPitch = 90F;
+        }
+        prevRotationPitch += rotationPitch - f2;
+        prevRotationYaw += rotationYaw - f3;
+    }
+
+    public void onUpdate()
+    {
+        onEntityUpdate();
+    }
+
+    public void onEntityUpdate()
+    {
+        Profiler.startSection("entityBaseTick");
+        if(ridingEntity != null && ridingEntity.isDead)
+        {
+            ridingEntity = null;
+        }
+        ticksExisted++;
+        prevDistanceWalkedModified = distanceWalkedModified;
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        prevRotationPitch = rotationPitch;
+        prevRotationYaw = rotationYaw;
+        if(isSprinting())
+        {
+            int i = MathHelper.floor_double(posX);
+            int j = MathHelper.floor_double(posY - 0.20000000298023224D - (double)yOffset);
+            int k = MathHelper.floor_double(posZ);
+            int j1 = worldObj.getBlockId(i, j, k);
+            if(j1 > 0)
+            {
+                worldObj.spawnParticle((new StringBuilder()).append("tilecrack_").append(j1).toString(), posX + ((double)rand.nextFloat() - 0.5D) * (double)width, boundingBox.minY + 0.10000000000000001D, posZ + ((double)rand.nextFloat() - 0.5D) * (double)width, -motionX * 4D, 1.5D, -motionZ * 4D);
+            }
+        }
+        if(handleWaterMovement())
+        {
+            if(!inWater && !firstUpdate)
+            {
+                float f = MathHelper.sqrt_double(motionX * motionX * 0.20000000298023224D + motionY * motionY + motionZ * motionZ * 0.20000000298023224D) * 0.2F;
+                if(f > 1.0F)
+                {
+                    f = 1.0F;
+                }
+                worldObj.playSoundAtEntity(this, "random.splash", f, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
+                float f1 = MathHelper.floor_double(boundingBox.minY);
+                for(int l = 0; (float)l < 1.0F + width * 20F; l++)
+                {
+                    float f2 = (rand.nextFloat() * 2.0F - 1.0F) * width;
+                    float f4 = (rand.nextFloat() * 2.0F - 1.0F) * width;
+                    worldObj.spawnParticle("bubble", posX + (double)f2, f1 + 1.0F, posZ + (double)f4, motionX, motionY - (double)(rand.nextFloat() * 0.2F), motionZ);
+                }
+
+                for(int i1 = 0; (float)i1 < 1.0F + width * 20F; i1++)
+                {
+                    float f3 = (rand.nextFloat() * 2.0F - 1.0F) * width;
+                    float f5 = (rand.nextFloat() * 2.0F - 1.0F) * width;
+                    worldObj.spawnParticle("splash", posX + (double)f3, f1 + 1.0F, posZ + (double)f5, motionX, motionY, motionZ);
+                }
+
+            }
+            fallDistance = 0.0F;
+            inWater = true;
+            fire = 0;
+        } else
+        {
+            inWater = false;
+        }
+        if(worldObj.multiplayerWorld)
+        {
+            fire = 0;
+        } else
+        if(fire > 0)
+        {
+            if(isImmuneToFire)
+            {
+                fire -= 4;
+                if(fire < 0)
+                {
+                    fire = 0;
+                }
+            } else
+            {
+                if(fire % 20 == 0)
+                {
+                    attackEntityFrom(DamageSource.onFire, 1);
+                }
+                fire--;
+            }
+        }
+        if(handleLavaMovement())
+        {
+            setOnFireFromLava();
+            fallDistance *= 0.5F;
+        }
+        if(posY < -64D)
+        {
+            kill();
+        }
+        if(!worldObj.multiplayerWorld)
+        {
+            setFlag(0, fire > 0);
+            setFlag(2, ridingEntity != null);
+        }
+        firstUpdate = false;
+        Profiler.endSection();
+    }
+
+    protected void setOnFireFromLava()
+    {
+        if(!isImmuneToFire)
+        {
+            attackEntityFrom(DamageSource.lava, 4);
+            func_40046_d(15);
+        }
+    }
+
+    public void func_40046_d(int i)
+    {
+        int j = i * 20;
+        if(fire < j)
+        {
+            fire = j;
+        }
+    }
+
+    public void func_40045_B()
+    {
+        fire = 0;
+    }
+
+    protected void kill()
+    {
+        setEntityDead();
+    }
+
+    public boolean isOffsetPositionInLiquid(double d, double d1, double d2)
+    {
+        AxisAlignedBB axisalignedbb = boundingBox.getOffsetBoundingBox(d, d1, d2);
+        List list = worldObj.getCollidingBoundingBoxes(this, axisalignedbb);
+        if(list.size() > 0)
+        {
+            return false;
+        }
+        return !worldObj.getIsAnyLiquid(axisalignedbb);
+    }
+
+    public void moveEntity(double d, double d1, double d2)
+    {
+        if(noClip)
+        {
+            boundingBox.offset(d, d1, d2);
+            posX = (boundingBox.minX + boundingBox.maxX) / 2D;
+            posY = (boundingBox.minY + (double)yOffset) - (double)ySize;
+            posZ = (boundingBox.minZ + boundingBox.maxZ) / 2D;
+            return;
+        }
+        Profiler.startSection("move");
+        ySize *= 0.4F;
+        double d3 = posX;
+        double d4 = posZ;
+        if(isInWeb)
+        {
+            isInWeb = false;
+            d *= 0.25D;
+            d1 *= 0.05000000074505806D;
+            d2 *= 0.25D;
+            motionX = 0.0D;
+            motionY = 0.0D;
+            motionZ = 0.0D;
+        }
+        double d5 = d;
+        double d6 = d1;
+        double d7 = d2;
+        AxisAlignedBB axisalignedbb = boundingBox.copy();
+        boolean flag = onGround && isSneaking();
+        if(flag)
+        {
+            double d8 = 0.050000000000000003D;
+            for(; d != 0.0D && worldObj.getCollidingBoundingBoxes(this, boundingBox.getOffsetBoundingBox(d, -1D, 0.0D)).size() == 0; d5 = d)
+            {
+                if(d < d8 && d >= -d8)
+                {
+                    d = 0.0D;
+                    continue;
+                }
+                if(d > 0.0D)
+                {
+                    d -= d8;
+                } else
+                {
+                    d += d8;
+                }
+            }
+
+            for(; d2 != 0.0D && worldObj.getCollidingBoundingBoxes(this, boundingBox.getOffsetBoundingBox(0.0D, -1D, d2)).size() == 0; d7 = d2)
+            {
+                if(d2 < d8 && d2 >= -d8)
+                {
+                    d2 = 0.0D;
+                    continue;
+                }
+                if(d2 > 0.0D)
+                {
+                    d2 -= d8;
+                } else
+                {
+                    d2 += d8;
+                }
+            }
+
+        }
+        List list = worldObj.getCollidingBoundingBoxes(this, boundingBox.addCoord(d, d1, d2));
+        for(int i = 0; i < list.size(); i++)
+        {
+            d1 = ((AxisAlignedBB)list.get(i)).calculateYOffset(boundingBox, d1);
+        }
+
+        boundingBox.offset(0.0D, d1, 0.0D);
+        if(!field_9293_aM && d6 != d1)
+        {
+            d = d1 = d2 = 0.0D;
+        }
+        boolean flag1 = onGround || d6 != d1 && d6 < 0.0D;
+        for(int j = 0; j < list.size(); j++)
+        {
+            d = ((AxisAlignedBB)list.get(j)).calculateXOffset(boundingBox, d);
+        }
+
+        boundingBox.offset(d, 0.0D, 0.0D);
+        if(!field_9293_aM && d5 != d)
+        {
+            d = d1 = d2 = 0.0D;
+        }
+        for(int k = 0; k < list.size(); k++)
+        {
+            d2 = ((AxisAlignedBB)list.get(k)).calculateZOffset(boundingBox, d2);
+        }
+
+        boundingBox.offset(0.0D, 0.0D, d2);
+        if(!field_9293_aM && d7 != d2)
+        {
+            d = d1 = d2 = 0.0D;
+        }
+        if(stepHeight > 0.0F && flag1 && (flag || ySize < 0.05F) && (d5 != d || d7 != d2))
+        {
+            double d9 = d;
+            double d11 = d1;
+            double d13 = d2;
+            d = d5;
+            d1 = stepHeight;
+            d2 = d7;
+            AxisAlignedBB axisalignedbb1 = boundingBox.copy();
+            boundingBox.setBB(axisalignedbb);
+            List list1 = worldObj.getCollidingBoundingBoxes(this, boundingBox.addCoord(d, d1, d2));
+            for(int j2 = 0; j2 < list1.size(); j2++)
+            {
+                d1 = ((AxisAlignedBB)list1.get(j2)).calculateYOffset(boundingBox, d1);
+            }
+
+            boundingBox.offset(0.0D, d1, 0.0D);
+            if(!field_9293_aM && d6 != d1)
+            {
+                d = d1 = d2 = 0.0D;
+            }
+            for(int k2 = 0; k2 < list1.size(); k2++)
+            {
+                d = ((AxisAlignedBB)list1.get(k2)).calculateXOffset(boundingBox, d);
+            }
+
+            boundingBox.offset(d, 0.0D, 0.0D);
+            if(!field_9293_aM && d5 != d)
+            {
+                d = d1 = d2 = 0.0D;
+            }
+            for(int l2 = 0; l2 < list1.size(); l2++)
+            {
+                d2 = ((AxisAlignedBB)list1.get(l2)).calculateZOffset(boundingBox, d2);
+            }
+
+            boundingBox.offset(0.0D, 0.0D, d2);
+            if(!field_9293_aM && d7 != d2)
+            {
+                d = d1 = d2 = 0.0D;
+            }
+            if(!field_9293_aM && d6 != d1)
+            {
+                d = d1 = d2 = 0.0D;
+            } else
+            {
+                d1 = -stepHeight;
+                for(int i3 = 0; i3 < list1.size(); i3++)
+                {
+                    d1 = ((AxisAlignedBB)list1.get(i3)).calculateYOffset(boundingBox, d1);
+                }
+
+                boundingBox.offset(0.0D, d1, 0.0D);
+            }
+            if(d9 * d9 + d13 * d13 >= d * d + d2 * d2)
+            {
+                d = d9;
+                d1 = d11;
+                d2 = d13;
+                boundingBox.setBB(axisalignedbb1);
+            } else
+            {
+                double d14 = boundingBox.minY - (double)(int)boundingBox.minY;
+                if(d14 > 0.0D)
+                {
+                    ySize += d14 + 0.01D;
+                }
+            }
+        }
+        Profiler.endSection();
+        Profiler.startSection("rest");
+        posX = (boundingBox.minX + boundingBox.maxX) / 2D;
+        posY = (boundingBox.minY + (double)yOffset) - (double)ySize;
+        posZ = (boundingBox.minZ + boundingBox.maxZ) / 2D;
+        isCollidedHorizontally = d5 != d || d7 != d2;
+        isCollidedVertically = d6 != d1;
+        onGround = d6 != d1 && d6 < 0.0D;
+        isCollided = isCollidedHorizontally || isCollidedVertically;
+        updateFallState(d1, onGround);
+        if(d5 != d)
+        {
+            motionX = 0.0D;
+        }
+        if(d6 != d1)
+        {
+            motionY = 0.0D;
+        }
+        if(d7 != d2)
+        {
+            motionZ = 0.0D;
+        }
+        double d10 = posX - d3;
+        double d12 = posZ - d4;
+        if(canTriggerWalking() && !flag && ridingEntity == null)
+        {
+            distanceWalkedModified += (double)MathHelper.sqrt_double(d10 * d10 + d12 * d12) * 0.59999999999999998D;
+            int l = MathHelper.floor_double(posX);
+            int j1 = MathHelper.floor_double(posY - 0.20000000298023224D - (double)yOffset);
+            int l1 = MathHelper.floor_double(posZ);
+            int j3 = worldObj.getBlockId(l, j1, l1);
+            if(j3 == 0 && worldObj.getBlockId(l, j1 - 1, l1) == Block.fence.blockID)
+            {
+                j3 = worldObj.getBlockId(l, j1 - 1, l1);
+            }
+            if(distanceWalkedModified > (float)nextStepDistance && j3 > 0)
+            {
+                nextStepDistance = (int)distanceWalkedModified + 1;
+                func_41002_a(l, j1, l1, j3);
+                Block.blocksList[j3].onEntityWalking(worldObj, l, j1, l1, this);
+            }
+        }
+        int i1 = MathHelper.floor_double(boundingBox.minX + 0.001D);
+        int k1 = MathHelper.floor_double(boundingBox.minY + 0.001D);
+        int i2 = MathHelper.floor_double(boundingBox.minZ + 0.001D);
+        int k3 = MathHelper.floor_double(boundingBox.maxX - 0.001D);
+        int l3 = MathHelper.floor_double(boundingBox.maxY - 0.001D);
+        int i4 = MathHelper.floor_double(boundingBox.maxZ - 0.001D);
+        if(worldObj.checkChunksExist(i1, k1, i2, k3, l3, i4))
+        {
+            for(int j4 = i1; j4 <= k3; j4++)
+            {
+                for(int k4 = k1; k4 <= l3; k4++)
+                {
+                    for(int l4 = i2; l4 <= i4; l4++)
+                    {
+                        int i5 = worldObj.getBlockId(j4, k4, l4);
+                        if(i5 > 0)
+                        {
+                            Block.blocksList[i5].onEntityCollidedWithBlock(worldObj, j4, k4, l4, this);
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+        boolean flag2 = isWet();
+        if(worldObj.isBoundingBoxBurning(boundingBox.contract(0.001D, 0.001D, 0.001D)))
+        {
+            dealFireDamage(1);
+            if(!flag2)
+            {
+                fire++;
+                if(fire == 0)
+                {
+                    func_40046_d(8);
+                }
+            }
+        } else
+        if(fire <= 0)
+        {
+            fire = -fireResistance;
+        }
+        if(flag2 && fire > 0)
+        {
+            worldObj.playSoundAtEntity(this, "random.fizz", 0.7F, 1.6F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
+            fire = -fireResistance;
+        }
+        Profiler.endSection();
+    }
+
+    protected void func_41002_a(int i, int j, int k, int l)
+    {
+        StepSound stepsound = Block.blocksList[l].stepSound;
+        if(worldObj.getBlockId(i, j + 1, k) == Block.snow.blockID)
+        {
+            stepsound = Block.snow.stepSound;
+            worldObj.playSoundAtEntity(this, stepsound.stepSoundDir2(), stepsound.getVolume() * 0.15F, stepsound.getPitch());
+        } else
+        if(!Block.blocksList[l].blockMaterial.getIsLiquid())
+        {
+            worldObj.playSoundAtEntity(this, stepsound.stepSoundDir2(), stepsound.getVolume() * 0.15F, stepsound.getPitch());
+        }
+    }
+
+    protected boolean canTriggerWalking()
+    {
+        return true;
+    }
+
+    protected void updateFallState(double d, boolean flag)
+    {
+        if(flag)
+        {
+            if(fallDistance > 0.0F)
+            {
+                fall(fallDistance);
+                fallDistance = 0.0F;
+            }
+        } else
+        if(d < 0.0D)
+        {
+            fallDistance -= d;
+        }
+    }
+
+    public AxisAlignedBB getBoundingBox()
+    {
+        return null;
+    }
+
+    protected void dealFireDamage(int i)
+    {
+        if(!isImmuneToFire)
+        {
+            attackEntityFrom(DamageSource.inFire, i);
+        }
+    }
+
+    public final boolean func_40047_D()
+    {
+        return isImmuneToFire;
+    }
+
+    protected void fall(float f)
+    {
+        if(riddenByEntity != null)
+        {
+            riddenByEntity.fall(f);
+        }
+    }
+
+    public boolean isWet()
+    {
+        return inWater || worldObj.canLightningStrikeAt(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ));
+    }
+
+    public boolean isInWater()
+    {
+        return inWater;
+    }
+
+    public boolean handleWaterMovement()
+    {
+        return worldObj.handleMaterialAcceleration(boundingBox.expand(0.0D, -0.40000000596046448D, 0.0D).contract(0.001D, 0.001D, 0.001D), Material.water, this);
+    }
+
+    public boolean isInsideOfMaterial(Material material)
+    {
+        double d = posY + (double)getEyeHeight();
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_float(MathHelper.floor_double(d));
+        int k = MathHelper.floor_double(posZ);
+        int l = worldObj.getBlockId(i, j, k);
+        if(l != 0 && Block.blocksList[l].blockMaterial == material)
+        {
+            float f = BlockFluid.getFluidHeightPercent(worldObj.getBlockMetadata(i, j, k)) - 0.1111111F;
+            float f1 = (float)(j + 1) - f;
+            return d < (double)f1;
+        } else
+        {
+            return false;
+        }
+    }
+
+    public float getEyeHeight()
+    {
+        return 0.0F;
+    }
+
+    public boolean handleLavaMovement()
+    {
+        return worldObj.isMaterialInBB(boundingBox.expand(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D), Material.lava);
+    }
+
+    public void moveFlying(float f, float f1, float f2)
+    {
+        float f3 = MathHelper.sqrt_float(f * f + f1 * f1);
+        if(f3 < 0.01F)
+        {
+            return;
+        }
+        if(f3 < 1.0F)
+        {
+            f3 = 1.0F;
+        }
+        f3 = f2 / f3;
+        f *= f3;
+        f1 *= f3;
+        float f4 = MathHelper.sin((rotationYaw * 3.141593F) / 180F);
+        float f5 = MathHelper.cos((rotationYaw * 3.141593F) / 180F);
+        motionX += f * f5 - f1 * f4;
+        motionZ += f1 * f5 + f * f4;
+    }
+
+    public int getEntityBrightnessForRender(float f)
+    {
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_double(posZ);
+        if(worldObj.blockExists(i, worldObj.field_35472_c / 2, j))
+        {
+            double d = (boundingBox.maxY - boundingBox.minY) * 0.66000000000000003D;
+            int k = MathHelper.floor_double((posY - (double)yOffset) + d);
+            return worldObj.getLightBrightnessForSkyBlocks(i, k, j, 0);
+        } else
+        {
+            return 0;
+        }
+    }
+
+    public float getEntityBrightness(float f)
+    {
+        int i = MathHelper.floor_double(posX);
+        int j = MathHelper.floor_double(posZ);
+        if(worldObj.blockExists(i, worldObj.field_35472_c / 2, j))
+        {
+            double d = (boundingBox.maxY - boundingBox.minY) * 0.66000000000000003D;
+            int k = MathHelper.floor_double((posY - (double)yOffset) + d);
+            return worldObj.getLightBrightness(i, k, j);
+        } else
+        {
+            return 0.0F;
+        }
+    }
+
+    public void setWorld(World world)
+    {
+        worldObj = world;
+    }
+
+    public void setPositionAndRotation(double d, double d1, double d2, float f, 
+            float f1)
+    {
+        prevPosX = posX = d;
+        prevPosY = posY = d1;
+        prevPosZ = posZ = d2;
+        prevRotationYaw = rotationYaw = f;
+        prevRotationPitch = rotationPitch = f1;
+        ySize = 0.0F;
+        double d3 = prevRotationYaw - f;
+        if(d3 < -180D)
+        {
+            prevRotationYaw += 360F;
+        }
+        if(d3 >= 180D)
+        {
+            prevRotationYaw -= 360F;
+        }
+        setPosition(posX, posY, posZ);
+        setRotation(f, f1);
+    }
+
+    public void setLocationAndAngles(double d, double d1, double d2, float f, 
+            float f1)
+    {
+        lastTickPosX = prevPosX = posX = d;
+        lastTickPosY = prevPosY = posY = d1 + (double)yOffset;
+        lastTickPosZ = prevPosZ = posZ = d2;
+        rotationYaw = f;
+        rotationPitch = f1;
+        setPosition(posX, posY, posZ);
+    }
+
+    public float getDistanceToEntity(Entity entity)
+    {
+        float f = (float)(posX - entity.posX);
+        float f1 = (float)(posY - entity.posY);
+        float f2 = (float)(posZ - entity.posZ);
+        return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
+    }
+
+    public double getDistanceSq(double d, double d1, double d2)
+    {
+        double d3 = posX - d;
+        double d4 = posY - d1;
+        double d5 = posZ - d2;
+        return d3 * d3 + d4 * d4 + d5 * d5;
+    }
+
+    public double getDistance(double d, double d1, double d2)
+    {
+        double d3 = posX - d;
+        double d4 = posY - d1;
+        double d5 = posZ - d2;
+        return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
+    }
+
+    public double getDistanceSqToEntity(Entity entity)
+    {
+        double d = posX - entity.posX;
+        double d1 = posY - entity.posY;
+        double d2 = posZ - entity.posZ;
+        return d * d + d1 * d1 + d2 * d2;
+    }
+
+    public void onCollideWithPlayer(EntityPlayer entityplayer)
+    {
+    }
+
+    public void applyEntityCollision(Entity entity)
+    {
+        if(entity.riddenByEntity == this || entity.ridingEntity == this)
+        {
+            return;
+        }
+        double d = entity.posX - posX;
+        double d1 = entity.posZ - posZ;
+        double d2 = MathHelper.abs_max(d, d1);
+        if(d2 >= 0.0099999997764825821D)
+        {
+            d2 = MathHelper.sqrt_double(d2);
+            d /= d2;
+            d1 /= d2;
+            double d3 = 1.0D / d2;
+            if(d3 > 1.0D)
+            {
+                d3 = 1.0D;
+            }
+            d *= d3;
+            d1 *= d3;
+            d *= 0.05000000074505806D;
+            d1 *= 0.05000000074505806D;
+            d *= 1.0F - entityCollisionReduction;
+            d1 *= 1.0F - entityCollisionReduction;
+            addVelocity(-d, 0.0D, -d1);
+            entity.addVelocity(d, 0.0D, d1);
+        }
+    }
+
+    public void addVelocity(double d, double d1, double d2)
+    {
+        motionX += d;
+        motionY += d1;
+        motionZ += d2;
+        isAirBorne = true;
+    }
+
+    protected void setBeenAttacked()
+    {
+        beenAttacked = true;
+    }
+
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        setBeenAttacked();
+        return false;
+    }
+
+    public boolean canBeCollidedWith()
+    {
+        return false;
+    }
+
+    public boolean canBePushed()
+    {
+        return false;
+    }
+
+    public void addToPlayerScore(Entity entity, int i)
+    {
+    }
+
+    public boolean isInRangeToRenderVec3D(Vec3D vec3d)
+    {
+        double d = posX - vec3d.xCoord;
+        double d1 = posY - vec3d.yCoord;
+        double d2 = posZ - vec3d.zCoord;
+        double d3 = d * d + d1 * d1 + d2 * d2;
+        return isInRangeToRenderDist(d3);
+    }
+
+    public boolean isInRangeToRenderDist(double d)
+    {
+        double d1 = boundingBox.getAverageEdgeLength();
+        d1 *= 64D * renderDistanceWeight;
+        return d < d1 * d1;
+    }
+
+    public String getEntityTexture()
+    {
+        return null;
+    }
+
+    public boolean addEntityID(NBTTagCompound nbttagcompound)
+    {
+        String s = getEntityString();
+        if(isDead || s == null)
+        {
+            return false;
+        } else
+        {
+            nbttagcompound.setString("id", s);
+            writeToNBT(nbttagcompound);
+            return true;
+        }
+    }
+
+    public void writeToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setTag("Pos", newDoubleNBTList(new double[] {
+            posX, posY + (double)ySize, posZ
+        }));
+        nbttagcompound.setTag("Motion", newDoubleNBTList(new double[] {
+            motionX, motionY, motionZ
+        }));
+        nbttagcompound.setTag("Rotation", newFloatNBTList(new float[] {
+            rotationYaw, rotationPitch
+        }));
+        nbttagcompound.setFloat("FallDistance", fallDistance);
+        nbttagcompound.setShort("Fire", (short)fire);
+        nbttagcompound.setShort("Air", (short)func_41001_Z());
+        nbttagcompound.setBoolean("OnGround", onGround);
+        writeEntityToNBT(nbttagcompound);
+    }
+
+    public void readFromNBT(NBTTagCompound nbttagcompound)
+    {
+        NBTTagList nbttaglist = nbttagcompound.getTagList("Pos");
+        NBTTagList nbttaglist1 = nbttagcompound.getTagList("Motion");
+        NBTTagList nbttaglist2 = nbttagcompound.getTagList("Rotation");
+        motionX = ((NBTTagDouble)nbttaglist1.tagAt(0)).doubleValue;
+        motionY = ((NBTTagDouble)nbttaglist1.tagAt(1)).doubleValue;
+        motionZ = ((NBTTagDouble)nbttaglist1.tagAt(2)).doubleValue;
+        if(Math.abs(motionX) > 10D)
+        {
+            motionX = 0.0D;
+        }
+        if(Math.abs(motionY) > 10D)
+        {
+            motionY = 0.0D;
+        }
+        if(Math.abs(motionZ) > 10D)
+        {
+            motionZ = 0.0D;
+        }
+        prevPosX = lastTickPosX = posX = ((NBTTagDouble)nbttaglist.tagAt(0)).doubleValue;
+        prevPosY = lastTickPosY = posY = ((NBTTagDouble)nbttaglist.tagAt(1)).doubleValue;
+        prevPosZ = lastTickPosZ = posZ = ((NBTTagDouble)nbttaglist.tagAt(2)).doubleValue;
+        prevRotationYaw = rotationYaw = ((NBTTagFloat)nbttaglist2.tagAt(0)).floatValue;
+        prevRotationPitch = rotationPitch = ((NBTTagFloat)nbttaglist2.tagAt(1)).floatValue;
+        fallDistance = nbttagcompound.getFloat("FallDistance");
+        fire = nbttagcompound.getShort("Fire");
+        func_41003_g(nbttagcompound.getShort("Air"));
+        onGround = nbttagcompound.getBoolean("OnGround");
+        setPosition(posX, posY, posZ);
+        setRotation(rotationYaw, rotationPitch);
+        readEntityFromNBT(nbttagcompound);
+    }
+
+    protected final String getEntityString()
+    {
+        return EntityList.getEntityString(this);
+    }
+
+    protected abstract void readEntityFromNBT(NBTTagCompound nbttagcompound);
+
+    protected abstract void writeEntityToNBT(NBTTagCompound nbttagcompound);
+
+    protected NBTTagList newDoubleNBTList(double ad[])
+    {
+        NBTTagList nbttaglist = new NBTTagList();
+        double ad1[] = ad;
+        int i = ad1.length;
+        for(int j = 0; j < i; j++)
+        {
+            double d = ad1[j];
+            nbttaglist.setTag(new NBTTagDouble(null, d));
+        }
+
+        return nbttaglist;
+    }
+
+    protected NBTTagList newFloatNBTList(float af[])
+    {
+        NBTTagList nbttaglist = new NBTTagList();
+        float af1[] = af;
+        int i = af1.length;
+        for(int j = 0; j < i; j++)
+        {
+            float f = af1[j];
+            nbttaglist.setTag(new NBTTagFloat(null, f));
+        }
+
+        return nbttaglist;
+    }
+
+    public float getShadowSize()
+    {
+        return height / 2.0F;
+    }
+
+    public EntityItem dropItem(int i, int j)
+    {
+        return dropItemWithOffset(i, j, 0.0F);
+    }
+
+    public EntityItem dropItemWithOffset(int i, int j, float f)
+    {
+        return entityDropItem(new ItemStack(i, j, 0), f);
+    }
+
+    public EntityItem entityDropItem(ItemStack itemstack, float f)
+    {
+        EntityItem entityitem = new EntityItem(worldObj, posX, posY + (double)f, posZ, itemstack);
+        entityitem.delayBeforeCanPickup = 10;
+        worldObj.entityJoinedWorld(entityitem);
+        return entityitem;
+    }
+
+    public boolean isEntityAlive()
+    {
+        return !isDead;
+    }
+
+    public boolean isEntityInsideOpaqueBlock()
+    {
+        for(int i = 0; i < 8; i++)
+        {
+            float f = ((float)((i >> 0) % 2) - 0.5F) * width * 0.8F;
+            float f1 = ((float)((i >> 1) % 2) - 0.5F) * 0.1F;
+            float f2 = ((float)((i >> 2) % 2) - 0.5F) * width * 0.8F;
+            int j = MathHelper.floor_double(posX + (double)f);
+            int k = MathHelper.floor_double(posY + (double)getEyeHeight() + (double)f1);
+            int l = MathHelper.floor_double(posZ + (double)f2);
+            if(worldObj.isBlockNormalCube(j, k, l))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean interact(EntityPlayer entityplayer)
+    {
+        return false;
+    }
+
+    public AxisAlignedBB getCollisionBox(Entity entity)
+    {
+        return null;
+    }
+
+    public void updateRidden()
+    {
+        if(ridingEntity.isDead)
+        {
+            ridingEntity = null;
+            return;
+        }
+        motionX = 0.0D;
+        motionY = 0.0D;
+        motionZ = 0.0D;
+        onUpdate();
+        if(ridingEntity == null)
+        {
+            return;
+        }
+        ridingEntity.updateRiderPosition();
+        entityRiderYawDelta += ridingEntity.rotationYaw - ridingEntity.prevRotationYaw;
+        entityRiderPitchDelta += ridingEntity.rotationPitch - ridingEntity.prevRotationPitch;
+        for(; entityRiderYawDelta >= 180D; entityRiderYawDelta -= 360D) { }
+        for(; entityRiderYawDelta < -180D; entityRiderYawDelta += 360D) { }
+        for(; entityRiderPitchDelta >= 180D; entityRiderPitchDelta -= 360D) { }
+        for(; entityRiderPitchDelta < -180D; entityRiderPitchDelta += 360D) { }
+        double d = entityRiderYawDelta * 0.5D;
+        double d1 = entityRiderPitchDelta * 0.5D;
+        float f = 10F;
+        if(d > (double)f)
+        {
+            d = f;
+        }
+        if(d < (double)(-f))
+        {
+            d = -f;
+        }
+        if(d1 > (double)f)
+        {
+            d1 = f;
+        }
+        if(d1 < (double)(-f))
+        {
+            d1 = -f;
+        }
+        entityRiderYawDelta -= d;
+        entityRiderPitchDelta -= d1;
+        rotationYaw += d;
+        rotationPitch += d1;
+    }
+
+    public void updateRiderPosition()
+    {
+        riddenByEntity.setPosition(posX, posY + getMountedYOffset() + riddenByEntity.getYOffset(), posZ);
+    }
+
+    public double getYOffset()
+    {
+        return (double)yOffset;
+    }
+
+    public double getMountedYOffset()
+    {
+        return (double)height * 0.75D;
+    }
+
+    public void mountEntity(Entity entity)
+    {
+        entityRiderPitchDelta = 0.0D;
+        entityRiderYawDelta = 0.0D;
+        if(entity == null)
+        {
+            if(ridingEntity != null)
+            {
+                setLocationAndAngles(ridingEntity.posX, ridingEntity.boundingBox.minY + (double)ridingEntity.height, ridingEntity.posZ, rotationYaw, rotationPitch);
+                ridingEntity.riddenByEntity = null;
+            }
+            ridingEntity = null;
+            return;
+        }
+        if(ridingEntity == entity)
+        {
+            ridingEntity.riddenByEntity = null;
+            ridingEntity = null;
+            setLocationAndAngles(entity.posX, entity.boundingBox.minY + (double)entity.height, entity.posZ, rotationYaw, rotationPitch);
+            return;
+        }
+        if(ridingEntity != null)
+        {
+            ridingEntity.riddenByEntity = null;
+        }
+        if(entity.riddenByEntity != null)
+        {
+            entity.riddenByEntity.ridingEntity = null;
+        }
+        ridingEntity = entity;
+        entity.riddenByEntity = this;
+    }
+
+    public void setPositionAndRotation2(double d, double d1, double d2, float f, 
+            float f1, int i)
+    {
+        setPosition(d, d1, d2);
+        setRotation(f, f1);
+        List list = worldObj.getCollidingBoundingBoxes(this, boundingBox.contract(0.03125D, 0.0D, 0.03125D));
+        if(list.size() > 0)
+        {
+            double d3 = 0.0D;
+            for(int j = 0; j < list.size(); j++)
+            {
+                AxisAlignedBB axisalignedbb = (AxisAlignedBB)list.get(j);
+                if(axisalignedbb.maxY > d3)
+                {
+                    d3 = axisalignedbb.maxY;
+                }
+            }
+
+            d1 += d3 - boundingBox.minY;
+            setPosition(d, d1, d2);
+        }
+    }
+
+    public float getCollisionBorderSize()
+    {
+        return 0.1F;
+    }
+
+    public Vec3D getLookVec()
+    {
+        return null;
+    }
+
+    public void setInPortal()
+    {
+    }
+
+    public void setVelocity(double d, double d1, double d2)
+    {
+        motionX = d;
+        motionY = d1;
+        motionZ = d2;
+    }
+
+    public void handleHealthUpdate(byte byte0)
+    {
+    }
+
+    public void performHurtAnimation()
+    {
+    }
+
+    public void updateCloak()
+    {
+    }
+
+    public void outfitWithItem(int i, int j, int k)
+    {
+    }
+
+    public boolean isBurning()
+    {
+        return fire > 0 || getEntityFlag(0);
+    }
+
+    public boolean isRiding()
+    {
+        return ridingEntity != null || getEntityFlag(2);
+    }
+
+    public boolean isSneaking()
+    {
+        return getEntityFlag(1);
+    }
+
+    public boolean isSprinting()
+    {
+        return getEntityFlag(3);
+    }
+
+    public void setSprinting(boolean flag)
+    {
+        setFlag(3, flag);
+    }
+
+    public boolean isEating()
+    {
+        return getEntityFlag(4);
+    }
+
+    public void setEating(boolean flag)
+    {
+        setFlag(4, flag);
+    }
+
+    protected boolean getEntityFlag(int i)
+    {
+        return (dataWatcher.getWatchableObjectByte(0) & 1 << i) != 0;
+    }
+
+    protected void setFlag(int i, boolean flag)
+    {
+        byte byte0 = dataWatcher.getWatchableObjectByte(0);
+        if(flag)
+        {
+            dataWatcher.updateObject(0, Byte.valueOf((byte)(byte0 | 1 << i)));
+        } else
+        {
+            dataWatcher.updateObject(0, Byte.valueOf((byte)(byte0 & ~(1 << i))));
+        }
+    }
+
+    public int func_41001_Z()
+    {
+        return dataWatcher.func_41062_b(1);
+    }
+
+    public void func_41003_g(int i)
+    {
+        dataWatcher.updateObject(1, Short.valueOf((short)i));
+    }
+
+    public void onStruckByLightning(EntityLightningBolt entitylightningbolt)
+    {
+        dealFireDamage(5);
+        fire++;
+        if(fire == 0)
+        {
+            func_40046_d(8);
+        }
+    }
+
+    public void onKillEntity(EntityLiving entityliving)
+    {
+    }
+
+    protected boolean pushOutOfBlocks(double d, double d1, double d2)
+    {
+        int i = MathHelper.floor_double(d);
+        int j = MathHelper.floor_double(d1);
+        int k = MathHelper.floor_double(d2);
+        double d3 = d - (double)i;
+        double d4 = d1 - (double)j;
+        double d5 = d2 - (double)k;
+        if(worldObj.isBlockNormalCube(i, j, k))
+        {
+            boolean flag = !worldObj.isBlockNormalCube(i - 1, j, k);
+            boolean flag1 = !worldObj.isBlockNormalCube(i + 1, j, k);
+            boolean flag2 = !worldObj.isBlockNormalCube(i, j - 1, k);
+            boolean flag3 = !worldObj.isBlockNormalCube(i, j + 1, k);
+            boolean flag4 = !worldObj.isBlockNormalCube(i, j, k - 1);
+            boolean flag5 = !worldObj.isBlockNormalCube(i, j, k + 1);
+            byte byte0 = -1;
+            double d6 = 9999D;
+            if(flag && d3 < d6)
+            {
+                d6 = d3;
+                byte0 = 0;
+            }
+            if(flag1 && 1.0D - d3 < d6)
+            {
+                d6 = 1.0D - d3;
+                byte0 = 1;
+            }
+            if(flag2 && d4 < d6)
+            {
+                d6 = d4;
+                byte0 = 2;
+            }
+            if(flag3 && 1.0D - d4 < d6)
+            {
+                d6 = 1.0D - d4;
+                byte0 = 3;
+            }
+            if(flag4 && d5 < d6)
+            {
+                d6 = d5;
+                byte0 = 4;
+            }
+            if(flag5 && 1.0D - d5 < d6)
+            {
+                double d7 = 1.0D - d5;
+                byte0 = 5;
+            }
+            float f = rand.nextFloat() * 0.2F + 0.1F;
+            if(byte0 == 0)
+            {
+                motionX = -f;
+            }
+            if(byte0 == 1)
+            {
+                motionX = f;
+            }
+            if(byte0 == 2)
+            {
+                motionY = -f;
+            }
+            if(byte0 == 3)
+            {
+                motionY = f;
+            }
+            if(byte0 == 4)
+            {
+                motionZ = -f;
+            }
+            if(byte0 == 5)
+            {
+                motionZ = f;
+            }
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+
+    public void setInWeb()
+    {
+        isInWeb = true;
+    }
+
+    public Entity[] func_40048_X()
+    {
+        return null;
+    }
+
+    public boolean func_41004_h(Entity entity)
+    {
+        return this == entity;
+    }
+
 }

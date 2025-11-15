@@ -1,104 +1,136 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockRedstoneOre extends Block {
-	private boolean field_468_a;
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, Item, 
+//            ItemStack, EntityPlayer, Entity
 
-	public BlockRedstoneOre(int var1, int var2, boolean var3) {
-		super(var1, var2, Material.rock);
-		if(var3) {
-			this.setTickOnLoad(true);
-		}
+public class BlockRedstoneOre extends Block
+{
 
-		this.field_468_a = var3;
-	}
+    private boolean glowing;
 
-	public int tickRate() {
-		return 30;
-	}
+    public BlockRedstoneOre(int i, int j, boolean flag)
+    {
+        super(i, j, Material.rock);
+        if(flag)
+        {
+            setTickOnLoad(true);
+        }
+        glowing = flag;
+    }
 
-	public void onBlockClicked(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		this.func_320_h(var1, var2, var3, var4);
-		super.onBlockClicked(var1, var2, var3, var4, var5);
-	}
+    public int tickRate()
+    {
+        return 30;
+    }
 
-	public void onEntityWalking(World var1, int var2, int var3, int var4, Entity var5) {
-		this.func_320_h(var1, var2, var3, var4);
-		super.onEntityWalking(var1, var2, var3, var4, var5);
-	}
+    public void onBlockClicked(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        func_320_h(world, i, j, k);
+        super.onBlockClicked(world, i, j, k, entityplayer);
+    }
 
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		this.func_320_h(var1, var2, var3, var4);
-		return super.blockActivated(var1, var2, var3, var4, var5);
-	}
+    public void onEntityWalking(World world, int i, int j, int k, Entity entity)
+    {
+        func_320_h(world, i, j, k);
+        super.onEntityWalking(world, i, j, k, entity);
+    }
 
-	private void func_320_h(World var1, int var2, int var3, int var4) {
-		this.func_319_i(var1, var2, var3, var4);
-		if(this.blockID == Block.oreRedstone.blockID) {
-			var1.setBlockWithNotify(var2, var3, var4, Block.oreRedstoneGlowing.blockID);
-		}
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        func_320_h(world, i, j, k);
+        return super.blockActivated(world, i, j, k, entityplayer);
+    }
 
-	}
+    private void func_320_h(World world, int i, int j, int k)
+    {
+        func_319_i(world, i, j, k);
+        if(blockID == Block.oreRedstone.blockID)
+        {
+            world.setBlockWithNotify(i, j, k, Block.oreRedstoneGlowing.blockID);
+        }
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(this.blockID == Block.oreRedstoneGlowing.blockID) {
-			var1.setBlockWithNotify(var2, var3, var4, Block.oreRedstone.blockID);
-		}
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(blockID == Block.oreRedstoneGlowing.blockID)
+        {
+            world.setBlockWithNotify(i, j, k, Block.oreRedstone.blockID);
+        }
+    }
 
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Item.redstone.shiftedIndex;
+    }
 
-	public int idDropped(int var1, Random var2) {
-		return Item.redstone.shiftedIndex;
-	}
+    public int func_40198_a(int i, Random random)
+    {
+        return quantityDropped(random) + random.nextInt(i + 1);
+    }
 
-	public int quantityDropped(Random var1) {
-		return 4 + var1.nextInt(2);
-	}
+    public int quantityDropped(Random random)
+    {
+        return 4 + random.nextInt(2);
+    }
 
-	public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(this.field_468_a) {
-			this.func_319_i(var1, var2, var3, var4);
-		}
+    public void randomDisplayTick(World world, int i, int j, int k, Random random)
+    {
+        if(glowing)
+        {
+            func_319_i(world, i, j, k);
+        }
+    }
 
-	}
+    private void func_319_i(World world, int i, int j, int k)
+    {
+        Random random = world.rand;
+        double d = 0.0625D;
+        for(int l = 0; l < 6; l++)
+        {
+            double d1 = (float)i + random.nextFloat();
+            double d2 = (float)j + random.nextFloat();
+            double d3 = (float)k + random.nextFloat();
+            if(l == 0 && !world.isBlockOpaqueCube(i, j + 1, k))
+            {
+                d2 = (double)(j + 1) + d;
+            }
+            if(l == 1 && !world.isBlockOpaqueCube(i, j - 1, k))
+            {
+                d2 = (double)(j + 0) - d;
+            }
+            if(l == 2 && !world.isBlockOpaqueCube(i, j, k + 1))
+            {
+                d3 = (double)(k + 1) + d;
+            }
+            if(l == 3 && !world.isBlockOpaqueCube(i, j, k - 1))
+            {
+                d3 = (double)(k + 0) - d;
+            }
+            if(l == 4 && !world.isBlockOpaqueCube(i + 1, j, k))
+            {
+                d1 = (double)(i + 1) + d;
+            }
+            if(l == 5 && !world.isBlockOpaqueCube(i - 1, j, k))
+            {
+                d1 = (double)(i + 0) - d;
+            }
+            if(d1 < (double)i || d1 > (double)(i + 1) || d2 < 0.0D || d2 > (double)(j + 1) || d3 < (double)k || d3 > (double)(k + 1))
+            {
+                world.spawnParticle("reddust", d1, d2, d3, 0.0D, 0.0D, 0.0D);
+            }
+        }
 
-	private void func_319_i(World var1, int var2, int var3, int var4) {
-		Random var5 = var1.rand;
-		double var6 = 1.0D / 16.0D;
+    }
 
-		for(int var8 = 0; var8 < 6; ++var8) {
-			double var9 = (double)((float)var2 + var5.nextFloat());
-			double var11 = (double)((float)var3 + var5.nextFloat());
-			double var13 = (double)((float)var4 + var5.nextFloat());
-			if(var8 == 0 && !var1.isBlockOpaqueCube(var2, var3 + 1, var4)) {
-				var11 = (double)(var3 + 1) + var6;
-			}
-
-			if(var8 == 1 && !var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-				var11 = (double)(var3 + 0) - var6;
-			}
-
-			if(var8 == 2 && !var1.isBlockOpaqueCube(var2, var3, var4 + 1)) {
-				var13 = (double)(var4 + 1) + var6;
-			}
-
-			if(var8 == 3 && !var1.isBlockOpaqueCube(var2, var3, var4 - 1)) {
-				var13 = (double)(var4 + 0) - var6;
-			}
-
-			if(var8 == 4 && !var1.isBlockOpaqueCube(var2 + 1, var3, var4)) {
-				var9 = (double)(var2 + 1) + var6;
-			}
-
-			if(var8 == 5 && !var1.isBlockOpaqueCube(var2 - 1, var3, var4)) {
-				var9 = (double)(var2 + 0) - var6;
-			}
-
-			if(var9 < (double)var2 || var9 > (double)(var2 + 1) || var11 < 0.0D || var11 > (double)(var3 + 1) || var13 < (double)var4 || var13 > (double)(var4 + 1)) {
-				var1.spawnParticle("reddust", var9, var11, var13, 0.0D, 0.0D, 0.0D);
-			}
-		}
-
-	}
+    protected ItemStack func_41049_c_(int i)
+    {
+        return new ItemStack(Block.oreRedstone);
+    }
 }

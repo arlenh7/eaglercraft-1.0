@@ -1,20 +1,54 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class RecipesWeapons {
-	private String[][] recipePatterns = new String[][]{{"X", "X", "#"}};
-	private Object[][] recipeItems = new Object[][]{{Block.planks, Block.cobblestone, Item.ingotIron, Item.diamond, Item.ingotGold}, {Item.swordWood, Item.swordStone, Item.swordSteel, Item.swordDiamond, Item.swordGold}};
 
-	public void addRecipes(CraftingManager var1) {
-		for(int var2 = 0; var2 < this.recipeItems[0].length; ++var2) {
-			Object var3 = this.recipeItems[0][var2];
+// Referenced classes of package net.minecraft.src:
+//            Block, Item, ItemStack, CraftingManager
 
-			for(int var4 = 0; var4 < this.recipeItems.length - 1; ++var4) {
-				Item var5 = (Item)this.recipeItems[var4 + 1][var2];
-				var1.addRecipe(new ItemStack(var5), new Object[]{this.recipePatterns[var4], '#', Item.stick, 'X', var3});
-			}
-		}
+public class RecipesWeapons
+{
 
-		var1.addRecipe(new ItemStack(Item.bow, 1), new Object[]{" #X", "# X", " #X", 'X', Item.silk, '#', Item.stick});
-		var1.addRecipe(new ItemStack(Item.arrow, 4), new Object[]{"X", "#", "Y", 'Y', Item.feather, 'X', Item.flint, '#', Item.stick});
-	}
+    private String recipePatterns[][] = {
+        {
+            "X", "X", "#"
+        }
+    };
+    private Object recipeItems[][];
+
+    public RecipesWeapons()
+    {
+        recipeItems = (new Object[][] {
+            new Object[] {
+                Block.planks, Block.cobblestone, Item.ingotIron, Item.diamond, Item.ingotGold
+            }, new Object[] {
+                Item.swordWood, Item.swordStone, Item.swordSteel, Item.swordDiamond, Item.swordGold
+            }
+        });
+    }
+
+    public void addRecipes(CraftingManager craftingmanager)
+    {
+        for(int i = 0; i < recipeItems[0].length; i++)
+        {
+            Object obj = recipeItems[0][i];
+            for(int j = 0; j < recipeItems.length - 1; j++)
+            {
+                Item item = (Item)recipeItems[j + 1][i];
+                craftingmanager.addRecipe(new ItemStack(item), new Object[] {
+                    recipePatterns[j], Character.valueOf('#'), Item.stick, Character.valueOf('X'), obj
+                });
+            }
+
+        }
+
+        craftingmanager.addRecipe(new ItemStack(Item.bow, 1), new Object[] {
+            " #X", "# X", " #X", Character.valueOf('X'), Item.silk, Character.valueOf('#'), Item.stick
+        });
+        craftingmanager.addRecipe(new ItemStack(Item.arrow, 4), new Object[] {
+            "X", "#", "Y", Character.valueOf('Y'), Item.feather, Character.valueOf('X'), Item.flint, Character.valueOf('#'), Item.stick
+        });
+    }
 }

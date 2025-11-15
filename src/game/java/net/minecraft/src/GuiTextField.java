@@ -1,96 +1,126 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.FontRenderer;
 
-public class GuiTextField extends Gui {
-	protected final FontRenderer field_22080_c;
-	protected final int field_22079_d;
-	protected final int field_22078_e;
-	protected final int field_22077_f;
-	protected final int field_22076_g;
-	protected String field_22075_h;
-	protected int maxLength;
-	protected int ticks;
-	public boolean field_22082_a = false;
-	public boolean field_22081_b = true;
+// Referenced classes of package net.minecraft.src:
+//            Gui, GuiScreen, ChatAllowedCharacters, FontRenderer
 
-	public GuiTextField(FontRenderer fontRenderer, int n, int n2, int n3, int n4, String string) {
-		this.field_22080_c = fontRenderer;
-		this.field_22079_d = n;
-		this.field_22078_e = n2;
-		this.field_22077_f = n3;
-		this.field_22076_g = n4;
-		this.setTextBoxText(string);
-	}
+public class GuiTextField extends Gui
+{
 
-	public void setTextBoxText(String string) {
-		this.field_22075_h = string;
-	}
+    private final FontRenderer fontRenderer;
+    private final int xPos;
+    private final int yPos;
+    private final int width;
+    private final int height;
+    private String text;
+    private int maxStringLength;
+    private int cursorCounter;
+    public boolean isFocused;
+    public boolean isEnabled;
+    private GuiScreen parentGuiScreen;
 
-	public String getTextBoxText() {
-		return this.field_22075_h;
-	}
+    public GuiTextField(GuiScreen guiscreen, FontRenderer fontrenderer, int i, int j, int k, int l, String s)
+    {
+        isFocused = false;
+        isEnabled = true;
+        parentGuiScreen = guiscreen;
+        fontRenderer = fontrenderer;
+        xPos = i;
+        yPos = j;
+        width = k;
+        height = l;
+        setText(s);
+    }
 
-	public void onUpdate() {
-		++this.ticks;
-	}
+    public void setText(String s)
+    {
+        text = s;
+    }
 
-	public void handleKeyboardInput(char c, int n) {
-		if (!this.field_22081_b || !this.field_22082_a) {
-			return;
-		}
-		
-		if ((int)c == 16 || (GuiScreen.isCtrlKeyDown() && n == 47)) {
-			int n2;
-			String string = GuiScreen.getClipboardString();
-			if (string == null) {
-				string = "";
-			}
-			if ((n2 = 32 - this.field_22075_h.length()) > string.length()) {
-				n2 = string.length();
-			}
-			if (n2 > 0) {
-				this.field_22075_h = this.field_22075_h + string.substring(0, n2);
-			}
-		}
-		if (n == 14 && this.field_22075_h.length() > 0) {
-			this.field_22075_h = this.field_22075_h.substring(0, this.field_22075_h.length() - 1);
-		}
-		if (FontAllowedCharacters.isAllowed(c) >= 0
-				&& (this.field_22075_h.length() < this.maxLength || this.maxLength == 0)) {
-			this.field_22075_h = this.field_22075_h + c;
-		}
-	}
+    public String getText()
+    {
+        return text;
+    }
 
-	public void handleMouseInput(int n, int n2, int n3) {
-		boolean bl = this.field_22081_b && n >= this.field_22079_d && n < this.field_22079_d + this.field_22077_f
-				&& n2 >= this.field_22078_e && n2 < this.field_22078_e + this.field_22076_g;
-		if (bl && !this.field_22082_a) {
-			this.ticks = 0;
-		}
-		this.field_22082_a = bl;
-	}
+    public void updateCursorCounter()
+    {
+        cursorCounter++;
+    }
 
-	public void drawTextBox() {
-		this.drawRect(this.field_22079_d - 1, this.field_22078_e - 1, this.field_22079_d + this.field_22077_f + 1,
-				this.field_22078_e + this.field_22076_g + 1, -6250336);
-		this.drawRect(this.field_22079_d, this.field_22078_e, this.field_22079_d + this.field_22077_f,
-				this.field_22078_e + this.field_22076_g, -16777216);
-		if (this.field_22081_b) {
-			boolean bl = this.field_22082_a && this.ticks / 6 % 2 == 0;
-			this.drawString(this.field_22080_c, this.field_22075_h + (bl ? "_" : ""), this.field_22079_d + 4,
-					this.field_22078_e + (this.field_22076_g - 8) / 2, 0xE0E0E0);
-		} else {
-			this.drawString(this.field_22080_c, this.field_22075_h, this.field_22079_d + 4,
-					this.field_22078_e + (this.field_22076_g - 8) / 2, 0x707070);
-		}
-	}
-	
-	public void setFocused(boolean b) {
-		this.field_22082_a = b;
-	}
+    public void textboxKeyTyped(char c, int i)
+    {
+        if(!isEnabled || !isFocused)
+        {
+            return;
+        }
+        if(c == '\t')
+        {
+            parentGuiScreen.selectNextField();
+        }
+        if(c == '\026')
+        {
+            String s;
+            int j;
+            s = GuiScreen.getClipboardString();
+            if(s == null)
+            {
+                s = "";
+            }
+            j = 32 - text.length();
+            if(j > s.length())
+            {
+                j = s.length();
+            }
+            if(j > 0)
+            {
+                text += s.substring(0, j);
+            }
+        }
+        if(i == 14 && text.length() > 0)
+        {
+            text = text.substring(0, text.length() - 1);
+        }
+        if(ChatAllowedCharacters.allowedCharacters.indexOf(c) >= 0 && (text.length() < maxStringLength || maxStringLength == 0))
+        {
+            text += c;
+        }
+    }
 
-	public void setMaxLength(int n) {
-		this.maxLength = n;
-	}
+    public void mouseClicked(int i, int j, int k)
+    {
+        boolean flag = isEnabled && i >= xPos && i < xPos + width && j >= yPos && j < yPos + height;
+        setFocused(flag);
+    }
+
+    public void setFocused(boolean flag)
+    {
+        if(flag && !isFocused)
+        {
+            cursorCounter = 0;
+        }
+        isFocused = flag;
+    }
+
+    public void drawTextBox()
+    {
+        drawRect(xPos - 1, yPos - 1, xPos + width + 1, yPos + height + 1, 0xffa0a0a0);
+        drawRect(xPos, yPos, xPos + width, yPos + height, 0xff000000);
+        if(isEnabled)
+        {
+            boolean flag = isFocused && (cursorCounter / 6) % 2 == 0;
+            drawString(fontRenderer, (new StringBuilder()).append(text).append(flag ? "_" : "").toString(), xPos + 4, yPos + (height - 8) / 2, 0xe0e0e0);
+        } else
+        {
+            drawString(fontRenderer, text, xPos + 4, yPos + (height - 8) / 2, 0x707070);
+        }
+    }
+
+    public void setMaxStringLength(int i)
+    {
+        maxStringLength = i;
+    }
 }

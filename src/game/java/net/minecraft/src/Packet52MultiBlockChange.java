@@ -1,55 +1,69 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet52MultiBlockChange extends Packet {
-	public int xPosition;
-	public int zPosition;
-	public short[] coordinateArray;
-	public byte[] typeArray;
-	public byte[] metadataArray;
-	public int size;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet52MultiBlockChange() {
-		this.isChunkDataPacket = true;
-	}
+public class Packet52MultiBlockChange extends Packet
+{
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readInt();
-		this.zPosition = var1.readInt();
-		this.size = var1.readShort() & '\uffff';
-		this.coordinateArray = new short[this.size];
-		this.typeArray = new byte[this.size];
-		this.metadataArray = new byte[this.size];
+    public int xPosition;
+    public int zPosition;
+    public short coordinateArray[];
+    public byte typeArray[];
+    public byte metadataArray[];
+    public int size;
 
-		for(int var2 = 0; var2 < this.size; ++var2) {
-			this.coordinateArray[var2] = var1.readShort();
-		}
+    public Packet52MultiBlockChange()
+    {
+        isChunkDataPacket = true;
+    }
 
-		var1.readFully(this.typeArray);
-		var1.readFully(this.metadataArray);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readInt();
+        zPosition = datainputstream.readInt();
+        size = datainputstream.readShort() & 0xffff;
+        coordinateArray = new short[size];
+        typeArray = new byte[size];
+        metadataArray = new byte[size];
+        for(int i = 0; i < size; i++)
+        {
+            coordinateArray[i] = datainputstream.readShort();
+        }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.xPosition);
-		var1.writeInt(this.zPosition);
-		var1.writeShort((short)this.size);
+        datainputstream.readFully(typeArray);
+        datainputstream.readFully(metadataArray);
+    }
 
-		for(int var2 = 0; var2 < this.size; ++var2) {
-			var1.writeShort(this.coordinateArray[var2]);
-		}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeInt(zPosition);
+        dataoutputstream.writeShort((short)size);
+        for(int i = 0; i < size; i++)
+        {
+            dataoutputstream.writeShort(coordinateArray[i]);
+        }
 
-		var1.write(this.typeArray);
-		var1.write(this.metadataArray);
-	}
+        dataoutputstream.write(typeArray);
+        dataoutputstream.write(metadataArray);
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleMultiBlockChange(this);
-	}
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleMultiBlockChange(this);
+    }
 
-	public int getPacketSize() {
-		return 10 + this.size * 4;
-	}
+    public int getPacketSize()
+    {
+        return 10 + size * 4;
+    }
 }

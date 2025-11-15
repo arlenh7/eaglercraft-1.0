@@ -1,66 +1,126 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class GuiControls extends GuiScreen {
-	private GuiScreen parentScreen;
-	protected String screenTitle = "Controls";
-	private GameSettings options;
-	private int buttonId = -1;
+import java.util.List;
+import net.minecraft.client.Minecraft;
 
-	public GuiControls(GuiScreen var1, GameSettings var2) {
-		this.parentScreen = var1;
-		this.options = var2;
-	}
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, StringTranslate, GameSettings, GuiSmallButton, 
+//            GuiButton, KeyBinding
 
-	private int func_20080_j() {
-		return this.width / 2 - 155;
-	}
+public class GuiControls extends GuiScreen
+{
 
-	public void initGui() {
-		StringTranslate var1 = StringTranslate.func_20162_a();
-		int var2 = this.func_20080_j();
+    private GuiScreen parentScreen;
+    protected String screenTitle;
+    private GameSettings options;
+    private int buttonId;
 
-		for(int var3 = 0; var3 < this.options.keyBindings.length; ++var3) {
-			this.controlList.add(new GuiSmallButton(var3, var2 + var3 % 2 * 160, this.height / 6 + 24 * (var3 >> 1), 70, 20, this.options.getOptionDisplayString(var3)));
-		}
+    public GuiControls(GuiScreen guiscreen, GameSettings gamesettings)
+    {
+        screenTitle = "Controls";
+        buttonId = -1;
+        parentScreen = guiscreen;
+        options = gamesettings;
+    }
 
-		this.controlList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, var1.func_20163_a("gui.done")));
-		this.screenTitle = var1.func_20163_a("controls.title");
-	}
+    private int func_20080_j()
+    {
+        return width / 2 - 155;
+    }
 
-	protected void actionPerformed(GuiButton var1) {
-		for(int var2 = 0; var2 < this.options.keyBindings.length; ++var2) {
-			((GuiButton)this.controlList.get(var2)).displayString = this.options.getOptionDisplayString(var2);
-		}
+    public void initGui()
+    {
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        int i = func_20080_j();
+        for(int j = 0; j < options.keyBindings.length; j++)
+        {
+            controlList.add(new GuiSmallButton(j, i + (j % 2) * 160, height / 6 + 24 * (j >> 1), 70, 20, options.getOptionDisplayString(j)));
+        }
 
-		if(var1.id == 200) {
-			this.mc.displayGuiScreen(this.parentScreen);
-		} else {
-			this.buttonId = var1.id;
-			var1.displayString = "> " + this.options.getOptionDisplayString(var1.id) + " <";
-		}
+        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+        screenTitle = stringtranslate.translateKey("controls.title");
+    }
 
-	}
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        for(int i = 0; i < options.keyBindings.length; i++)
+        {
+            ((GuiButton)controlList.get(i)).displayString = options.getOptionDisplayString(i);
+        }
 
-	protected void keyTyped(char var1, int var2) {
-		if(this.buttonId >= 0) {
-			this.options.setKeyBinding(this.buttonId, var2);
-			((GuiButton)this.controlList.get(this.buttonId)).displayString = this.options.getOptionDisplayString(this.buttonId);
-			this.buttonId = -1;
-		} else {
-			super.keyTyped(var1, var2);
-		}
+        if(guibutton.id == 200)
+        {
+            mc.displayGuiScreen(parentScreen);
+        } else
+        {
+            buttonId = guibutton.id;
+            guibutton.displayString = (new StringBuilder()).append("> ").append(options.getOptionDisplayString(guibutton.id)).append(" <").toString();
+        }
+    }
 
-	}
+    protected void mouseClicked(int i, int j, int k)
+    {
+        if(buttonId >= 0)
+        {
+            options.setKeyBinding(buttonId, -100 + k);
+            ((GuiButton)controlList.get(buttonId)).displayString = options.getOptionDisplayString(buttonId);
+            buttonId = -1;
+            KeyBinding.resetKeyBindingArrayAndHash();
+        } else
+        {
+            super.mouseClicked(i, j, k);
+        }
+    }
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRenderer, this.screenTitle, this.width / 2, 20, 16777215);
-		int var4 = this.func_20080_j();
+    protected void keyTyped(char c, int i)
+    {
+        if(buttonId >= 0)
+        {
+            options.setKeyBinding(buttonId, i);
+            ((GuiButton)controlList.get(buttonId)).displayString = options.getOptionDisplayString(buttonId);
+            buttonId = -1;
+            KeyBinding.resetKeyBindingArrayAndHash();
+        } else
+        {
+            super.keyTyped(c, i);
+        }
+    }
 
-		for(int var5 = 0; var5 < this.options.keyBindings.length; ++var5) {
-			this.drawString(this.fontRenderer, this.options.func_20102_a(var5), var4 + var5 % 2 * 160 + 70 + 6, this.height / 6 + 24 * (var5 >> 1) + 7, -1);
-		}
+    public void drawScreen(int i, int j, float f)
+    {
+        drawDefaultBackground();
+        drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
+        int k = func_20080_j();
+        for(int l = 0; l < options.keyBindings.length; l++)
+        {
+            boolean flag = false;
+            for(int i1 = 0; i1 < options.keyBindings.length; i1++)
+            {
+                if(i1 != l && options.keyBindings[l].keyCode == options.keyBindings[i1].keyCode)
+                {
+                    flag = true;
+                }
+            }
 
-		super.drawScreen(var1, var2, var3);
-	}
+            int j1 = l;
+            if(buttonId == l)
+            {
+                ((GuiButton)controlList.get(j1)).displayString = "\247f> \247e??? \247f<";
+            } else
+            if(flag)
+            {
+                ((GuiButton)controlList.get(j1)).displayString = (new StringBuilder()).append("\247c").append(options.getOptionDisplayString(j1)).toString();
+            } else
+            {
+                ((GuiButton)controlList.get(j1)).displayString = options.getOptionDisplayString(j1);
+            }
+            drawString(fontRenderer, options.getKeyBindingDescription(l), k + (l % 2) * 160 + 70 + 6, height / 6 + 24 * (l >> 1) + 7, -1);
+        }
+
+        super.drawScreen(i, j, f);
+    }
 }

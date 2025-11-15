@@ -1,78 +1,102 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenTrees extends WorldGenerator {
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		int var6 = var2.nextInt(3) + 4;
-		boolean var7 = true;
-		if(var4 >= 1 && var4 + var6 + 1 <= 128) {
-			int var8;
-			int var10;
-			int var11;
-			int var12;
-			for(var8 = var4; var8 <= var4 + 1 + var6; ++var8) {
-				byte var9 = 1;
-				if(var8 == var4) {
-					var9 = 0;
-				}
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Block, BlockLeaves, 
+//            BlockGrass
 
-				if(var8 >= var4 + 1 + var6 - 2) {
-					var9 = 2;
-				}
+public class WorldGenTrees extends WorldGenerator
+{
 
-				for(var10 = var3 - var9; var10 <= var3 + var9 && var7; ++var10) {
-					for(var11 = var5 - var9; var11 <= var5 + var9 && var7; ++var11) {
-						if(var8 >= 0 && var8 < 128) {
-							var12 = var1.getBlockId(var10, var8, var11);
-							if(var12 != 0 && var12 != Block.leaves.blockID) {
-								var7 = false;
-							}
-						} else {
-							var7 = false;
-						}
-					}
-				}
-			}
+    public WorldGenTrees(boolean flag)
+    {
+        super(flag);
+    }
 
-			if(!var7) {
-				return false;
-			} else {
-				var8 = var1.getBlockId(var3, var4 - 1, var5);
-				if((var8 == Block.grass.blockID || var8 == Block.dirt.blockID) && var4 < 128 - var6 - 1) {
-					var1.setBlock(var3, var4 - 1, var5, Block.dirt.blockID);
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        int l = random.nextInt(3) + 4;
+        boolean flag = true;
+        if(j < 1 || j + l + 1 > world.field_35472_c)
+        {
+            return false;
+        }
+        for(int i1 = j; i1 <= j + 1 + l; i1++)
+        {
+            byte byte0 = 1;
+            if(i1 == j)
+            {
+                byte0 = 0;
+            }
+            if(i1 >= (j + 1 + l) - 2)
+            {
+                byte0 = 2;
+            }
+            for(int i2 = i - byte0; i2 <= i + byte0 && flag; i2++)
+            {
+                for(int l2 = k - byte0; l2 <= k + byte0 && flag; l2++)
+                {
+                    if(i1 >= 0 && i1 < world.field_35472_c)
+                    {
+                        int j3 = world.getBlockId(i2, i1, l2);
+                        if(j3 != 0 && j3 != Block.leaves.blockID)
+                        {
+                            flag = false;
+                        }
+                    } else
+                    {
+                        flag = false;
+                    }
+                }
 
-					int var16;
-					for(var16 = var4 - 3 + var6; var16 <= var4 + var6; ++var16) {
-						var10 = var16 - (var4 + var6);
-						var11 = 1 - var10 / 2;
+            }
 
-						for(var12 = var3 - var11; var12 <= var3 + var11; ++var12) {
-							int var13 = var12 - var3;
+        }
 
-							for(int var14 = var5 - var11; var14 <= var5 + var11; ++var14) {
-								int var15 = var14 - var5;
-								if((Math.abs(var13) != var11 || Math.abs(var15) != var11 || var2.nextInt(2) != 0 && var10 != 0) && !Block.opaqueCubeLookup[var1.getBlockId(var12, var16, var14)]) {
-									var1.setBlock(var12, var16, var14, Block.leaves.blockID);
-								}
-							}
-						}
-					}
+        if(!flag)
+        {
+            return false;
+        }
+        int j1 = world.getBlockId(i, j - 1, k);
+        if(j1 != Block.grass.blockID && j1 != Block.dirt.blockID || j >= world.field_35472_c - l - 1)
+        {
+            return false;
+        }
+        world.setBlock(i, j - 1, k, Block.dirt.blockID);
+        for(int k1 = (j - 3) + l; k1 <= j + l; k1++)
+        {
+            int j2 = k1 - (j + l);
+            int i3 = 1 - j2 / 2;
+            for(int k3 = i - i3; k3 <= i + i3; k3++)
+            {
+                int l3 = k3 - i;
+                for(int i4 = k - i3; i4 <= k + i3; i4++)
+                {
+                    int j4 = i4 - k;
+                    if((Math.abs(l3) != i3 || Math.abs(j4) != i3 || random.nextInt(2) != 0 && j2 != 0) && !Block.opaqueCubeLookup[world.getBlockId(k3, k1, i4)])
+                    {
+                        func_41060_a(world, k3, k1, i4, Block.leaves.blockID, 0);
+                    }
+                }
 
-					for(var16 = 0; var16 < var6; ++var16) {
-						var10 = var1.getBlockId(var3, var4 + var16, var5);
-						if(var10 == 0 || var10 == Block.leaves.blockID) {
-							var1.setBlock(var3, var4 + var16, var5, Block.wood.blockID);
-						}
-					}
+            }
 
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
-			return false;
-		}
-	}
+        }
+
+        for(int l1 = 0; l1 < l; l1++)
+        {
+            int k2 = world.getBlockId(i, j + l1, k);
+            if(k2 == 0 || k2 == Block.leaves.blockID)
+            {
+                func_41060_a(world, i, j + l1, k, Block.wood.blockID, 0);
+            }
+        }
+
+        return true;
+    }
 }

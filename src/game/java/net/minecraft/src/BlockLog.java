@@ -1,40 +1,89 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockLog extends Block {
-	protected BlockLog(int var1) {
-		super(var1, Material.wood);
-		this.blockIndexInTexture = 20;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, BlockLeaves, 
+//            EntityPlayer
 
-	public int quantityDropped(Random var1) {
-		return 1;
-	}
+public class BlockLog extends Block
+{
 
-	public int idDropped(int var1, Random var2) {
-		return Block.wood.blockID;
-	}
+    protected BlockLog(int i)
+    {
+        super(i, Material.wood);
+        blockIndexInTexture = 20;
+    }
 
-	public void onBlockRemoval(World var1, int var2, int var3, int var4) {
-		byte var5 = 4;
-		int var6 = var5 + 1;
-		if(var1.checkChunksExist(var2 - var6, var3 - var6, var4 - var6, var2 + var6, var3 + var6, var4 + var6)) {
-			for(int var7 = -var5; var7 <= var5; ++var7) {
-				for(int var8 = -var5; var8 <= var5; ++var8) {
-					for(int var9 = -var5; var9 <= var5; ++var9) {
-						int var10 = var1.getBlockId(var2 + var7, var3 + var8, var4 + var9);
-						if(var10 == Block.leaves.blockID && var1.getBlockMetadata(var2 + var7, var3 + var8, var4 + var9) != 7) {
-							var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, 7);
-						}
-					}
-				}
-			}
-		}
+    public int quantityDropped(Random random)
+    {
+        return 1;
+    }
 
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Block.wood.blockID;
+    }
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 1 ? 21 : (var1 == 0 ? 21 : 20);
-	}
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        super.harvestBlock(world, entityplayer, i, j, k, l);
+    }
+
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        byte byte0 = 4;
+        int l = byte0 + 1;
+        if(world.checkChunksExist(i - l, j - l, k - l, i + l, j + l, k + l))
+        {
+            for(int i1 = -byte0; i1 <= byte0; i1++)
+            {
+                for(int j1 = -byte0; j1 <= byte0; j1++)
+                {
+                    for(int k1 = -byte0; k1 <= byte0; k1++)
+                    {
+                        int l1 = world.getBlockId(i + i1, j + j1, k + k1);
+                        if(l1 != Block.leaves.blockID)
+                        {
+                            continue;
+                        }
+                        int i2 = world.getBlockMetadata(i + i1, j + j1, k + k1);
+                        if((i2 & 8) == 0)
+                        {
+                            world.setBlockMetadata(i + i1, j + j1, k + k1, i2 | 8);
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if(i == 1)
+        {
+            return 21;
+        }
+        if(i == 0)
+        {
+            return 21;
+        }
+        if(j == 1)
+        {
+            return 116;
+        }
+        return j != 2 ? 20 : 117;
+    }
+
+    protected int damageDropped(int i)
+    {
+        return i;
+    }
 }

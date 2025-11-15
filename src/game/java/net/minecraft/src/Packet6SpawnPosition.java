@@ -1,31 +1,48 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet6SpawnPosition extends Packet {
-	public int xPosition;
-	public int yPosition;
-	public int zPosition;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.xPosition = var1.readInt();
-		this.yPosition = var1.readInt();
-		this.zPosition = var1.readInt();
-	}
+public class Packet6SpawnPosition extends Packet
+{
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.xPosition);
-		var1.writeInt(this.yPosition);
-		var1.writeInt(this.zPosition);
-	}
+    public int xPosition;
+    public int yPosition;
+    public int zPosition;
 
-	public void processPacket(NetHandler var1) {
-		var1.handleSpawnPosition(this);
-	}
+    public Packet6SpawnPosition()
+    {
+    }
 
-	public int getPacketSize() {
-		return 12;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        xPosition = datainputstream.readInt();
+        yPosition = datainputstream.readInt();
+        zPosition = datainputstream.readInt();
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(xPosition);
+        dataoutputstream.writeInt(yPosition);
+        dataoutputstream.writeInt(zPosition);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleSpawnPosition(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 12;
+    }
 }

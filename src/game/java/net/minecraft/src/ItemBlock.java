@@ -1,61 +1,104 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemBlock extends Item {
-	private int blockID;
 
-	public ItemBlock(int var1) {
-		super(var1);
-		this.blockID = var1 + 256;
-		this.setIconIndex(Block.blocksList[var1 + 256].getBlockTextureFromSide(2));
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, Block, World, ItemStack, 
+//            EntityPlayer, Material, StepSound
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var3.getBlockId(var4, var5, var6) == Block.snow.blockID) {
-			var7 = 0;
-		} else {
-			if(var7 == 0) {
-				--var5;
-			}
+public class ItemBlock extends Item
+{
 
-			if(var7 == 1) {
-				++var5;
-			}
+    private int blockID;
 
-			if(var7 == 2) {
-				--var6;
-			}
+    public ItemBlock(int i)
+    {
+        super(i);
+        blockID = i + 256;
+        setIconIndex(Block.blocksList[i + 256].getBlockTextureFromSide(2));
+    }
 
-			if(var7 == 3) {
-				++var6;
-			}
+    public int getBlockID()
+    {
+        return blockID;
+    }
 
-			if(var7 == 4) {
-				--var4;
-			}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 == Block.snow.blockID)
+        {
+            l = 0;
+        } else
+        if(i1 != Block.vine.blockID)
+        {
+            if(l == 0)
+            {
+                j--;
+            }
+            if(l == 1)
+            {
+                j++;
+            }
+            if(l == 2)
+            {
+                k--;
+            }
+            if(l == 3)
+            {
+                k++;
+            }
+            if(l == 4)
+            {
+                i--;
+            }
+            if(l == 5)
+            {
+                i++;
+            }
+        }
+        if(itemstack.stackSize == 0)
+        {
+            return false;
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        if(j == world.field_35472_c - 1 && Block.blocksList[blockID].blockMaterial.isSolid())
+        {
+            return false;
+        }
+        if(world.canBlockBePlacedAt(blockID, i, j, k, false, l))
+        {
+            Block block = Block.blocksList[blockID];
+            if(world.setBlockAndMetadataWithNotify(i, j, k, blockID, getPlacedBlockMetadata(itemstack.getItemDamage())))
+            {
+                if(world.getBlockId(i, j, k) == blockID)
+                {
+                    Block.blocksList[blockID].onBlockPlaced(world, i, j, k, l);
+                    Block.blocksList[blockID].onBlockPlacedBy(world, i, j, k, entityplayer);
+                }
+                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.stepSoundDir2(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+                itemstack.stackSize--;
+            }
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-			if(var7 == 5) {
-				++var4;
-			}
-		}
+    public String getItemNameIS(ItemStack itemstack)
+    {
+        return Block.blocksList[blockID].getBlockName();
+    }
 
-		if(var1.stackSize == 0) {
-			return false;
-		} else {
-			if(var3.canBlockBePlacedAt(this.blockID, var4, var5, var6, false)) {
-				Block var8 = Block.blocksList[this.blockID];
-				if(var3.setBlockWithNotify(var4, var5, var6, this.blockID)) {
-					Block.blocksList[this.blockID].onBlockPlaced(var3, var4, var5, var6, var7);
-					Block.blocksList[this.blockID].onBlockPlacedBy(var3, var4, var5, var6, var2);
-					var3.playSoundEffect((double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), var8.stepSound.func_1145_d(), (var8.stepSound.func_1147_b() + 1.0F) / 2.0F, var8.stepSound.func_1144_c() * 0.8F);
-					--var1.stackSize;
-				}
-			}
-
-			return true;
-		}
-	}
-
-	public String func_20009_a() {
-		return Block.blocksList[this.blockID].func_20013_i();
-	}
+    public String getItemName()
+    {
+        return Block.blocksList[blockID].getBlockName();
+    }
 }

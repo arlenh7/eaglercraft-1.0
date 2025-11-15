@@ -1,134 +1,253 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockFurnace extends BlockContainer {
-	private final boolean isActive;
+// Referenced classes of package net.minecraft.src:
+//            BlockContainer, Material, Block, World, 
+//            IBlockAccess, TileEntityFurnace, EntityPlayer, TileEntity, 
+//            EntityLiving, MathHelper, IInventory, ItemStack, 
+//            EntityItem
 
-	protected BlockFurnace(int var1, boolean var2) {
-		super(var1, Material.rock);
-		this.isActive = var2;
-		this.blockIndexInTexture = 45;
-	}
+public class BlockFurnace extends BlockContainer
+{
 
-	public int idDropped(int var1, Random var2) {
-		return Block.stoneOvenIdle.blockID;
-	}
+    private Random furnaceRand;
+    private final boolean isActive;
+    private static boolean keepFurnaceInventory = false;
 
-	public void onBlockAdded(World var1, int var2, int var3, int var4) {
-		super.onBlockAdded(var1, var2, var3, var4);
-		this.func_284_h(var1, var2, var3, var4);
-	}
+    protected BlockFurnace(int i, boolean flag)
+    {
+        super(i, Material.rock);
+        furnaceRand = new Random();
+        isActive = flag;
+        blockIndexInTexture = 45;
+    }
 
-	private void func_284_h(World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockId(var2, var3, var4 - 1);
-		int var6 = var1.getBlockId(var2, var3, var4 + 1);
-		int var7 = var1.getBlockId(var2 - 1, var3, var4);
-		int var8 = var1.getBlockId(var2 + 1, var3, var4);
-		byte var9 = 3;
-		if(Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
-			var9 = 3;
-		}
+    public int idDropped(int i, Random random, int j)
+    {
+        return Block.stoneOvenIdle.blockID;
+    }
 
-		if(Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
-			var9 = 2;
-		}
+    public void onBlockAdded(World world, int i, int j, int k)
+    {
+        super.onBlockAdded(world, i, j, k);
+        setDefaultDirection(world, i, j, k);
+    }
 
-		if(Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
-			var9 = 5;
-		}
+    private void setDefaultDirection(World world, int i, int j, int k)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        int l = world.getBlockId(i, j, k - 1);
+        int i1 = world.getBlockId(i, j, k + 1);
+        int j1 = world.getBlockId(i - 1, j, k);
+        int k1 = world.getBlockId(i + 1, j, k);
+        byte byte0 = 3;
+        if(Block.opaqueCubeLookup[l] && !Block.opaqueCubeLookup[i1])
+        {
+            byte0 = 3;
+        }
+        if(Block.opaqueCubeLookup[i1] && !Block.opaqueCubeLookup[l])
+        {
+            byte0 = 2;
+        }
+        if(Block.opaqueCubeLookup[j1] && !Block.opaqueCubeLookup[k1])
+        {
+            byte0 = 5;
+        }
+        if(Block.opaqueCubeLookup[k1] && !Block.opaqueCubeLookup[j1])
+        {
+            byte0 = 4;
+        }
+        world.setBlockMetadataWithNotify(i, j, k, byte0);
+    }
 
-		if(Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
-			var9 = 4;
-		}
+    public int getBlockTexture(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        if(l == 1)
+        {
+            return blockIndexInTexture + 17;
+        }
+        if(l == 0)
+        {
+            return blockIndexInTexture + 17;
+        }
+        int i1 = iblockaccess.getBlockMetadata(i, j, k);
+        if(l != i1)
+        {
+            return blockIndexInTexture;
+        }
+        if(isActive)
+        {
+            return blockIndexInTexture + 16;
+        } else
+        {
+            return blockIndexInTexture - 1;
+        }
+    }
 
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
-	}
+    public void randomDisplayTick(World world, int i, int j, int k, Random random)
+    {
+        if(!isActive)
+        {
+            return;
+        }
+        int l = world.getBlockMetadata(i, j, k);
+        float f = (float)i + 0.5F;
+        float f1 = (float)j + 0.0F + (random.nextFloat() * 6F) / 16F;
+        float f2 = (float)k + 0.5F;
+        float f3 = 0.52F;
+        float f4 = random.nextFloat() * 0.6F - 0.3F;
+        if(l == 4)
+        {
+            world.spawnParticle("smoke", f - f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", f - f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 5)
+        {
+            world.spawnParticle("smoke", f + f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", f + f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 2)
+        {
+            world.spawnParticle("smoke", f + f4, f1, f2 - f3, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", f + f4, f1, f2 - f3, 0.0D, 0.0D, 0.0D);
+        } else
+        if(l == 3)
+        {
+            world.spawnParticle("smoke", f + f4, f1, f2 + f3, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle("flame", f + f4, f1, f2 + f3, 0.0D, 0.0D, 0.0D);
+        }
+    }
 
-	public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		if(var5 == 1) {
-			return Block.stone.blockIndexInTexture;
-		} else if(var5 == 0) {
-			return Block.stone.blockIndexInTexture;
-		} else {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			return var5 != var6 ? this.blockIndexInTexture : (this.isActive ? this.blockIndexInTexture + 16 : this.blockIndexInTexture - 1);
-		}
-	}
+    public int getBlockTextureFromSide(int i)
+    {
+        if(i == 1)
+        {
+            return blockIndexInTexture + 17;
+        }
+        if(i == 0)
+        {
+            return blockIndexInTexture + 17;
+        }
+        if(i == 3)
+        {
+            return blockIndexInTexture - 1;
+        } else
+        {
+            return blockIndexInTexture;
+        }
+    }
 
-	public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(this.isActive) {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			float var7 = (float)var2 + 0.5F;
-			float var8 = (float)var3 + 0.0F + var5.nextFloat() * 6.0F / 16.0F;
-			float var9 = (float)var4 + 0.5F;
-			float var10 = 0.52F;
-			float var11 = var5.nextFloat() * 0.6F - 0.3F;
-			if(var6 == 4) {
-				var1.spawnParticle("smoke", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0D, 0.0D, 0.0D);
-				var1.spawnParticle("flame", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0D, 0.0D, 0.0D);
-			} else if(var6 == 5) {
-				var1.spawnParticle("smoke", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0D, 0.0D, 0.0D);
-				var1.spawnParticle("flame", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0D, 0.0D, 0.0D);
-			} else if(var6 == 2) {
-				var1.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0D, 0.0D, 0.0D);
-				var1.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0D, 0.0D, 0.0D);
-			} else if(var6 == 3) {
-				var1.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0D, 0.0D, 0.0D);
-				var1.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0D, 0.0D, 0.0D);
-			}
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(world.multiplayerWorld)
+        {
+            return true;
+        }
+        TileEntityFurnace tileentityfurnace = (TileEntityFurnace)world.getBlockTileEntity(i, j, k);
+        if(tileentityfurnace != null)
+        {
+            entityplayer.displayGUIFurnace(tileentityfurnace);
+        }
+        return true;
+    }
 
-		}
-	}
+    public static void updateFurnaceBlockState(boolean flag, World world, int i, int j, int k)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        TileEntity tileentity = world.getBlockTileEntity(i, j, k);
+        keepFurnaceInventory = true;
+        if(flag)
+        {
+            world.setBlockWithNotify(i, j, k, Block.stoneOvenActive.blockID);
+        } else
+        {
+            world.setBlockWithNotify(i, j, k, Block.stoneOvenIdle.blockID);
+        }
+        keepFurnaceInventory = false;
+        world.setBlockMetadataWithNotify(i, j, k, l);
+        if(tileentity != null)
+        {
+            tileentity.validate();
+            world.setBlockTileEntity(i, j, k, tileentity);
+        }
+    }
 
-	public int getBlockTextureFromSide(int var1) {
-		return var1 == 1 ? Block.stone.blockID : (var1 == 0 ? Block.stone.blockID : (var1 == 3 ? this.blockIndexInTexture - 1 : this.blockIndexInTexture));
-	}
+    public TileEntity getBlockEntity()
+    {
+        return new TileEntityFurnace();
+    }
 
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		if(var1.multiplayerWorld) {
-			return true;
-		} else {
-			TileEntityFurnace var6 = (TileEntityFurnace)var1.getBlockTileEntity(var2, var3, var4);
-			var5.displayGUIFurnace(var6);
-			return true;
-		}
-	}
+    public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
+    {
+        int l = MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 0.5D) & 3;
+        if(l == 0)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 2);
+        }
+        if(l == 1)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 5);
+        }
+        if(l == 2)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 3);
+        }
+        if(l == 3)
+        {
+            world.setBlockMetadataWithNotify(i, j, k, 4);
+        }
+    }
 
-	public static void updateFurnaceBlockState(boolean var0, World var1, int var2, int var3, int var4) {
-		int var5 = var1.getBlockMetadata(var2, var3, var4);
-		TileEntity var6 = var1.getBlockTileEntity(var2, var3, var4);
-		if(var0) {
-			var1.setBlockWithNotify(var2, var3, var4, Block.stoneOvenActive.blockID);
-		} else {
-			var1.setBlockWithNotify(var2, var3, var4, Block.stoneOvenIdle.blockID);
-		}
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        if(!keepFurnaceInventory)
+        {
+            TileEntityFurnace tileentityfurnace = (TileEntityFurnace)world.getBlockTileEntity(i, j, k);
+            if(tileentityfurnace != null)
+            {
+label0:
+                for(int l = 0; l < tileentityfurnace.getSizeInventory(); l++)
+                {
+                    ItemStack itemstack = tileentityfurnace.getStackInSlot(l);
+                    if(itemstack == null)
+                    {
+                        continue;
+                    }
+                    float f = furnaceRand.nextFloat() * 0.8F + 0.1F;
+                    float f1 = furnaceRand.nextFloat() * 0.8F + 0.1F;
+                    float f2 = furnaceRand.nextFloat() * 0.8F + 0.1F;
+                    do
+                    {
+                        if(itemstack.stackSize <= 0)
+                        {
+                            continue label0;
+                        }
+                        int i1 = furnaceRand.nextInt(21) + 10;
+                        if(i1 > itemstack.stackSize)
+                        {
+                            i1 = itemstack.stackSize;
+                        }
+                        itemstack.stackSize -= i1;
+                        EntityItem entityitem = new EntityItem(world, (float)i + f, (float)j + f1, (float)k + f2, new ItemStack(itemstack.itemID, i1, itemstack.getItemDamage()));
+                        float f3 = 0.05F;
+                        entityitem.motionX = (float)furnaceRand.nextGaussian() * f3;
+                        entityitem.motionY = (float)furnaceRand.nextGaussian() * f3 + 0.2F;
+                        entityitem.motionZ = (float)furnaceRand.nextGaussian() * f3;
+                        world.entityJoinedWorld(entityitem);
+                    } while(true);
+                }
 
-		var1.setBlockMetadataWithNotify(var2, var3, var4, var5);
-		var1.setBlockTileEntity(var2, var3, var4, var6);
-	}
+            }
+        }
+        super.onBlockRemoval(world, i, j, k);
+    }
 
-	protected TileEntity SetBlockEntity() {
-		return new TileEntityFurnace();
-	}
-
-	public void onBlockPlacedBy(World var1, int var2, int var3, int var4, EntityLiving var5) {
-		int var6 = MathHelper.floor_double((double)(var5.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		if(var6 == 0) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
-		}
-
-		if(var6 == 1) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 5);
-		}
-
-		if(var6 == 2) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
-		}
-
-		if(var6 == 3) {
-			var1.setBlockMetadataWithNotify(var2, var3, var4, 4);
-		}
-
-	}
 }

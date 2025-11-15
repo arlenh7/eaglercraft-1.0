@@ -1,144 +1,237 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+import java.util.List;
+import java.util.Random;
 
-public class EntityGhast extends EntityFlying implements IMobs {
-	public int field_4121_a = 0;
-	public double field_4120_b;
-	public double field_4127_c;
-	public double field_4126_d;
-	private Entity field_4123_g = null;
-	private int field_4122_h = 0;
-	public int field_4125_e = 0;
-	public int field_4124_f = 0;
-	
-	private static final TextureLocation ghast = new TextureLocation("/mob/ghast.png");
-	private static final TextureLocation ghastFire = new TextureLocation("/mob/ghast_fire.png");
+// Referenced classes of package net.minecraft.src:
+//            EntityFlying, IMob, DamageSource, EntityPlayer, 
+//            AchievementList, DataWatcher, World, MathHelper, 
+//            Entity, AxisAlignedBB, EntityFireball, Vec3D, 
+//            Item
 
-	public EntityGhast(World var1) {
-		super(var1);
-		this.texture = ghast;
-		this.setSize(4.0F, 4.0F);
-		this.isImmuneToFire = true;
-	}
+public class EntityGhast extends EntityFlying
+    implements IMob
+{
 
-	protected void updatePlayerActionState() {
-		if(this.worldObj.difficultySetting == 0) {
-			this.setEntityDead();
-		}
+    public int courseChangeCooldown;
+    public double waypointX;
+    public double waypointY;
+    public double waypointZ;
+    private Entity targetedEntity;
+    private int aggroCooldown;
+    public int prevAttackCounter;
+    public int attackCounter;
 
-		this.field_4125_e = this.field_4124_f;
-		double var1 = this.field_4120_b - this.posX;
-		double var3 = this.field_4127_c - this.posY;
-		double var5 = this.field_4126_d - this.posZ;
-		double var7 = (double)MathHelper.sqrt_double(var1 * var1 + var3 * var3 + var5 * var5);
-		if(var7 < 1.0D || var7 > 60.0D) {
-			this.field_4120_b = this.posX + (double)((this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F);
-			this.field_4127_c = this.posY + (double)((this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F);
-			this.field_4126_d = this.posZ + (double)((this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F);
-		}
+    public EntityGhast(World world)
+    {
+        super(world);
+        courseChangeCooldown = 0;
+        targetedEntity = null;
+        aggroCooldown = 0;
+        prevAttackCounter = 0;
+        attackCounter = 0;
+        texture = "/mob/ghast.png";
+        setSize(4F, 4F);
+        isImmuneToFire = true;
+        field_35171_bJ = 5;
+    }
 
-		if(this.field_4121_a-- <= 0) {
-			this.field_4121_a += this.rand.nextInt(5) + 2;
-			if(this.func_4050_a(this.field_4120_b, this.field_4127_c, this.field_4126_d, var7)) {
-				this.motionX += var1 / var7 * 0.1D;
-				this.motionY += var3 / var7 * 0.1D;
-				this.motionZ += var5 / var7 * 0.1D;
-			} else {
-				this.field_4120_b = this.posX;
-				this.field_4127_c = this.posY;
-				this.field_4126_d = this.posZ;
-			}
-		}
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        if("fireball".equals(damagesource.func_40545_l()) && (damagesource.getEntity() instanceof EntityPlayer))
+        {
+            super.attackEntityFrom(damagesource, 1000);
+            ((EntityPlayer)damagesource.getEntity()).triggerAchievement(AchievementList.ghast);
+            return true;
+        } else
+        {
+            return super.attackEntityFrom(damagesource, i);
+        }
+    }
 
-		if(this.field_4123_g != null && this.field_4123_g.isDead) {
-			this.field_4123_g = null;
-		}
+    protected void entityInit()
+    {
+        super.entityInit();
+        dataWatcher.addObject(16, Byte.valueOf((byte)0));
+    }
 
-		if(this.field_4123_g == null || this.field_4122_h-- <= 0) {
-			this.field_4123_g = this.worldObj.getClosestPlayerToEntity(this, 100.0D);
-			if(this.field_4123_g != null) {
-				this.field_4122_h = 20;
-			}
-		}
+    public int getMaxHealth()
+    {
+        return 10;
+    }
 
-		double var9 = 64.0D;
-		if(this.field_4123_g != null && this.field_4123_g.getDistanceSqToEntity(this) < var9 * var9) {
-			double var11 = this.field_4123_g.posX - this.posX;
-			double var13 = this.field_4123_g.boundingBox.minY + (double)(this.field_4123_g.height / 2.0F) - (this.posY + (double)(this.height / 2.0F));
-			double var15 = this.field_4123_g.posZ - this.posZ;
-			this.renderYawOffset = this.rotationYaw = -((float)Math.atan2(var11, var15)) * 180.0F / (float)Math.PI;
-			if(this.canEntityBeSeen(this.field_4123_g)) {
-				if(this.field_4124_f == 10) {
-					this.worldObj.playSoundAtEntity(this, "mob.ghast.charge", this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-				}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        byte byte0 = dataWatcher.getWatchableObjectByte(16);
+        texture = byte0 != 1 ? "/mob/ghast.png" : "/mob/ghast_fire.png";
+    }
 
-				++this.field_4124_f;
-				if(this.field_4124_f == 20) {
-					this.worldObj.playSoundAtEntity(this, "mob.ghast.fireball", this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-					EntityFireball var17 = new EntityFireball(this.worldObj, this, var11, var13, var15);
-					double var18 = 4.0D;
-					Vec3D var20 = this.getLook(1.0F);
-					var17.posX = this.posX + var20.xCoord * var18;
-					var17.posY = this.posY + (double)(this.height / 2.0F) + 0.5D;
-					var17.posZ = this.posZ + var20.zCoord * var18;
-					this.worldObj.entityJoinedWorld(var17);
-					this.field_4124_f = -40;
-				}
-			} else if(this.field_4124_f > 0) {
-				--this.field_4124_f;
-			}
-		} else {
-			this.renderYawOffset = this.rotationYaw = -((float)Math.atan2(this.motionX, this.motionZ)) * 180.0F / (float)Math.PI;
-			if(this.field_4124_f > 0) {
-				--this.field_4124_f;
-			}
-		}
+    protected void updateEntityActionState()
+    {
+        if(!worldObj.multiplayerWorld && worldObj.difficultySetting == 0)
+        {
+            setEntityDead();
+        }
+        despawnEntity();
+        prevAttackCounter = attackCounter;
+        double d = waypointX - posX;
+        double d1 = waypointY - posY;
+        double d2 = waypointZ - posZ;
+        double d3 = MathHelper.sqrt_double(d * d + d1 * d1 + d2 * d2);
+        if(d3 < 1.0D || d3 > 60D)
+        {
+            waypointX = posX + (double)((rand.nextFloat() * 2.0F - 1.0F) * 16F);
+            waypointY = posY + (double)((rand.nextFloat() * 2.0F - 1.0F) * 16F);
+            waypointZ = posZ + (double)((rand.nextFloat() * 2.0F - 1.0F) * 16F);
+        }
+        if(courseChangeCooldown-- <= 0)
+        {
+            courseChangeCooldown += rand.nextInt(5) + 2;
+            if(isCourseTraversable(waypointX, waypointY, waypointZ, d3))
+            {
+                motionX += (d / d3) * 0.10000000000000001D;
+                motionY += (d1 / d3) * 0.10000000000000001D;
+                motionZ += (d2 / d3) * 0.10000000000000001D;
+            } else
+            {
+                waypointX = posX;
+                waypointY = posY;
+                waypointZ = posZ;
+            }
+        }
+        if(targetedEntity != null && targetedEntity.isDead)
+        {
+            targetedEntity = null;
+        }
+        if(targetedEntity == null || aggroCooldown-- <= 0)
+        {
+            targetedEntity = worldObj.getClosestVulnerablePlayerToEntity(this, 100D);
+            if(targetedEntity != null)
+            {
+                aggroCooldown = 20;
+            }
+        }
+        double d4 = 64D;
+        if(targetedEntity != null && targetedEntity.getDistanceSqToEntity(this) < d4 * d4)
+        {
+            double d5 = targetedEntity.posX - posX;
+            double d6 = (targetedEntity.boundingBox.minY + (double)(targetedEntity.height / 2.0F)) - (posY + (double)(height / 2.0F));
+            double d7 = targetedEntity.posZ - posZ;
+            renderYawOffset = rotationYaw = (-(float)Math.atan2(d5, d7) * 180F) / 3.141593F;
+            if(canEntityBeSeen(targetedEntity))
+            {
+                if(attackCounter == 10)
+                {
+                    worldObj.playAuxSFXAtEntity(null, 1007, (int)posX, (int)posY, (int)posZ, 0);
+                }
+                attackCounter++;
+                if(attackCounter == 20)
+                {
+                    worldObj.playAuxSFXAtEntity(null, 1008, (int)posX, (int)posY, (int)posZ, 0);
+                    EntityFireball entityfireball = new EntityFireball(worldObj, this, d5, d6, d7);
+                    double d8 = 4D;
+                    Vec3D vec3d = getLook(1.0F);
+                    entityfireball.posX = posX + vec3d.xCoord * d8;
+                    entityfireball.posY = posY + (double)(height / 2.0F) + 0.5D;
+                    entityfireball.posZ = posZ + vec3d.zCoord * d8;
+                    worldObj.entityJoinedWorld(entityfireball);
+                    attackCounter = -40;
+                }
+            } else
+            if(attackCounter > 0)
+            {
+                attackCounter--;
+            }
+        } else
+        {
+            renderYawOffset = rotationYaw = (-(float)Math.atan2(motionX, motionZ) * 180F) / 3.141593F;
+            if(attackCounter > 0)
+            {
+                attackCounter--;
+            }
+        }
+        if(!worldObj.multiplayerWorld)
+        {
+            byte byte0 = dataWatcher.getWatchableObjectByte(16);
+            byte byte1 = (byte)(attackCounter <= 10 ? 0 : 1);
+            if(byte0 != byte1)
+            {
+                dataWatcher.updateObject(16, Byte.valueOf(byte1));
+            }
+        }
+    }
 
-		this.texture = this.field_4124_f > 10 ? ghastFire : ghast;
-	}
+    private boolean isCourseTraversable(double d, double d1, double d2, double d3)
+    {
+        double d4 = (waypointX - posX) / d3;
+        double d5 = (waypointY - posY) / d3;
+        double d6 = (waypointZ - posZ) / d3;
+        AxisAlignedBB axisalignedbb = boundingBox.copy();
+        for(int i = 1; (double)i < d3; i++)
+        {
+            axisalignedbb.offset(d4, d5, d6);
+            if(worldObj.getCollidingBoundingBoxes(this, axisalignedbb).size() > 0)
+            {
+                return false;
+            }
+        }
 
-	private boolean func_4050_a(double var1, double var3, double var5, double var7) {
-		double var9 = (this.field_4120_b - this.posX) / var7;
-		double var11 = (this.field_4127_c - this.posY) / var7;
-		double var13 = (this.field_4126_d - this.posZ) / var7;
-		AxisAlignedBB var15 = this.boundingBox.copy();
+        return true;
+    }
 
-		for(int var16 = 1; (double)var16 < var7; ++var16) {
-			var15.offset(var9, var11, var13);
-			if(this.worldObj.getCollidingBoundingBoxes(this, var15).size() > 0) {
-				return false;
-			}
-		}
+    protected String getLivingSound()
+    {
+        return "mob.ghast.moan";
+    }
 
-		return true;
-	}
+    protected String getHurtSound()
+    {
+        return "mob.ghast.scream";
+    }
 
-	protected String getLivingSound() {
-		return "mob.ghast.moan";
-	}
+    protected String getDeathSound()
+    {
+        return "mob.ghast.death";
+    }
 
-	protected String getHurtSound() {
-		return "mob.ghast.scream";
-	}
+    protected int getDropItemId()
+    {
+        return Item.gunpowder.shiftedIndex;
+    }
 
-	protected String getDeathSound() {
-		return "mob.ghast.death";
-	}
+    protected void dropFewItems(boolean flag, int i)
+    {
+        int j = rand.nextInt(2) + rand.nextInt(1 + i);
+        for(int k = 0; k < j; k++)
+        {
+            dropItem(Item.ghastTear.shiftedIndex, 1);
+        }
 
-	protected int getDropItemId() {
-		return Item.gunpowder.shiftedIndex;
-	}
+        j = rand.nextInt(3) + rand.nextInt(1 + i);
+        for(int l = 0; l < j; l++)
+        {
+            dropItem(Item.gunpowder.shiftedIndex, 1);
+        }
 
-	protected float getSoundVolume() {
-		return 10.0F;
-	}
+    }
 
-	public boolean getCanSpawnHere() {
-		return this.rand.nextInt(20) == 0 && super.getCanSpawnHere() && this.worldObj.difficultySetting > 0;
-	}
+    protected float getSoundVolume()
+    {
+        return 10F;
+    }
 
-	public int getMaxSpawnedInChunk() {
-		return 1;
-	}
+    public boolean getCanSpawnHere()
+    {
+        return rand.nextInt(20) == 0 && super.getCanSpawnHere() && worldObj.difficultySetting > 0;
+    }
+
+    public int getMaxSpawnedInChunk()
+    {
+        return 1;
+    }
 }

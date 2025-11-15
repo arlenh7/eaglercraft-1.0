@@ -1,35 +1,71 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
-public class NBTTagByteArray extends NBTBase {
-	public byte[] byteArray;
+// Referenced classes of package net.minecraft.src:
+//            NBTBase
 
-	public NBTTagByteArray() {
-	}
+public class NBTTagByteArray extends NBTBase
+{
 
-	public NBTTagByteArray(byte[] var1) {
-		this.byteArray = var1;
-	}
+    public byte byteArray[];
 
-	void writeTagContents(DataOutput var1) throws IOException {
-		var1.writeInt(this.byteArray.length);
-		var1.write(this.byteArray);
-	}
+    public NBTTagByteArray(String s)
+    {
+        super(s);
+    }
 
-	void readTagContents(DataInput var1) throws IOException {
-		int var2 = var1.readInt();
-		this.byteArray = new byte[var2];
-		var1.readFully(this.byteArray);
-	}
+    public NBTTagByteArray(String s, byte abyte0[])
+    {
+        super(s);
+        byteArray = abyte0;
+    }
 
-	public byte getType() {
-		return (byte)7;
-	}
+    void writeTagContents(DataOutput dataoutput)
+        throws IOException
+    {
+        dataoutput.writeInt(byteArray.length);
+        dataoutput.write(byteArray);
+    }
 
-	public String toString() {
-		return "[" + this.byteArray.length + " bytes]";
-	}
+    void readTagContents(DataInput datainput)
+        throws IOException
+    {
+        int i = datainput.readInt();
+        byteArray = new byte[i];
+        datainput.readFully(byteArray);
+    }
+
+    public byte getType()
+    {
+        return 7;
+    }
+
+    public String toString()
+    {
+        return (new StringBuilder()).append("[").append(byteArray.length).append(" bytes]").toString();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(super.equals(obj))
+        {
+            NBTTagByteArray nbttagbytearray = (NBTTagByteArray)obj;
+            return byteArray == null && nbttagbytearray.byteArray == null || byteArray != null && byteArray.equals(nbttagbytearray.byteArray);
+        } else
+        {
+            return false;
+        }
+    }
+
+    public NBTBase func_40195_b()
+    {
+        byte abyte0[] = new byte[byteArray.length];
+        System.arraycopy(byteArray, 0, abyte0, 0, byteArray.length);
+        return new NBTTagByteArray(getKey(), abyte0);
+    }
 }

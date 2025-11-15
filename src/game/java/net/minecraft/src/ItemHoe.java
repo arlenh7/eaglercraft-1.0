@@ -1,45 +1,53 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemHoe extends Item {
-	public ItemHoe(int var1, int var2) {
-		super(var1);
-		this.maxStackSize = 1;
-		this.maxDamage = 32 << var2;
-	}
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		int var8 = var3.getBlockId(var4, var5, var6);
-		Material var9 = var3.getBlockMaterial(var4, var5 + 1, var6);
-		if((var9.func_878_a() || var8 != Block.grass.blockID) && var8 != Block.dirt.blockID) {
-			return false;
-		} else {
-			Block var10 = Block.tilledField;
-			var3.playSoundEffect((double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), var10.stepSound.func_1145_d(), (var10.stepSound.func_1147_b() + 1.0F) / 2.0F, var10.stepSound.func_1144_c() * 0.8F);
-			if(var3.multiplayerWorld) {
-				return true;
-			} else {
-				var3.setBlockWithNotify(var4, var5, var6, var10.blockID);
-				var1.damageItem(1);
-				if(var3.rand.nextInt(8) == 0 && var8 == Block.grass.blockID) {
-					byte var11 = 1;
+// Referenced classes of package net.minecraft.src:
+//            Item, EnumToolMaterial, EntityPlayer, World, 
+//            Block, BlockGrass, StepSound, ItemStack
 
-					for(int var12 = 0; var12 < var11; ++var12) {
-						float var13 = 0.7F;
-						float var14 = var3.rand.nextFloat() * var13 + (1.0F - var13) * 0.5F;
-						float var15 = 1.2F;
-						float var16 = var3.rand.nextFloat() * var13 + (1.0F - var13) * 0.5F;
-						EntityItem var17 = new EntityItem(var3, (double)((float)var4 + var14), (double)((float)var5 + var15), (double)((float)var6 + var16), new ItemStack(Item.seeds));
-						var17.delayBeforeCanPickup = 10;
-						var3.entityJoinedWorld(var17);
-					}
-				}
+public class ItemHoe extends Item
+{
 
-				return true;
-			}
-		}
-	}
+    public ItemHoe(int i, EnumToolMaterial enumtoolmaterial)
+    {
+        super(i);
+        maxStackSize = 1;
+        setMaxDamage(enumtoolmaterial.getMaxUses());
+    }
 
-	public boolean isFull3D() {
-		return true;
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        int i1 = world.getBlockId(i, j, k);
+        int j1 = world.getBlockId(i, j + 1, k);
+        if(l != 0 && j1 == 0 && i1 == Block.grass.blockID || i1 == Block.dirt.blockID)
+        {
+            Block block = Block.tilledField;
+            world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.stepSoundDir2(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+            if(world.multiplayerWorld)
+            {
+                return true;
+            } else
+            {
+                world.setBlockWithNotify(i, j, k, block.blockID);
+                itemstack.damageItem(1, entityplayer);
+                return true;
+            }
+        } else
+        {
+            return false;
+        }
+    }
+
+    public boolean isFull3D()
+    {
+        return true;
+    }
 }

@@ -1,60 +1,81 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.EagRuntime;
 
-public class Timer {
-	public float ticksPerSecond;
-	private double lastHRTime;
-	public int elapsedTicks;
-	public float renderPartialTicks;
-	public float timerSpeed = 1.0F;
-	public float elapsedPartialTicks = 0.0F;
-	private long lastSyncSysClock;
-	private long lastSyncHRClock;
-	private double timeSyncAdjustment = 1.0D;
+public class Timer
+{
 
-	public Timer(float var1) {
-		this.ticksPerSecond = var1;
-		this.lastSyncSysClock = EagRuntime.steadyTimeMillis();
-		this.lastSyncHRClock = EagRuntime.nanoTime() / 1000000L;
-	}
+    float ticksPerSecond;
+    private double lastHRTime;
+    public int elapsedTicks;
+    public float renderPartialTicks;
+    public float timerSpeed;
+    public float elapsedPartialTicks;
+    private long lastSyncSysClock;
+    private long lastSyncHRClock;
+    private long field_28132_i;
+    private double timeSyncAdjustment;
 
-	public void updateTimer() {
-		long var1 = EagRuntime.steadyTimeMillis();
-		long var3 = var1 - this.lastSyncSysClock;
-		long var5 = EagRuntime.nanoTime() / 1000000L;
-		double var9;
-		if(var3 > 1000L) {
-			long var7 = var5 - this.lastSyncHRClock;
-			var9 = (double)var3 / (double)var7;
-			this.timeSyncAdjustment += (var9 - this.timeSyncAdjustment) * (double)0.2F;
-			this.lastSyncSysClock = var1;
-			this.lastSyncHRClock = var5;
-		}
+    public Timer(float f)
+    {
+        timerSpeed = 1.0F;
+        elapsedPartialTicks = 0.0F;
+        timeSyncAdjustment = 1.0D;
+        ticksPerSecond = f;
+        lastSyncSysClock = System.currentTimeMillis();
+        lastSyncHRClock = System.nanoTime() / 0xf4240L;
+    }
 
-		if(var3 < 0L) {
-			this.lastSyncSysClock = var1;
-			this.lastSyncHRClock = var5;
-		}
-
-		double var11 = (double)var5 / 1000.0D;
-		var9 = (var11 - this.lastHRTime) * this.timeSyncAdjustment;
-		this.lastHRTime = var11;
-		if(var9 < 0.0D) {
-			var9 = 0.0D;
-		}
-
-		if(var9 > 1.0D) {
-			var9 = 1.0D;
-		}
-
-		this.elapsedPartialTicks = (float)((double)this.elapsedPartialTicks + var9 * (double)this.timerSpeed * (double)this.ticksPerSecond);
-		this.elapsedTicks = (int)this.elapsedPartialTicks;
-		this.elapsedPartialTicks -= (float)this.elapsedTicks;
-		if(this.elapsedTicks > 10) {
-			this.elapsedTicks = 10;
-		}
-
-		this.renderPartialTicks = this.elapsedPartialTicks;
-	}
+    public void updateTimer()
+    {
+        long l = System.currentTimeMillis();
+        long l1 = l - lastSyncSysClock;
+        long l2 = System.nanoTime() / 0xf4240L;
+        double d = (double)l2 / 1000D;
+        if(l1 > 1000L)
+        {
+            lastHRTime = d;
+        } else
+        if(l1 < 0L)
+        {
+            lastHRTime = d;
+        } else
+        {
+            field_28132_i += l1;
+            if(field_28132_i > 1000L)
+            {
+                long l3 = l2 - lastSyncHRClock;
+                double d2 = (double)field_28132_i / (double)l3;
+                timeSyncAdjustment += (d2 - timeSyncAdjustment) * 0.20000000298023224D;
+                lastSyncHRClock = l2;
+                field_28132_i = 0L;
+            }
+            if(field_28132_i < 0L)
+            {
+                lastSyncHRClock = l2;
+            }
+        }
+        lastSyncSysClock = l;
+        double d1 = (d - lastHRTime) * timeSyncAdjustment;
+        lastHRTime = d;
+        if(d1 < 0.0D)
+        {
+            d1 = 0.0D;
+        }
+        if(d1 > 1.0D)
+        {
+            d1 = 1.0D;
+        }
+        elapsedPartialTicks += d1 * (double)timerSpeed * (double)ticksPerSecond;
+        elapsedTicks = (int)elapsedPartialTicks;
+        elapsedPartialTicks -= elapsedTicks;
+        if(elapsedTicks > 10)
+        {
+            elapsedTicks = 10;
+        }
+        renderPartialTicks = elapsedPartialTicks;
+    }
 }

@@ -1,44 +1,74 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class PathPoint {
-	public final int xCoord;
-	public final int yCoord;
-	public final int zCoord;
-	public final int hash;
-	int index = -1;
-	float totalPathDistance;
-	float distanceToNext;
-	float distanceToTarget;
-	PathPoint previous;
-	public boolean isFirst = false;
 
-	public PathPoint(int var1, int var2, int var3) {
-		this.xCoord = var1;
-		this.yCoord = var2;
-		this.zCoord = var3;
-		this.hash = var1 | var2 << 10 | var3 << 20;
-	}
+// Referenced classes of package net.minecraft.src:
+//            MathHelper
 
-	public float distanceTo(PathPoint var1) {
-		float var2 = (float)(var1.xCoord - this.xCoord);
-		float var3 = (float)(var1.yCoord - this.yCoord);
-		float var4 = (float)(var1.zCoord - this.zCoord);
-		return MathHelper.sqrt_float(var2 * var2 + var3 * var3 + var4 * var4);
-	}
+public class PathPoint
+{
 
-	public boolean equals(Object var1) {
-		return ((PathPoint)var1).hash == this.hash;
-	}
+    public final int xCoord;
+    public final int yCoord;
+    public final int zCoord;
+    private final int hash;
+    int index;
+    float totalPathDistance;
+    float distanceToNext;
+    float distanceToTarget;
+    PathPoint previous;
+    public boolean isFirst;
 
-	public int hashCode() {
-		return this.hash;
-	}
+    public PathPoint(int i, int j, int k)
+    {
+        index = -1;
+        isFirst = false;
+        xCoord = i;
+        yCoord = j;
+        zCoord = k;
+        hash = func_22329_a(i, j, k);
+    }
 
-	public boolean isAssigned() {
-		return this.index >= 0;
-	}
+    public static int func_22329_a(int i, int j, int k)
+    {
+        return j & 0xff | (i & 0x7fff) << 8 | (k & 0x7fff) << 24 | (i >= 0 ? 0 : 0x80000000) | (k >= 0 ? 0 : 0x8000);
+    }
 
-	public String toString() {
-		return this.xCoord + ", " + this.yCoord + ", " + this.zCoord;
-	}
+    public float distanceTo(PathPoint pathpoint)
+    {
+        float f = pathpoint.xCoord - xCoord;
+        float f1 = pathpoint.yCoord - yCoord;
+        float f2 = pathpoint.zCoord - zCoord;
+        return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof PathPoint)
+        {
+            PathPoint pathpoint = (PathPoint)obj;
+            return hash == pathpoint.hash && xCoord == pathpoint.xCoord && yCoord == pathpoint.yCoord && zCoord == pathpoint.zCoord;
+        } else
+        {
+            return false;
+        }
+    }
+
+    public int hashCode()
+    {
+        return hash;
+    }
+
+    public boolean isAssigned()
+    {
+        return index >= 0;
+    }
+
+    public String toString()
+    {
+        return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
+    }
 }

@@ -1,52 +1,69 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.Tessellator;
 
-public class TexturedQuad {
-	public PositionTexureVertex[] field_1195_a;
-	public int field_1194_b;
-	private boolean field_1196_c;
+// Referenced classes of package net.minecraft.src:
+//            PositionTextureVertex, Vec3D, Tessellator
 
-	public TexturedQuad(PositionTexureVertex[] var1) {
-		this.field_1194_b = 0;
-		this.field_1196_c = false;
-		this.field_1195_a = var1;
-		this.field_1194_b = var1.length;
-	}
+public class TexturedQuad
+{
 
-	public TexturedQuad(PositionTexureVertex[] var1, int var2, int var3, int var4, int var5) {
-		this(var1);
-		float var6 = 0.0015625F;
-		float var7 = 0.003125F;
-		var1[0] = var1[0].setTexturePosition((float)var4 / 64.0F - var6, (float)var3 / 32.0F + var7);
-		var1[1] = var1[1].setTexturePosition((float)var2 / 64.0F + var6, (float)var3 / 32.0F + var7);
-		var1[2] = var1[2].setTexturePosition((float)var2 / 64.0F + var6, (float)var5 / 32.0F - var7);
-		var1[3] = var1[3].setTexturePosition((float)var4 / 64.0F - var6, (float)var5 / 32.0F - var7);
-	}
+    public PositionTextureVertex vertexPositions[];
+    public int nVertices;
+    private boolean invertNormal;
 
-	public void func_809_a() {
-		PositionTexureVertex[] var1 = new PositionTexureVertex[this.field_1195_a.length];
+    public TexturedQuad(PositionTextureVertex apositiontexturevertex[])
+    {
+        nVertices = 0;
+        invertNormal = false;
+        vertexPositions = apositiontexturevertex;
+        nVertices = apositiontexturevertex.length;
+    }
 
-		for(int var2 = 0; var2 < this.field_1195_a.length; ++var2) {
-			var1[var2] = this.field_1195_a[this.field_1195_a.length - var2 - 1];
-		}
+    public TexturedQuad(PositionTextureVertex apositiontexturevertex[], int i, int j, int k, int l, float f, float f1)
+    {
+        this(apositiontexturevertex);
+        float f2 = 0.0F / f;
+        float f3 = 0.0F / f1;
+        apositiontexturevertex[0] = apositiontexturevertex[0].setTexturePosition((float)k / f - f2, (float)j / f1 + f3);
+        apositiontexturevertex[1] = apositiontexturevertex[1].setTexturePosition((float)i / f + f2, (float)j / f1 + f3);
+        apositiontexturevertex[2] = apositiontexturevertex[2].setTexturePosition((float)i / f + f2, (float)l / f1 - f3);
+        apositiontexturevertex[3] = apositiontexturevertex[3].setTexturePosition((float)k / f - f2, (float)l / f1 - f3);
+    }
 
-		this.field_1195_a = var1;
-	}
+    public void flipFace()
+    {
+        PositionTextureVertex apositiontexturevertex[] = new PositionTextureVertex[vertexPositions.length];
+        for(int i = 0; i < vertexPositions.length; i++)
+        {
+            apositiontexturevertex[i] = vertexPositions[vertexPositions.length - i - 1];
+        }
 
-	public void render(Tessellator var1, float var2) {
-		Vec3D var3 = this.field_1195_a[1].vector3D.subtract(this.field_1195_a[0].vector3D);
-		Vec3D var4 = this.field_1195_a[1].vector3D.subtract(this.field_1195_a[2].vector3D);
-		Vec3D var5 = var4.crossProduct(var3).normalize();
-		if(this.field_1196_c) {
-			var1.setNormal(-((float)var5.xCoord), -((float)var5.yCoord), -((float)var5.zCoord));
-		} else {
-			var1.setNormal((float)var5.xCoord, (float)var5.yCoord, (float)var5.zCoord);
-		}
+        vertexPositions = apositiontexturevertex;
+    }
 
-		for(int var6 = 0; var6 < 4; ++var6) {
-			PositionTexureVertex var7 = this.field_1195_a[var6];
-			var1.addVertexWithUV((double)((float)var7.vector3D.xCoord * var2), (double)((float)var7.vector3D.yCoord * var2), (double)((float)var7.vector3D.zCoord * var2), (double)var7.texturePositionX, (double)var7.texturePositionY);
-		}
-	}
+    public void draw(Tessellator tessellator, float f)
+    {
+        Vec3D vec3d = vertexPositions[1].vector3D.subtract(vertexPositions[0].vector3D);
+        Vec3D vec3d1 = vertexPositions[1].vector3D.subtract(vertexPositions[2].vector3D);
+        Vec3D vec3d2 = vec3d1.crossProduct(vec3d).normalize();
+        tessellator.startDrawingQuads();
+        if(invertNormal)
+        {
+            tessellator.setNormal(-(float)vec3d2.xCoord, -(float)vec3d2.yCoord, -(float)vec3d2.zCoord);
+        } else
+        {
+            tessellator.setNormal((float)vec3d2.xCoord, (float)vec3d2.yCoord, (float)vec3d2.zCoord);
+        }
+        for(int i = 0; i < 4; i++)
+        {
+            PositionTextureVertex positiontexturevertex = vertexPositions[i];
+            tessellator.addVertexWithUV((float)positiontexturevertex.vector3D.xCoord * f, (float)positiontexturevertex.vector3D.yCoord * f, (float)positiontexturevertex.vector3D.zCoord * f, positiontexturevertex.texturePositionX, positiontexturevertex.texturePositionY);
+        }
+
+        tessellator.draw();
+    }
 }

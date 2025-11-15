@@ -1,37 +1,56 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.lwjgl.opengl.GL11;
 
-public class TileEntityMobSpawnerRenderer extends TileEntitySpecialRenderer {
-	private Map<String, Entity> field_1412_b = new HashMap<>();
+// Referenced classes of package net.minecraft.src:
+//            TileEntitySpecialRenderer, TileEntityMobSpawner, Entity, EntityList, 
+//            RenderManager, TileEntity
 
-	public void a(TileEntityMobSpawner var1, double var2, double var4, double var6, float var8) {
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float)var2 + 0.5F, (float)var4, (float)var6 + 0.5F);
-		Entity var9 = (Entity)this.field_1412_b.get(var1.entityID);
-		if(var9 == null) {
-			var9 = EntityList.createEntityInWorld(var1.entityID, (World)null);
-			this.field_1412_b.put(var1.entityID, var9);
-		}
+public class TileEntityMobSpawnerRenderer extends TileEntitySpecialRenderer
+{
 
-		if(var9 != null) {
-			var9.setWorld(var1.worldObj);
-			float var10 = 7.0F / 16.0F;
-			GL11.glTranslatef(0.0F, 0.4F, 0.0F);
-			GL11.glRotatef((float)(var1.field_830_d + (var1.field_831_c - var1.field_830_d) * (double)var8) * 10.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(-30.0F, 1.0F, 0.0F, 0.0F);
-			GL11.glTranslatef(0.0F, -0.4F, 0.0F);
-			GL11.glScalef(var10, var10, var10);
-			var9.setLocationAndAngles(var2, var4, var6, 0.0F, 0.0F);
-			RenderManager.instance.renderEntityWithPosYaw(var9, 0.0D, 0.0D, 0.0D, 0.0F, var8);
-		}
+    private Map entityHashMap;
 
-		GL11.glPopMatrix();
-	}
+    public TileEntityMobSpawnerRenderer()
+    {
+        entityHashMap = new HashMap();
+    }
 
-	public void renderTileEntityAt(TileEntity var1, double var2, double var4, double var6, float var8) {
-		this.a((TileEntityMobSpawner)var1, var2, var4, var6, var8);
-	}
+    public void renderTileEntityMobSpawner(TileEntityMobSpawner tileentitymobspawner, double d, double d1, double d2, 
+            float f)
+    {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d + 0.5F, (float)d1, (float)d2 + 0.5F);
+        Entity entity = (Entity)entityHashMap.get(tileentitymobspawner.getMobID());
+        if(entity == null)
+        {
+            entity = EntityList.createEntityInWorld(tileentitymobspawner.getMobID(), null);
+            entityHashMap.put(tileentitymobspawner.getMobID(), entity);
+        }
+        if(entity != null)
+        {
+            entity.setWorld(tileentitymobspawner.worldObj);
+            float f1 = 0.4375F;
+            GL11.glTranslatef(0.0F, 0.4F, 0.0F);
+            GL11.glRotatef((float)(tileentitymobspawner.yaw2 + (tileentitymobspawner.yaw - tileentitymobspawner.yaw2) * (double)f) * 10F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-30F, 1.0F, 0.0F, 0.0F);
+            GL11.glTranslatef(0.0F, -0.4F, 0.0F);
+            GL11.glScalef(f1, f1, f1);
+            entity.setLocationAndAngles(d, d1, d2, 0.0F, 0.0F);
+            RenderManager.instance.renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, f);
+        }
+        GL11.glPopMatrix();
+    }
+
+    public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, 
+            float f)
+    {
+        renderTileEntityMobSpawner((TileEntityMobSpawner)tileentity, d, d1, d2, f);
+    }
 }

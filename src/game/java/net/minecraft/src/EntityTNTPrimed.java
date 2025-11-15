@@ -1,72 +1,105 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityTNTPrimed extends Entity {
-	public int fuse;
 
-	public EntityTNTPrimed(World var1) {
-		super(var1);
-		this.fuse = 0;
-		this.preventEntitySpawning = true;
-		this.setSize(0.98F, 0.98F);
-		this.yOffset = this.height / 2.0F;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Entity, MathHelper, World, NBTTagCompound
 
-	public EntityTNTPrimed(World var1, double var2, double var4, double var6) {
-		this(var1);
-		this.setPosition(var2, var4, var6);
-		float var8 = (float)(Math.random() * (double)((float)Math.PI) * 2.0D);
-		this.motionX = (double)(-MathHelper.sin(var8 * (float)Math.PI / 180.0F) * 0.02F);
-		this.motionY = (double)0.2F;
-		this.motionZ = (double)(-MathHelper.cos(var8 * (float)Math.PI / 180.0F) * 0.02F);
-		this.entityWalks = false;
-		this.fuse = 80;
-		this.prevPosX = var2;
-		this.prevPosY = var4;
-		this.prevPosZ = var6;
-	}
+public class EntityTNTPrimed extends Entity
+{
 
-	public boolean canBeCollidedWith() {
-		return !this.isDead;
-	}
+    public int fuse;
 
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.motionY -= (double)0.04F;
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= (double)0.98F;
-		this.motionY *= (double)0.98F;
-		this.motionZ *= (double)0.98F;
-		if(this.onGround) {
-			this.motionX *= (double)0.7F;
-			this.motionZ *= (double)0.7F;
-			this.motionY *= -0.5D;
-		}
+    public EntityTNTPrimed(World world)
+    {
+        super(world);
+        fuse = 0;
+        preventEntitySpawning = true;
+        setSize(0.98F, 0.98F);
+        yOffset = height / 2.0F;
+    }
 
-		if(this.fuse-- <= 0) {
-			this.setEntityDead();
-			this.explode();
-		} else {
-			this.worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
-		}
+    public EntityTNTPrimed(World world, double d, double d1, double d2)
+    {
+        this(world);
+        setPosition(d, d1, d2);
+        float f = (float)(Math.random() * 3.1415927410125732D * 2D);
+        motionX = -MathHelper.sin((f * 3.141593F) / 180F) * 0.02F;
+        motionY = 0.20000000298023224D;
+        motionZ = -MathHelper.cos((f * 3.141593F) / 180F) * 0.02F;
+        fuse = 80;
+        prevPosX = d;
+        prevPosY = d1;
+        prevPosZ = d2;
+    }
 
-	}
+    protected void entityInit()
+    {
+    }
 
-	private void explode() {
-		float var1 = 4.0F;
-		this.worldObj.createExplosion((Entity)null, this.posX, this.posY, this.posZ, var1);
-	}
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
 
-	protected void writeEntityToNBT(NBTTagCompound var1) {
-		var1.setByte("Fuse", (byte)this.fuse);
-	}
+    public boolean canBeCollidedWith()
+    {
+        return !isDead;
+    }
 
-	protected void readEntityFromNBT(NBTTagCompound var1) {
-		this.fuse = var1.getByte("Fuse");
-	}
+    public void onUpdate()
+    {
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        motionY -= 0.039999999105930328D;
+        moveEntity(motionX, motionY, motionZ);
+        motionX *= 0.98000001907348633D;
+        motionY *= 0.98000001907348633D;
+        motionZ *= 0.98000001907348633D;
+        if(onGround)
+        {
+            motionX *= 0.69999998807907104D;
+            motionZ *= 0.69999998807907104D;
+            motionY *= -0.5D;
+        }
+        if(fuse-- <= 0)
+        {
+            if(!worldObj.multiplayerWorld)
+            {
+                setEntityDead();
+                explode();
+            } else
+            {
+                setEntityDead();
+            }
+        } else
+        {
+            worldObj.spawnParticle("smoke", posX, posY + 0.5D, posZ, 0.0D, 0.0D, 0.0D);
+        }
+    }
 
-	public float func_392_h_() {
-		return 0.0F;
-	}
+    private void explode()
+    {
+        float f = 4F;
+        worldObj.createExplosion(null, posX, posY, posZ, f);
+    }
+
+    protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        nbttagcompound.setByte("Fuse", (byte)fuse);
+    }
+
+    protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        fuse = nbttagcompound.getByte("Fuse");
+    }
+
+    public float getShadowSize()
+    {
+        return 0.0F;
+    }
 }

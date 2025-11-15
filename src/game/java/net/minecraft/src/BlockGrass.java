@@ -1,53 +1,94 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockGrass extends Block {
-	protected BlockGrass(int var1) {
-		super(var1, Material.ground);
-		this.blockIndexInTexture = 3;
-		this.setTickOnLoad(true);
-	}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, IBlockAccess, ColorizerGrass, 
+//            WorldChunkManager, BiomeGenBase, World
 
-	public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {
-		if(var5 == 1) {
-			return 0;
-		} else if(var5 == 0) {
-			return 2;
-		} else {
-			Material var6 = var1.getBlockMaterial(var2, var3 + 1, var4);
-			return var6 != Material.snow && var6 != Material.builtSnow ? 3 : 68;
-		}
-	}
+public class BlockGrass extends Block
+{
 
-	public int colorMultiplier(IBlockAccess var1, int var2, int var3, int var4) {
-		var1.func_4075_a().func_4069_a(var2, var4, 1, 1);
-		double var5 = var1.func_4075_a().temperature[0];
-		double var7 = var1.func_4075_a().humidity[0];
-		return ColorizerGrass.func_4147_a(var5, var7);
-	}
+    protected BlockGrass(int i)
+    {
+        super(i, Material.grass);
+        blockIndexInTexture = 3;
+        setTickOnLoad(true);
+    }
 
-	public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
-		if(!var1.multiplayerWorld) {
-			if(var1.getBlockLightValue(var2, var3 + 1, var4) < 4 && var1.getBlockMaterial(var2, var3 + 1, var4).getCanBlockGrass()) {
-				if(var5.nextInt(4) != 0) {
-					return;
-				}
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if(i == 1)
+        {
+            return 0;
+        }
+        return i != 0 ? 3 : 2;
+    }
 
-				var1.setBlockWithNotify(var2, var3, var4, Block.dirt.blockID);
-			} else if(var1.getBlockLightValue(var2, var3 + 1, var4) >= 9) {
-				int var6 = var2 + var5.nextInt(3) - 1;
-				int var7 = var3 + var5.nextInt(5) - 3;
-				int var8 = var4 + var5.nextInt(3) - 1;
-				if(var1.getBlockId(var6, var7, var8) == Block.dirt.blockID && var1.getBlockLightValue(var6, var7 + 1, var8) >= 4 && !var1.getBlockMaterial(var6, var7 + 1, var8).getCanBlockGrass()) {
-					var1.setBlockWithNotify(var6, var7, var8, Block.grass.blockID);
-				}
-			}
+    public int getBlockTexture(IBlockAccess iblockaccess, int i, int j, int k, int l)
+    {
+        if(l == 1)
+        {
+            return 0;
+        }
+        if(l == 0)
+        {
+            return 2;
+        }
+        Material material = iblockaccess.getBlockMaterial(i, j + 1, k);
+        return material != Material.snow && material != Material.craftedSnow ? 3 : 68;
+    }
 
-		}
-	}
+    public int getBlockColor()
+    {
+        double d = 0.5D;
+        double d1 = 1.0D;
+        return ColorizerGrass.getGrassColor(d, d1);
+    }
 
-	public int idDropped(int var1, Random var2) {
-		return Block.dirt.idDropped(0, var2);
-	}
+    public int getRenderColor(int i)
+    {
+        return getBlockColor();
+    }
+
+    public int colorMultiplier(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        return iblockaccess.getWorldChunkManager().getBiomeGenAt(i, k).func_40254_a(iblockaccess, i, j, k);
+    }
+
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        if(world.getBlockLightValue(i, j + 1, k) < 4 && Block.lightOpacity[world.getBlockId(i, j + 1, k)] > 2)
+        {
+            world.setBlockWithNotify(i, j, k, Block.dirt.blockID);
+        } else
+        if(world.getBlockLightValue(i, j + 1, k) >= 9)
+        {
+            for(int l = 0; l < 4; l++)
+            {
+                int i1 = (i + random.nextInt(3)) - 1;
+                int j1 = (j + random.nextInt(5)) - 3;
+                int k1 = (k + random.nextInt(3)) - 1;
+                int l1 = world.getBlockId(i1, j1 + 1, k1);
+                if(world.getBlockId(i1, j1, k1) == Block.dirt.blockID && world.getBlockLightValue(i1, j1 + 1, k1) >= 4 && Block.lightOpacity[l1] <= 2)
+                {
+                    world.setBlockWithNotify(i1, j1, k1, Block.grass.blockID);
+                }
+            }
+
+        }
+    }
+
+    public int idDropped(int i, Random random, int j)
+    {
+        return Block.dirt.idDropped(0, random, j);
+    }
 }

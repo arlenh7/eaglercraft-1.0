@@ -1,28 +1,50 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-class EnumOptionsMappingHelper {
-	static final int[] field_20155_a = new int[EnumOptions.values().length];
 
-	static {
-		try {
-			field_20155_a[EnumOptions.INVERT_MOUSE.ordinal()] = 1;
-		} catch (NoSuchFieldError var4) {
-		}
+// Referenced classes of package net.minecraft.src:
+//            EnumOptions
 
-		try {
-			field_20155_a[EnumOptions.VIEW_BOBBING.ordinal()] = 2;
-		} catch (NoSuchFieldError var3) {
-		}
+class EnumOptionsMappingHelper
+{
 
-		try {
-			field_20155_a[EnumOptions.ANAGLYPH.ordinal()] = 3;
-		} catch (NoSuchFieldError var2) {
-		}
+    static final int enumOptionsMappingHelperArray[]; /* synthetic field */
 
-		try {
-			field_20155_a[EnumOptions.LIMIT_FRAMERATE.ordinal()] = 4;
-		} catch (NoSuchFieldError var1) {
-		}
-
-	}
+    static 
+    {
+        enumOptionsMappingHelperArray = new int[EnumOptions.values().length];
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.INVERT_MOUSE.ordinal()] = 1;
+        }
+        catch(NoSuchFieldError nosuchfielderror) { }
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.VIEW_BOBBING.ordinal()] = 2;
+        }
+        catch(NoSuchFieldError nosuchfielderror1) { }
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.ANAGLYPH.ordinal()] = 3;
+        }
+        catch(NoSuchFieldError nosuchfielderror2) { }
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.ADVANCED_OPENGL.ordinal()] = 4;
+        }
+        catch(NoSuchFieldError nosuchfielderror3) { }
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.AMBIENT_OCCLUSION.ordinal()] = 5;
+        }
+        catch(NoSuchFieldError nosuchfielderror4) { }
+        try
+        {
+            enumOptionsMappingHelperArray[EnumOptions.RENDER_CLOUDS.ordinal()] = 6;
+        }
+        catch(NoSuchFieldError nosuchfielderror5) { }
+    }
 }

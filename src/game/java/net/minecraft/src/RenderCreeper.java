@@ -1,56 +1,125 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderCreeper extends RenderLiving {
-	public RenderCreeper() {
-		super(new ModelCreeper(), 0.5F);
-	}
+// Referenced classes of package net.minecraft.src:
+//            RenderLiving, ModelCreeper, EntityCreeper, MathHelper, 
+//            ModelBase, EntityLiving
 
-	protected void a(EntityCreeper var1, float var2) {
-		float var4 = var1.func_440_b(var2);
-		float var5 = 1.0F + MathHelper.sin(var4 * 100.0F) * var4 * 0.01F;
-		if(var4 < 0.0F) {
-			var4 = 0.0F;
-		}
+public class RenderCreeper extends RenderLiving
+{
 
-		if(var4 > 1.0F) {
-			var4 = 1.0F;
-		}
+    private ModelBase field_27008_a;
 
-		var4 *= var4;
-		var4 *= var4;
-		float var6 = (1.0F + var4 * 0.4F) * var5;
-		float var7 = (1.0F + var4 * 0.1F) / var5;
-		GL11.glScalef(var6, var7, var6);
-	}
+    public RenderCreeper()
+    {
+        super(new ModelCreeper(), 0.5F);
+        field_27008_a = new ModelCreeper(2.0F);
+    }
 
-	protected int a(EntityCreeper var1, float var2, float var3) {
-		float var5 = var1.func_440_b(var3);
-		if((int)(var5 * 10.0F) % 2 == 0) {
-			return 0;
-		} else {
-			int var6 = (int)(var5 * 0.2F * 255.0F);
-			if(var6 < 0) {
-				var6 = 0;
-			}
+    protected void updateCreeperScale(EntityCreeper entitycreeper, float f)
+    {
+        EntityCreeper entitycreeper1 = entitycreeper;
+        float f1 = entitycreeper1.setCreeperFlashTime(f);
+        float f2 = 1.0F + MathHelper.sin(f1 * 100F) * f1 * 0.01F;
+        if(f1 < 0.0F)
+        {
+            f1 = 0.0F;
+        }
+        if(f1 > 1.0F)
+        {
+            f1 = 1.0F;
+        }
+        f1 *= f1;
+        f1 *= f1;
+        float f3 = (1.0F + f1 * 0.4F) * f2;
+        float f4 = (1.0F + f1 * 0.1F) / f2;
+        GL11.glScalef(f3, f4, f3);
+    }
 
-			if(var6 > 255) {
-				var6 = 255;
-			}
+    protected int updateCreeperColorMultiplier(EntityCreeper entitycreeper, float f, float f1)
+    {
+        EntityCreeper entitycreeper1 = entitycreeper;
+        float f2 = entitycreeper1.setCreeperFlashTime(f1);
+        if((int)(f2 * 10F) % 2 == 0)
+        {
+            return 0;
+        }
+        int i = (int)(f2 * 0.2F * 255F);
+        if(i < 0)
+        {
+            i = 0;
+        }
+        if(i > 255)
+        {
+            i = 255;
+        }
+        char c = '\377';
+        char c1 = '\377';
+        char c2 = '\377';
+        return i << 24 | c << 16 | c1 << 8 | c2;
+    }
 
-			short var7 = 255;
-			short var8 = 255;
-			short var9 = 255;
-			return var6 << 24 | var7 << 16 | var8 << 8 | var9;
-		}
-	}
+    protected int func_27006_a(EntityCreeper entitycreeper, int i, float f)
+    {
+        if(entitycreeper.getPowered())
+        {
+            if(i == 1)
+            {
+                float f1 = (float)entitycreeper.ticksExisted + f;
+                loadTexture("/armor/power.png");
+                GL11.glMatrixMode(5890 /*GL_TEXTURE*/);
+                GL11.glLoadIdentity();
+                float f2 = f1 * 0.01F;
+                float f3 = f1 * 0.01F;
+                GL11.glTranslatef(f2, f3, 0.0F);
+                setRenderPassModel(field_27008_a);
+                GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
+                GL11.glEnable(3042 /*GL_BLEND*/);
+                float f4 = 0.5F;
+                GL11.glColor4f(f4, f4, f4, 1.0F);
+                GL11.glDisable(2896 /*GL_LIGHTING*/);
+                GL11.glBlendFunc(1, 1);
+                return 1;
+            }
+            if(i == 2)
+            {
+                GL11.glMatrixMode(5890 /*GL_TEXTURE*/);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
+                GL11.glEnable(2896 /*GL_LIGHTING*/);
+                GL11.glDisable(3042 /*GL_BLEND*/);
+            }
+        }
+        return -1;
+    }
 
-	protected void preRenderCallback(EntityLiving var1, float var2) {
-		this.a((EntityCreeper)var1, var2);
-	}
+    protected int func_27007_b(EntityCreeper entitycreeper, int i, float f)
+    {
+        return -1;
+    }
 
-	protected int getColorMultiplier(EntityLiving var1, float var2, float var3) {
-		return this.a((EntityCreeper)var1, var2, var3);
-	}
+    protected void preRenderCallback(EntityLiving entityliving, float f)
+    {
+        updateCreeperScale((EntityCreeper)entityliving, f);
+    }
+
+    protected int getColorMultiplier(EntityLiving entityliving, float f, float f1)
+    {
+        return updateCreeperColorMultiplier((EntityCreeper)entityliving, f, f1);
+    }
+
+    protected int shouldRenderPass(EntityLiving entityliving, int i, float f)
+    {
+        return func_27006_a((EntityCreeper)entityliving, i, f);
+    }
+
+    protected int inheritRenderPass(EntityLiving entityliving, int i, float f)
+    {
+        return func_27007_b((EntityCreeper)entityliving, i, f);
+    }
 }

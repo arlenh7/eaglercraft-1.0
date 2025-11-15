@@ -1,27 +1,55 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import org.lwjgl.opengl.GL11;
 
-public class RenderFallingSand extends Render {
-	private RenderBlocks field_197_d = new RenderBlocks();
+// Referenced classes of package net.minecraft.src:
+//            Render, RenderBlocks, Block, EntityFallingSand, 
+//            Tessellator, MathHelper, Entity
 
-	public RenderFallingSand() {
-		this.shadowSize = 0.5F;
-	}
+public class RenderFallingSand extends Render
+{
 
-	public void a(EntityFallingSand var1, double var2, double var4, double var6, float var8, float var9) {
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float)var2, (float)var4, (float)var6);
-		this.loadTexture("/terrain.png");
-		Block var10 = Block.blocksList[var1.entityID];
-		World var11 = var1.func_465_i();
-		GL11.glDisable(GL11.GL_LIGHTING);
-		this.field_197_d.func_1243_a(var10, var11, MathHelper.floor_double(var1.posX), MathHelper.floor_double(var1.posY), MathHelper.floor_double(var1.posZ));
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glPopMatrix();
-	}
+    private RenderBlocks field_197_d;
 
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityFallingSand)var1, var2, var4, var6, var8, var9);
-	}
+    public RenderFallingSand()
+    {
+        field_197_d = new RenderBlocks();
+        shadowSize = 0.5F;
+    }
+
+    public void doRenderFallingSand(EntityFallingSand entityfallingsand, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d, (float)d1, (float)d2);
+        loadTexture("/terrain.png");
+        Block block = Block.blocksList[entityfallingsand.blockID];
+        World world = entityfallingsand.getWorld();
+        GL11.glDisable(2896 /*GL_LIGHTING*/);
+        if(block == Block.field_41050_bK)
+        {
+            field_197_d.blockAccess = world;
+            Tessellator tessellator = Tessellator.instance;
+            tessellator.startDrawingQuads();
+            tessellator.setTranslationD((float)(-MathHelper.floor_double(entityfallingsand.posX)) - 0.5F, (float)(-MathHelper.floor_double(entityfallingsand.posY)) - 0.5F, (float)(-MathHelper.floor_double(entityfallingsand.posZ)) - 0.5F);
+            field_197_d.renderBlockByRenderType(block, MathHelper.floor_double(entityfallingsand.posX), MathHelper.floor_double(entityfallingsand.posY), MathHelper.floor_double(entityfallingsand.posZ));
+            tessellator.setTranslationD(0.0D, 0.0D, 0.0D);
+            tessellator.draw();
+        } else
+        {
+            field_197_d.renderBlockFallingSand(block, world, MathHelper.floor_double(entityfallingsand.posX), MathHelper.floor_double(entityfallingsand.posY), MathHelper.floor_double(entityfallingsand.posZ));
+        }
+        GL11.glEnable(2896 /*GL_LIGHTING*/);
+        GL11.glPopMatrix();
+    }
+
+    public void doRender(Entity entity, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        doRenderFallingSand((EntityFallingSand)entity, d, d1, d2, f, f1);
+    }
 }

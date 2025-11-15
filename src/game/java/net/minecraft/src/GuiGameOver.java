@@ -1,48 +1,95 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import java.util.List;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-public class GuiGameOver extends GuiScreen {
-	public void initGui() {
-		this.controlList.clear();
-		this.controlList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 72, "Respawn"));
-		this.controlList.add(new GuiButton(2, this.width / 2 - 100, this.height / 4 + 96, "Title menu"));
-		if(this.mc.session == null) {
-			((GuiButton)this.controlList.get(1)).enabled = false;
-		}
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, World, WorldInfo, GuiButton, 
+//            StatCollector, ISaveFormat, ISaveHandler, GuiMainMenu, 
+//            EntityPlayerSP
 
-	}
+public class GuiGameOver extends GuiScreen
+{
 
-	protected void keyTyped(char var1, int var2) {
-	}
+    public GuiGameOver()
+    {
+    }
 
-	protected void actionPerformed(GuiButton var1) {
-		if(var1.id == 0) {
-		}
+    public void initGui()
+    {
+        controlList.clear();
+        if(mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+        {
+            controlList.add(new GuiButton(1, width / 2 - 100, height / 4 + 96, StatCollector.translateToLocal("deathScreen.deleteWorld")));
+        } else
+        {
+            controlList.add(new GuiButton(1, width / 2 - 100, height / 4 + 72, StatCollector.translateToLocal("deathScreen.respawn")));
+            controlList.add(new GuiButton(2, width / 2 - 100, height / 4 + 96, StatCollector.translateToLocal("deathScreen.titleScreen")));
+            if(mc.session == null)
+            {
+                ((GuiButton)controlList.get(1)).enabled = false;
+            }
+        }
+    }
 
-		if(var1.id == 1) {
-			this.mc.thePlayer.respawnPlayer();
-			this.mc.displayGuiScreen((GuiScreen)null);
-		}
+    protected void keyTyped(char c, int i)
+    {
+    }
 
-		if(var1.id == 2) {
-			this.mc.func_6261_a((World)null);
-			this.mc.displayGuiScreen(new GuiMainMenu());
-		}
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        if(guibutton.id != 0);
+        if(guibutton.id == 1)
+        {
+            if(mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+            {
+                World world = mc.theWorld;
+                mc.func_40002_b("Deleting world");
+                ISaveFormat isaveformat = mc.getSaveLoader();
+                isaveformat.flushCache();
+                isaveformat.deleteWorldDirectory(world.func_40479_y().func_40530_d());
+                mc.displayGuiScreen(new GuiMainMenu());
+            } else
+            {
+                mc.thePlayer.respawnPlayer();
+                mc.displayGuiScreen(null);
+            }
+        }
+        if(guibutton.id == 2)
+        {
+            mc.changeWorld1(null);
+            mc.displayGuiScreen(new GuiMainMenu());
+        }
+    }
 
-	}
+    public void drawScreen(int i, int j, float f)
+    {
+        drawGradientRect(0, 0, width, height, 0x60500000, 0xa0803030);
+        GL11.glPushMatrix();
+        GL11.glScalef(2.0F, 2.0F, 2.0F);
+        if(mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+        {
+            drawCenteredString(fontRenderer, StatCollector.translateToLocal("deathScreen.title.hardcore"), width / 2 / 2, 30, 0xffffff);
+        } else
+        {
+            drawCenteredString(fontRenderer, StatCollector.translateToLocal("deathScreen.title"), width / 2 / 2, 30, 0xffffff);
+        }
+        GL11.glPopMatrix();
+        if(mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+        {
+            drawCenteredString(fontRenderer, StatCollector.translateToLocal("deathScreen.hardcoreInfo"), width / 2, 144, 0xffffff);
+        }
+        drawCenteredString(fontRenderer, (new StringBuilder()).append(StatCollector.translateToLocal("deathScreen.score")).append(": \247e").append(mc.thePlayer.getScore()).toString(), width / 2, 100, 0xffffff);
+        super.drawScreen(i, j, f);
+    }
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawGradientRect(0, 0, this.width, this.height, 1615855616, -1602211792);
-		GL11.glPushMatrix();
-		GL11.glScalef(2.0F, 2.0F, 2.0F);
-		this.drawCenteredString(this.fontRenderer, "Game over!", this.width / 2 / 2, 30, 16777215);
-		GL11.glPopMatrix();
-		this.drawCenteredString(this.fontRenderer, "Score: &e" + this.mc.thePlayer.getScore(), this.width / 2, 100, 16777215);
-		super.drawScreen(var1, var2, var3);
-	}
-
-	public boolean doesGuiPauseGame() {
-		return false;
-	}
+    public boolean doesGuiPauseGame()
+    {
+        return false;
+    }
 }

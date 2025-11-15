@@ -1,195 +1,257 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class BlockDoor extends Block {
-	protected BlockDoor(int var1, Material var2) {
-		super(var1, var2);
-		this.blockIndexInTexture = 97;
-		if(var2 == Material.iron) {
-			++this.blockIndexInTexture;
-		}
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, IBlockAccess, World, 
+//            Item, AxisAlignedBB, EntityPlayer, Vec3D, 
+//            MovingObjectPosition
 
-		float var3 = 0.5F;
-		float var4 = 1.0F;
-		this.setBlockBounds(0.5F - var3, 0.0F, 0.5F - var3, 0.5F + var3, var4, 0.5F + var3);
-	}
+public class BlockDoor extends Block
+{
 
-	public int getBlockTextureFromSideAndMetadata(int var1, int var2) {
-		if(var1 != 0 && var1 != 1) {
-			int var3 = this.func_312_c(var2);
-			if((var3 == 0 || var3 == 2) ^ var1 <= 3) {
-				return this.blockIndexInTexture;
-			} else {
-				int var4 = var3 / 2 + (var1 & 1 ^ var3);
-				var4 += (var2 & 4) / 4;
-				int var5 = this.blockIndexInTexture - (var2 & 8) * 2;
-				if((var4 & 1) != 0) {
-					var5 = -var5;
-				}
+    protected BlockDoor(int i, Material material)
+    {
+        super(i, material);
+        blockIndexInTexture = 97;
+        if(material == Material.iron)
+        {
+            blockIndexInTexture++;
+        }
+        float f = 0.5F;
+        float f1 = 1.0F;
+        setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
+    }
 
-				return var5;
-			}
-		} else {
-			return this.blockIndexInTexture;
-		}
-	}
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        if(i == 0 || i == 1)
+        {
+            return blockIndexInTexture;
+        }
+        int k = getState(j);
+        if((k == 0 || k == 2) ^ (i <= 3))
+        {
+            return blockIndexInTexture;
+        }
+        int l = k / 2 + (i & 1 ^ k);
+        l += (j & 4) / 4;
+        int i1 = blockIndexInTexture - (j & 8) * 2;
+        if((l & 1) != 0)
+        {
+            i1 = -i1;
+        }
+        return i1;
+    }
 
-	public boolean isOpaqueCube() {
-		return false;
-	}
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
 
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
 
-	public int getRenderType() {
-		return 7;
-	}
+    public int getRenderType()
+    {
+        return 7;
+    }
 
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		this.setBlockBoundsBasedOnState(var1, var2, var3, var4);
-		return super.getSelectedBoundingBoxFromPool(var1, var2, var3, var4);
-	}
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        setBlockBoundsBasedOnState(world, i, j, k);
+        return super.getSelectedBoundingBoxFromPool(world, i, j, k);
+    }
 
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
-		this.setBlockBoundsBasedOnState(var1, var2, var3, var4);
-		return super.getCollisionBoundingBoxFromPool(var1, var2, var3, var4);
-	}
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)
+    {
+        setBlockBoundsBasedOnState(world, i, j, k);
+        return super.getCollisionBoundingBoxFromPool(world, i, j, k);
+    }
 
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, int var2, int var3, int var4) {
-		this.func_313_b(this.func_312_c(var1.getBlockMetadata(var2, var3, var4)));
-	}
+    public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, int i, int j, int k)
+    {
+        setDoorRotation(getState(iblockaccess.getBlockMetadata(i, j, k)));
+    }
 
-	public void func_313_b(int var1) {
-		float var2 = 3.0F / 16.0F;
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 2.0F, 1.0F);
-		if(var1 == 0) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, var2);
-		}
+    public void setDoorRotation(int i)
+    {
+        float f = 0.1875F;
+        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 2.0F, 1.0F);
+        if(i == 0)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, f);
+        }
+        if(i == 1)
+        {
+            setBlockBounds(1.0F - f, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+        }
+        if(i == 2)
+        {
+            setBlockBounds(0.0F, 0.0F, 1.0F - f, 1.0F, 1.0F, 1.0F);
+        }
+        if(i == 3)
+        {
+            setBlockBounds(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
+        }
+    }
 
-		if(var1 == 1) {
-			this.setBlockBounds(1.0F - var2, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		}
+    public void onBlockClicked(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        blockActivated(world, i, j, k, entityplayer);
+    }
 
-		if(var1 == 2) {
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - var2, 1.0F, 1.0F, 1.0F);
-		}
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(blockMaterial == Material.iron)
+        {
+            return true;
+        }
+        int l = world.getBlockMetadata(i, j, k);
+        if((l & 8) != 0)
+        {
+            if(world.getBlockId(i, j - 1, k) == blockID)
+            {
+                blockActivated(world, i, j - 1, k, entityplayer);
+            }
+            return true;
+        }
+        if(world.getBlockId(i, j + 1, k) == blockID)
+        {
+            world.setBlockMetadataWithNotify(i, j + 1, k, (l ^ 4) + 8);
+        }
+        world.setBlockMetadataWithNotify(i, j, k, l ^ 4);
+        world.markBlocksDirty(i, j - 1, k, i, j, k);
+        world.playAuxSFXAtEntity(entityplayer, 1003, i, j, k, 0);
+        return true;
+    }
 
-		if(var1 == 3) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, var2, 1.0F, 1.0F);
-		}
+    public void onPoweredBlockChange(World world, int i, int j, int k, boolean flag)
+    {
+        int l = world.getBlockMetadata(i, j, k);
+        if((l & 8) != 0)
+        {
+            if(world.getBlockId(i, j - 1, k) == blockID)
+            {
+                onPoweredBlockChange(world, i, j - 1, k, flag);
+            }
+            return;
+        }
+        boolean flag1 = (world.getBlockMetadata(i, j, k) & 4) > 0;
+        if(flag1 == flag)
+        {
+            return;
+        }
+        if(world.getBlockId(i, j + 1, k) == blockID)
+        {
+            world.setBlockMetadataWithNotify(i, j + 1, k, (l ^ 4) + 8);
+        }
+        world.setBlockMetadataWithNotify(i, j, k, l ^ 4);
+        world.markBlocksDirty(i, j - 1, k, i, j, k);
+        world.playAuxSFXAtEntity(null, 1003, i, j, k, 0);
+    }
 
-	}
+    public void onNeighborBlockChange(World world, int i, int j, int k, int l)
+    {
+        int i1 = world.getBlockMetadata(i, j, k);
+        if((i1 & 8) != 0)
+        {
+            if(world.getBlockId(i, j - 1, k) != blockID)
+            {
+                world.setBlockWithNotify(i, j, k, 0);
+            }
+            if(l > 0 && Block.blocksList[l].canProvidePower())
+            {
+                onNeighborBlockChange(world, i, j - 1, k, l);
+            }
+        } else
+        {
+            boolean flag = false;
+            if(world.getBlockId(i, j + 1, k) != blockID)
+            {
+                world.setBlockWithNotify(i, j, k, 0);
+                flag = true;
+            }
+            if(!world.isBlockNormalCube(i, j - 1, k))
+            {
+                world.setBlockWithNotify(i, j, k, 0);
+                flag = true;
+                if(world.getBlockId(i, j + 1, k) == blockID)
+                {
+                    world.setBlockWithNotify(i, j + 1, k, 0);
+                }
+            }
+            if(flag)
+            {
+                if(!world.multiplayerWorld)
+                {
+                    dropBlockAsItem(world, i, j, k, i1, 0);
+                }
+            } else
+            if(l > 0)
+            {
+                boolean flag1 = world.isBlockIndirectlyGettingPowered(i, j, k) || world.isBlockIndirectlyGettingPowered(i, j + 1, k);
+                onPoweredBlockChange(world, i, j, k, flag1);
+            }
+        }
+    }
 
-	public void onBlockClicked(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		this.blockActivated(var1, var2, var3, var4, var5);
-	}
+    public int idDropped(int i, Random random, int j)
+    {
+        if((i & 8) != 0)
+        {
+            return 0;
+        }
+        if(blockMaterial == Material.iron)
+        {
+            return Item.doorSteel.shiftedIndex;
+        } else
+        {
+            return Item.doorWood.shiftedIndex;
+        }
+    }
 
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		if(this.blockMaterial == Material.iron) {
-			return true;
-		} else {
-			int var6 = var1.getBlockMetadata(var2, var3, var4);
-			if((var6 & 8) != 0) {
-				if(var1.getBlockId(var2, var3 - 1, var4) == this.blockID) {
-					this.blockActivated(var1, var2, var3 - 1, var4, var5);
-				}
+    public MovingObjectPosition collisionRayTrace(World world, int i, int j, int k, Vec3D vec3d, Vec3D vec3d1)
+    {
+        setBlockBoundsBasedOnState(world, i, j, k);
+        return super.collisionRayTrace(world, i, j, k, vec3d, vec3d1);
+    }
 
-				return true;
-			} else {
-				if(var1.getBlockId(var2, var3 + 1, var4) == this.blockID) {
-					var1.setBlockMetadataWithNotify(var2, var3 + 1, var4, (var6 ^ 4) + 8);
-				}
+    public int getState(int i)
+    {
+        if((i & 4) == 0)
+        {
+            return i - 1 & 3;
+        } else
+        {
+            return i & 3;
+        }
+    }
 
-				var1.setBlockMetadataWithNotify(var2, var3, var4, var6 ^ 4);
-				var1.func_701_b(var2, var3 - 1, var4, var2, var3, var4);
-				if(Math.random() < 0.5D) {
-					var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_open", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-				} else {
-					var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_close", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-				}
+    public boolean canPlaceBlockAt(World world, int i, int j, int k)
+    {
+        if(j >= world.field_35472_c - 1)
+        {
+            return false;
+        } else
+        {
+            return world.isBlockNormalCube(i, j - 1, k) && super.canPlaceBlockAt(world, i, j, k) && super.canPlaceBlockAt(world, i, j + 1, k);
+        }
+    }
 
-				return true;
-			}
-		}
-	}
+    public static boolean isOpen(int i)
+    {
+        return (i & 4) != 0;
+    }
 
-	public void func_311_a(World var1, int var2, int var3, int var4, boolean var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if((var6 & 8) != 0) {
-			if(var1.getBlockId(var2, var3 - 1, var4) == this.blockID) {
-				this.func_311_a(var1, var2, var3 - 1, var4, var5);
-			}
-
-		} else {
-			boolean var7 = (var1.getBlockMetadata(var2, var3, var4) & 4) > 0;
-			if(var7 != var5) {
-				if(var1.getBlockId(var2, var3 + 1, var4) == this.blockID) {
-					var1.setBlockMetadataWithNotify(var2, var3 + 1, var4, (var6 ^ 4) + 8);
-				}
-
-				var1.setBlockMetadataWithNotify(var2, var3, var4, var6 ^ 4);
-				var1.func_701_b(var2, var3 - 1, var4, var2, var3, var4);
-				if(Math.random() < 0.5D) {
-					var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_open", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-				} else {
-					var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "random.door_close", 1.0F, var1.rand.nextFloat() * 0.1F + 0.9F);
-				}
-
-			}
-		}
-	}
-
-	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if((var6 & 8) != 0) {
-			if(var1.getBlockId(var2, var3 - 1, var4) != this.blockID) {
-				var1.setBlockWithNotify(var2, var3, var4, 0);
-			}
-
-			if(var5 > 0 && Block.blocksList[var5].canProvidePower()) {
-				this.onNeighborBlockChange(var1, var2, var3 - 1, var4, var5);
-			}
-		} else {
-			boolean var7 = false;
-			if(var1.getBlockId(var2, var3 + 1, var4) != this.blockID) {
-				var1.setBlockWithNotify(var2, var3, var4, 0);
-				var7 = true;
-			}
-
-			if(!var1.isBlockOpaqueCube(var2, var3 - 1, var4)) {
-				var1.setBlockWithNotify(var2, var3, var4, 0);
-				var7 = true;
-				if(var1.getBlockId(var2, var3 + 1, var4) == this.blockID) {
-					var1.setBlockWithNotify(var2, var3 + 1, var4, 0);
-				}
-			}
-
-			if(var7) {
-				this.dropBlockAsItem(var1, var2, var3, var4, var6);
-			} else if(var5 > 0 && Block.blocksList[var5].canProvidePower()) {
-				boolean var8 = var1.isBlockIndirectlyGettingPowered(var2, var3, var4) || var1.isBlockIndirectlyGettingPowered(var2, var3 + 1, var4);
-				this.func_311_a(var1, var2, var3, var4, var8);
-			}
-		}
-
-	}
-
-	public int idDropped(int var1, Random var2) {
-		return (var1 & 8) != 0 ? 0 : (this.blockMaterial == Material.iron ? Item.doorSteel.shiftedIndex : Item.doorWood.shiftedIndex);
-	}
-
-	public MovingObjectPosition collisionRayTrace(World var1, int var2, int var3, int var4, Vec3D var5, Vec3D var6) {
-		this.setBlockBoundsBasedOnState(var1, var2, var3, var4);
-		return super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
-	}
-
-	public int func_312_c(int var1) {
-		return (var1 & 4) == 0 ? var1 - 1 & 3 : var1 & 3;
-	}
-
-	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
-		return var3 >= 127 ? false : var1.isBlockOpaqueCube(var2, var3 - 1, var4) && super.canPlaceBlockAt(var1, var2, var3, var4) && super.canPlaceBlockAt(var1, var2, var3 + 1, var4);
-	}
+    public int getMobilityFlag()
+    {
+        return 1;
+    }
 }

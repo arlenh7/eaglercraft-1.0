@@ -1,44 +1,113 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class BlockJukeBox extends Block {
-	protected BlockJukeBox(int var1, int var2) {
-		super(var1, var2, Material.wood);
-	}
+import java.util.Random;
 
-	public int getBlockTextureFromSide(int var1) {
-		return this.blockIndexInTexture + (var1 == 1 ? 1 : 0);
-	}
+// Referenced classes of package net.minecraft.src:
+//            BlockContainer, Material, World, TileEntityRecordPlayer, 
+//            EntityItem, ItemStack, EntityPlayer, TileEntity
 
-	public boolean blockActivated(World var1, int var2, int var3, int var4, EntityPlayer var5) {
-		int var6 = var1.getBlockMetadata(var2, var3, var4);
-		if(var6 > 0) {
-			this.ejectRecord(var1, var2, var3, var4, var6);
-			return true;
-		} else {
-			return false;
-		}
-	}
+public class BlockJukeBox extends BlockContainer
+{
 
-	public void ejectRecord(World var1, int var2, int var3, int var4, int var5) {
-		var1.playRecord((String)null, var2, var3, var4);
-		var1.setBlockMetadataWithNotify(var2, var3, var4, 0);
-		int var6 = Item.record13.shiftedIndex + var5 - 1;
-		float var7 = 0.7F;
-		double var8 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
-		double var10 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.2D + 0.6D;
-		double var12 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
-		EntityItem var14 = new EntityItem(var1, (double)var2 + var8, (double)var3 + var10, (double)var4 + var12, new ItemStack(var6));
-		var14.delayBeforeCanPickup = 10;
-		var1.entityJoinedWorld(var14);
-	}
+    protected BlockJukeBox(int i, int j)
+    {
+        super(i, j, Material.wood);
+    }
 
-	public void dropBlockAsItemWithChance(World var1, int var2, int var3, int var4, int var5, float var6) {
-		if(!var1.multiplayerWorld) {
-			if(var5 > 0) {
-				this.ejectRecord(var1, var2, var3, var4, var5);
-			}
+    public int getBlockTextureFromSide(int i)
+    {
+        return blockIndexInTexture + (i != 1 ? 0 : 1);
+    }
 
-			super.dropBlockAsItemWithChance(var1, var2, var3, var4, var5, var6);
-		}
-	}
+    public boolean blockActivated(World world, int i, int j, int k, EntityPlayer entityplayer)
+    {
+        if(world.getBlockMetadata(i, j, k) == 0)
+        {
+            return false;
+        } else
+        {
+            func_28038_b_(world, i, j, k);
+            return true;
+        }
+    }
+
+    public void ejectRecord(World world, int i, int j, int k, int l)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        TileEntityRecordPlayer tileentityrecordplayer = (TileEntityRecordPlayer)world.getBlockTileEntity(i, j, k);
+        if(tileentityrecordplayer == null)
+        {
+            return;
+        } else
+        {
+            tileentityrecordplayer.record = l;
+            tileentityrecordplayer.onInventoryChanged();
+            world.setBlockMetadataWithNotify(i, j, k, 1);
+            return;
+        }
+    }
+
+    public void func_28038_b_(World world, int i, int j, int k)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
+        TileEntityRecordPlayer tileentityrecordplayer = (TileEntityRecordPlayer)world.getBlockTileEntity(i, j, k);
+        if(tileentityrecordplayer == null)
+        {
+            return;
+        }
+        int l = tileentityrecordplayer.record;
+        if(l == 0)
+        {
+            return;
+        } else
+        {
+            world.playAuxSFX(1005, i, j, k, 0);
+            world.playRecord(null, i, j, k);
+            tileentityrecordplayer.record = 0;
+            tileentityrecordplayer.onInventoryChanged();
+            world.setBlockMetadataWithNotify(i, j, k, 0);
+            int i1 = l;
+            float f = 0.7F;
+            double d = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.20000000000000001D + 0.59999999999999998D;
+            double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+            EntityItem entityitem = new EntityItem(world, (double)i + d, (double)j + d1, (double)k + d2, new ItemStack(i1, 1, 0));
+            entityitem.delayBeforeCanPickup = 10;
+            world.entityJoinedWorld(entityitem);
+            return;
+        }
+    }
+
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
+        func_28038_b_(world, i, j, k);
+        super.onBlockRemoval(world, i, j, k);
+    }
+
+    public void dropBlockAsItemWithChance(World world, int i, int j, int k, int l, float f, int i1)
+    {
+        if(world.multiplayerWorld)
+        {
+            return;
+        } else
+        {
+            super.dropBlockAsItemWithChance(world, i, j, k, l, f, 0);
+            return;
+        }
+    }
+
+    public TileEntity getBlockEntity()
+    {
+        return new TileEntityRecordPlayer();
+    }
 }

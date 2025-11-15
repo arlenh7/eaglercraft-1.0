@@ -1,180 +1,335 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
 
-public class PlayerControllerMP extends PlayerController {
-	private int field_9445_c = -1;
-	private int field_9444_d = -1;
-	private int field_9443_e = -1;
-	private float field_9442_f = 0.0F;
-	private float field_1080_g = 0.0F;
-	private float field_9441_h = 0.0F;
-	private int field_9440_i = 0;
-	private boolean field_9439_j = false;
-	private NetClientHandler field_9438_k;
-	private int field_1075_l = 0;
+// Referenced classes of package net.minecraft.src:
+//            PlayerController, PlayerControllerCreative, EntityPlayer, World, 
+//            EntityPlayerSP, ItemStack, Packet14BlockDig, NetClientHandler, 
+//            Block, StepSound, SoundManager, GuiIngame, 
+//            RenderGlobal, InventoryPlayer, Packet16BlockItemSwitch, Packet15Place, 
+//            EntityClientPlayerMP, Packet7UseEntity, Entity, Container, 
+//            Packet102WindowClick, Packet108EnchantItem, Packet107CreativeSetSlot
 
-	public PlayerControllerMP(Minecraft var1, NetClientHandler var2) {
-		super(var1);
-		this.field_9438_k = var2;
-	}
+public class PlayerControllerMP extends PlayerController
+{
 
-	public void flipPlayer(EntityPlayer var1) {
-		var1.rotationYaw = -180.0F;
-	}
+    private int currentBlockX;
+    private int currentBlockY;
+    private int currentblockZ;
+    private float curBlockDamageMP;
+    private float prevBlockDamageMP;
+    private float stepSoundTickCounter;
+    private int blockHitDelay;
+    private boolean isHittingBlock;
+    private boolean creativeMode;
+    private NetClientHandler netClientHandler;
+    private int currentPlayerItem;
 
-	public boolean sendBlockRemoved(int var1, int var2, int var3, int var4) {
-		this.field_9438_k.addToSendQueue(new Packet14BlockDig(3, var1, var2, var3, var4));
-		int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
-		boolean var6 = super.sendBlockRemoved(var1, var2, var3, var4);
-		ItemStack var7 = this.mc.thePlayer.getCurrentEquippedItem();
-		if(var7 != null) {
-			var7.hitBlock(var5, var1, var2, var3);
-			if(var7.stackSize == 0) {
-				var7.func_1097_a(this.mc.thePlayer);
-				this.mc.thePlayer.destroyCurrentEquippedItem();
-			}
-		}
+    public PlayerControllerMP(Minecraft minecraft, NetClientHandler netclienthandler)
+    {
+        super(minecraft);
+        currentBlockX = -1;
+        currentBlockY = -1;
+        currentblockZ = -1;
+        curBlockDamageMP = 0.0F;
+        prevBlockDamageMP = 0.0F;
+        stepSoundTickCounter = 0.0F;
+        blockHitDelay = 0;
+        isHittingBlock = false;
+        currentPlayerItem = 0;
+        netClientHandler = netclienthandler;
+    }
 
-		return var6;
-	}
+    public void func_35648_a(boolean flag)
+    {
+        creativeMode = flag;
+        if(creativeMode)
+        {
+            PlayerControllerCreative.func_35646_d(mc.thePlayer);
+        } else
+        {
+            PlayerControllerCreative.func_35645_e(mc.thePlayer);
+        }
+    }
 
-	public void clickBlock(int var1, int var2, int var3, int var4) {
-		this.field_9439_j = true;
-		this.field_9438_k.addToSendQueue(new Packet14BlockDig(0, var1, var2, var3, var4));
-		int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
-		if(var5 > 0 && this.field_9442_f == 0.0F) {
-			Block.blocksList[var5].onBlockClicked(this.mc.theWorld, var1, var2, var3, this.mc.thePlayer);
-		}
+    public void flipPlayer(EntityPlayer entityplayer)
+    {
+        entityplayer.rotationYaw = -180F;
+    }
 
-		if(var5 > 0 && Block.blocksList[var5].blockStrength(this.mc.thePlayer) >= 1.0F) {
-			this.sendBlockRemoved(var1, var2, var3, var4);
-		}
+    public boolean shouldDrawHUD()
+    {
+        return !creativeMode;
+    }
 
-	}
+    public boolean sendBlockRemoved(int i, int j, int k, int l)
+    {
+        if(creativeMode)
+        {
+            return super.sendBlockRemoved(i, j, k, l);
+        }
+        int i1 = mc.theWorld.getBlockId(i, j, k);
+        boolean flag = super.sendBlockRemoved(i, j, k, l);
+        ItemStack itemstack = mc.thePlayer.getCurrentEquippedItem();
+        if(itemstack != null)
+        {
+            itemstack.onDestroyBlock(i1, i, j, k, mc.thePlayer);
+            if(itemstack.stackSize == 0)
+            {
+                itemstack.onItemDestroyedByUse(mc.thePlayer);
+                mc.thePlayer.destroyCurrentEquippedItem();
+            }
+        }
+        return flag;
+    }
 
-	public void func_6468_a() {
-		if(this.field_9439_j) {
-			this.field_9439_j = false;
-			this.field_9438_k.addToSendQueue(new Packet14BlockDig(2, 0, 0, 0, 0));
-			this.field_9442_f = 0.0F;
-			this.field_9440_i = 0;
-		}
-	}
+    public void clickBlock(int i, int j, int k, int l)
+    {
+        if(creativeMode)
+        {
+            netClientHandler.addToSendQueue(new Packet14BlockDig(0, i, j, k, l));
+            PlayerControllerCreative.func_35644_a(mc, this, i, j, k, l);
+            blockHitDelay = 5;
+        } else
+        if(!isHittingBlock || i != currentBlockX || j != currentBlockY || k != currentblockZ)
+        {
+            netClientHandler.addToSendQueue(new Packet14BlockDig(0, i, j, k, l));
+            int i1 = mc.theWorld.getBlockId(i, j, k);
+            if(i1 > 0 && curBlockDamageMP == 0.0F)
+            {
+                Block.blocksList[i1].onBlockClicked(mc.theWorld, i, j, k, mc.thePlayer);
+            }
+            if(i1 > 0 && Block.blocksList[i1].blockStrength(mc.thePlayer) >= 1.0F)
+            {
+                sendBlockRemoved(i, j, k, l);
+            } else
+            {
+                isHittingBlock = true;
+                currentBlockX = i;
+                currentBlockY = j;
+                currentblockZ = k;
+                curBlockDamageMP = 0.0F;
+                prevBlockDamageMP = 0.0F;
+                stepSoundTickCounter = 0.0F;
+            }
+        }
+    }
 
-	public void sendBlockRemoving(int var1, int var2, int var3, int var4) {
-		this.field_9439_j = true;
-		this.func_730_e();
-		this.field_9438_k.addToSendQueue(new Packet14BlockDig(1, var1, var2, var3, var4));
-		if(this.field_9440_i > 0) {
-			--this.field_9440_i;
-		} else {
-			if(var1 == this.field_9445_c && var2 == this.field_9444_d && var3 == this.field_9443_e) {
-				int var5 = this.mc.theWorld.getBlockId(var1, var2, var3);
-				if(var5 == 0) {
-					return;
-				}
+    public void resetBlockRemoving()
+    {
+        curBlockDamageMP = 0.0F;
+        isHittingBlock = false;
+    }
 
-				Block var6 = Block.blocksList[var5];
-				this.field_9442_f += var6.blockStrength(this.mc.thePlayer);
-				if(this.field_9441_h % 4.0F == 0.0F && var6 != null) {
-					this.mc.sndManager.playSound(var6.stepSound.func_1145_d(), (float)var1 + 0.5F, (float)var2 + 0.5F, (float)var3 + 0.5F, (var6.stepSound.func_1147_b() + 1.0F) / 8.0F, var6.stepSound.func_1144_c() * 0.5F);
-				}
+    public void sendBlockRemoving(int i, int j, int k, int l)
+    {
+        syncCurrentPlayItem();
+        if(blockHitDelay > 0)
+        {
+            blockHitDelay--;
+            return;
+        }
+        if(creativeMode)
+        {
+            blockHitDelay = 5;
+            netClientHandler.addToSendQueue(new Packet14BlockDig(0, i, j, k, l));
+            PlayerControllerCreative.func_35644_a(mc, this, i, j, k, l);
+            return;
+        }
+        if(i == currentBlockX && j == currentBlockY && k == currentblockZ)
+        {
+            int i1 = mc.theWorld.getBlockId(i, j, k);
+            if(i1 == 0)
+            {
+                isHittingBlock = false;
+                return;
+            }
+            Block block = Block.blocksList[i1];
+            curBlockDamageMP += block.blockStrength(mc.thePlayer);
+            if(stepSoundTickCounter % 4F == 0.0F && block != null)
+            {
+                mc.sndManager.playSound(block.stepSound.stepSoundDir2(), (float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, (block.stepSound.getVolume() + 1.0F) / 8F, block.stepSound.getPitch() * 0.5F);
+            }
+            stepSoundTickCounter++;
+            if(curBlockDamageMP >= 1.0F)
+            {
+                isHittingBlock = false;
+                netClientHandler.addToSendQueue(new Packet14BlockDig(2, i, j, k, l));
+                sendBlockRemoved(i, j, k, l);
+                curBlockDamageMP = 0.0F;
+                prevBlockDamageMP = 0.0F;
+                stepSoundTickCounter = 0.0F;
+                blockHitDelay = 5;
+            }
+        } else
+        {
+            clickBlock(i, j, k, l);
+        }
+    }
 
-				++this.field_9441_h;
-				if(this.field_9442_f >= 1.0F) {
-					this.sendBlockRemoved(var1, var2, var3, var4);
-					this.field_9442_f = 0.0F;
-					this.field_1080_g = 0.0F;
-					this.field_9441_h = 0.0F;
-					this.field_9440_i = 5;
-				}
-			} else {
-				this.field_9442_f = 0.0F;
-				this.field_1080_g = 0.0F;
-				this.field_9441_h = 0.0F;
-				this.field_9445_c = var1;
-				this.field_9444_d = var2;
-				this.field_9443_e = var3;
-			}
+    public void setPartialTime(float f)
+    {
+        if(curBlockDamageMP <= 0.0F)
+        {
+            mc.ingameGUI.damageGuiPartialTime = 0.0F;
+            mc.renderGlobal.damagePartialTime = 0.0F;
+        } else
+        {
+            float f1 = prevBlockDamageMP + (curBlockDamageMP - prevBlockDamageMP) * f;
+            mc.ingameGUI.damageGuiPartialTime = f1;
+            mc.renderGlobal.damagePartialTime = f1;
+        }
+    }
 
-		}
-	}
+    public float getBlockReachDistance()
+    {
+        return !creativeMode ? 4.5F : 5F;
+    }
 
-	public void setPartialTime(float var1) {
-		if(this.field_9442_f <= 0.0F) {
-			this.mc.ingameGUI.field_6446_b = 0.0F;
-			this.mc.renderGlobal.field_1450_i = 0.0F;
-		} else {
-			float var2 = this.field_1080_g + (this.field_9442_f - this.field_1080_g) * var1;
-			this.mc.ingameGUI.field_6446_b = var2;
-			this.mc.renderGlobal.field_1450_i = var2;
-		}
+    public void onWorldChange(World world)
+    {
+        super.onWorldChange(world);
+    }
 
-	}
+    public void updateController()
+    {
+        syncCurrentPlayItem();
+        prevBlockDamageMP = curBlockDamageMP;
+        mc.sndManager.playRandomMusicIfReady();
+    }
 
-	public float getBlockReachDistance() {
-		return 4.0F;
-	}
+    private void syncCurrentPlayItem()
+    {
+        int i = mc.thePlayer.inventory.currentItem;
+        if(i != currentPlayerItem)
+        {
+            currentPlayerItem = i;
+            netClientHandler.addToSendQueue(new Packet16BlockItemSwitch(currentPlayerItem));
+        }
+    }
 
-	public void func_717_a(World var1) {
-		super.func_717_a(var1);
-	}
+    public boolean sendPlaceBlock(EntityPlayer entityplayer, World world, ItemStack itemstack, int i, int j, int k, int l)
+    {
+        syncCurrentPlayItem();
+        netClientHandler.addToSendQueue(new Packet15Place(i, j, k, l, entityplayer.inventory.getCurrentItem()));
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 > 0 && Block.blocksList[i1].blockActivated(world, i, j, k, entityplayer))
+        {
+            return true;
+        }
+        if(itemstack == null)
+        {
+            return false;
+        }
+        if(creativeMode)
+        {
+            int j1 = itemstack.getItemDamage();
+            int k1 = itemstack.stackSize;
+            boolean flag = itemstack.useItem(entityplayer, world, i, j, k, l);
+            itemstack.setItemDamage(j1);
+            itemstack.stackSize = k1;
+            return flag;
+        } else
+        {
+            return itemstack.useItem(entityplayer, world, i, j, k, l);
+        }
+    }
 
-	public void updateController() {
-		this.func_730_e();
-		this.field_1080_g = this.field_9442_f;
-		this.mc.sndManager.func_4033_c();
-	}
+    public boolean sendUseItem(EntityPlayer entityplayer, World world, ItemStack itemstack)
+    {
+        syncCurrentPlayItem();
+        netClientHandler.addToSendQueue(new Packet15Place(-1, -1, -1, 255, entityplayer.inventory.getCurrentItem()));
+        boolean flag = super.sendUseItem(entityplayer, world, itemstack);
+        return flag;
+    }
 
-	private void func_730_e() {
-		int var1 = this.mc.thePlayer.inventory.currentItem;
-		if(var1 != this.field_1075_l) {
-			this.field_1075_l = var1;
-			this.field_9438_k.addToSendQueue(new Packet16BlockItemSwitch(this.field_1075_l));
-		}
+    public EntityPlayer createPlayer(World world)
+    {
+        return new EntityClientPlayerMP(mc, world, mc.session, netClientHandler);
+    }
 
-	}
+    public void attackEntity(EntityPlayer entityplayer, Entity entity)
+    {
+        syncCurrentPlayItem();
+        netClientHandler.addToSendQueue(new Packet7UseEntity(entityplayer.entityId, entity.entityId, 1));
+        entityplayer.attackTargetEntityWithCurrentItem(entity);
+    }
 
-	public boolean sendPlaceBlock(EntityPlayer var1, World var2, ItemStack var3, int var4, int var5, int var6, int var7) {
-		this.func_730_e();
-		boolean var8 = super.sendPlaceBlock(var1, var2, var3, var4, var5, var6, var7);
-		this.field_9438_k.addToSendQueue(new Packet15Place(var4, var5, var6, var7, var1.inventory.getCurrentItem()));
-		return var8;
-	}
+    public void interactWithEntity(EntityPlayer entityplayer, Entity entity)
+    {
+        syncCurrentPlayItem();
+        netClientHandler.addToSendQueue(new Packet7UseEntity(entityplayer.entityId, entity.entityId, 0));
+        entityplayer.useCurrentItemOnEntity(entity);
+    }
 
-	public boolean sendUseItem(EntityPlayer var1, World var2, ItemStack var3) {
-		this.func_730_e();
-		boolean var4 = super.sendUseItem(var1, var2, var3);
-		this.field_9438_k.addToSendQueue(new Packet15Place(-1, -1, -1, 255, var1.inventory.getCurrentItem()));
-		return var4;
-	}
+    public ItemStack windowClick(int i, int j, int k, boolean flag, EntityPlayer entityplayer)
+    {
+        short word0 = entityplayer.craftingInventory.func_20111_a(entityplayer.inventory);
+        ItemStack itemstack = super.windowClick(i, j, k, flag, entityplayer);
+        netClientHandler.addToSendQueue(new Packet102WindowClick(i, j, k, flag, itemstack, word0));
+        return itemstack;
+    }
 
-	public EntityPlayer func_4087_b(World var1) {
-		return new EntityClientPlayerMP(this.mc, var1, this.mc.session, this.field_9438_k);
-	}
+    public void func_40593_a(int i, int j)
+    {
+        netClientHandler.addToSendQueue(new Packet108EnchantItem(i, j));
+    }
 
-	public void func_6472_b(EntityPlayer var1, Entity var2) {
-		this.func_730_e();
-		this.field_9438_k.addToSendQueue(new Packet7(var1.field_620_ab, var2.field_620_ab, 1));
-		var1.attackTargetEntityWithCurrentItem(var2);
-	}
+    public void func_35637_a(ItemStack itemstack, int i)
+    {
+        if(creativeMode)
+        {
+            netClientHandler.addToSendQueue(new Packet107CreativeSetSlot(i, itemstack));
+        }
+    }
 
-	public void func_6475_a(EntityPlayer var1, Entity var2) {
-		this.func_730_e();
-		this.field_9438_k.addToSendQueue(new Packet7(var1.field_620_ab, var2.field_620_ab, 0));
-		var1.useCurrentItemOnEntity(var2);
-	}
+    public void func_35639_a(ItemStack itemstack)
+    {
+        if(creativeMode && itemstack != null)
+        {
+            netClientHandler.addToSendQueue(new Packet107CreativeSetSlot(-1, itemstack));
+        }
+    }
 
-	public ItemStack func_20085_a(int var1, int var2, int var3, EntityPlayer var4) {
-		short var5 = var4.field_20068_h.func_20111_a(var4.inventory);
-		ItemStack var6 = super.func_20085_a(var1, var2, var3, var4);
-		this.field_9438_k.addToSendQueue(new Packet102(var1, var2, var3, var6, var5));
-		return var6;
-	}
+    public void func_20086_a(int i, EntityPlayer entityplayer)
+    {
+        if(i == -9999)
+        {
+            return;
+        } else
+        {
+            return;
+        }
+    }
 
-	public void func_20086_a(int var1, EntityPlayer var2) {
-		if(var1 != -9999) {
-		}
-	}
+    public void onStoppedUsingItem(EntityPlayer entityplayer)
+    {
+        syncCurrentPlayItem();
+        netClientHandler.addToSendQueue(new Packet14BlockDig(5, 0, 0, 0, 255));
+        super.onStoppedUsingItem(entityplayer);
+    }
+
+    public boolean func_35642_f()
+    {
+        return true;
+    }
+
+    public boolean func_35641_g()
+    {
+        return !creativeMode;
+    }
+
+    public boolean isInCreativeMode()
+    {
+        return creativeMode;
+    }
+
+    public boolean extendedReach()
+    {
+        return creativeMode;
+    }
 }

@@ -1,72 +1,100 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemDoor extends Item {
-	private Material field_321_a;
 
-	public ItemDoor(int var1, Material var2) {
-		super(var1);
-		this.field_321_a = var2;
-		this.maxDamage = 64;
-		this.maxStackSize = 1;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, Material, Block, EntityPlayer, 
+//            MathHelper, ItemStack, World
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 != 1) {
-			return false;
-		} else {
-			++var5;
-			Block var8;
-			if(this.field_321_a == Material.wood) {
-				var8 = Block.doorWood;
-			} else {
-				var8 = Block.doorSteel;
-			}
+public class ItemDoor extends Item
+{
 
-			if(!var8.canPlaceBlockAt(var3, var4, var5, var6)) {
-				return false;
-			} else {
-				int var9 = MathHelper.floor_double((double)((var2.rotationYaw + 180.0F) * 4.0F / 360.0F) - 0.5D) & 3;
-				byte var10 = 0;
-				byte var11 = 0;
-				if(var9 == 0) {
-					var11 = 1;
-				}
+    private Material doorMaterial;
 
-				if(var9 == 1) {
-					var10 = -1;
-				}
+    public ItemDoor(int i, Material material)
+    {
+        super(i);
+        doorMaterial = material;
+        maxStackSize = 1;
+    }
 
-				if(var9 == 2) {
-					var11 = -1;
-				}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(l != 1)
+        {
+            return false;
+        }
+        j++;
+        Block block;
+        if(doorMaterial == Material.wood)
+        {
+            block = Block.doorWood;
+        } else
+        {
+            block = Block.doorSteel;
+        }
+        if(!entityplayer.func_35190_e(i, j, k) || !entityplayer.func_35190_e(i, j + 1, k))
+        {
+            return false;
+        }
+        if(!block.canPlaceBlockAt(world, i, j, k))
+        {
+            return false;
+        } else
+        {
+            int i1 = MathHelper.floor_double((double)(((entityplayer.rotationYaw + 180F) * 4F) / 360F) - 0.5D) & 3;
+            placeDoorBlock(world, i, j, k, i1, block);
+            itemstack.stackSize--;
+            return true;
+        }
+    }
 
-				if(var9 == 3) {
-					var10 = 1;
-				}
-
-				int var12 = (var3.isBlockOpaqueCube(var4 - var10, var5, var6 - var11) ? 1 : 0) + (var3.isBlockOpaqueCube(var4 - var10, var5 + 1, var6 - var11) ? 1 : 0);
-				int var13 = (var3.isBlockOpaqueCube(var4 + var10, var5, var6 + var11) ? 1 : 0) + (var3.isBlockOpaqueCube(var4 + var10, var5 + 1, var6 + var11) ? 1 : 0);
-				boolean var14 = var3.getBlockId(var4 - var10, var5, var6 - var11) == var8.blockID || var3.getBlockId(var4 - var10, var5 + 1, var6 - var11) == var8.blockID;
-				boolean var15 = var3.getBlockId(var4 + var10, var5, var6 + var11) == var8.blockID || var3.getBlockId(var4 + var10, var5 + 1, var6 + var11) == var8.blockID;
-				boolean var16 = false;
-				if(var14 && !var15) {
-					var16 = true;
-				} else if(var13 > var12) {
-					var16 = true;
-				}
-
-				if(var16) {
-					var9 = var9 - 1 & 3;
-					var9 += 4;
-				}
-
-				var3.setBlockWithNotify(var4, var5, var6, var8.blockID);
-				var3.setBlockMetadataWithNotify(var4, var5, var6, var9);
-				var3.setBlockWithNotify(var4, var5 + 1, var6, var8.blockID);
-				var3.setBlockMetadataWithNotify(var4, var5 + 1, var6, var9 + 8);
-				--var1.stackSize;
-				return true;
-			}
-		}
-	}
+    public static void placeDoorBlock(World world, int i, int j, int k, int l, Block block)
+    {
+        byte byte0 = 0;
+        byte byte1 = 0;
+        if(l == 0)
+        {
+            byte1 = 1;
+        }
+        if(l == 1)
+        {
+            byte0 = -1;
+        }
+        if(l == 2)
+        {
+            byte1 = -1;
+        }
+        if(l == 3)
+        {
+            byte0 = 1;
+        }
+        int i1 = (world.isBlockNormalCube(i - byte0, j, k - byte1) ? 1 : 0) + (world.isBlockNormalCube(i - byte0, j + 1, k - byte1) ? 1 : 0);
+        int j1 = (world.isBlockNormalCube(i + byte0, j, k + byte1) ? 1 : 0) + (world.isBlockNormalCube(i + byte0, j + 1, k + byte1) ? 1 : 0);
+        boolean flag = world.getBlockId(i - byte0, j, k - byte1) == block.blockID || world.getBlockId(i - byte0, j + 1, k - byte1) == block.blockID;
+        boolean flag1 = world.getBlockId(i + byte0, j, k + byte1) == block.blockID || world.getBlockId(i + byte0, j + 1, k + byte1) == block.blockID;
+        boolean flag2 = false;
+        if(flag && !flag1)
+        {
+            flag2 = true;
+        } else
+        if(j1 > i1)
+        {
+            flag2 = true;
+        }
+        if(flag2)
+        {
+            l = l - 1 & 3;
+            l += 4;
+        }
+        world.editingBlocks = true;
+        world.setBlockAndMetadataWithNotify(i, j, k, block.blockID, l);
+        world.setBlockAndMetadataWithNotify(i, j + 1, k, block.blockID, l + 8);
+        world.editingBlocks = false;
+        world.notifyBlocksOfNeighborChange(i, j, k, block.blockID);
+        world.notifyBlocksOfNeighborChange(i, j + 1, k, block.blockID);
+    }
 }

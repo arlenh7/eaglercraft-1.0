@@ -1,70 +1,83 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenHellLava extends WorldGenerator {
-	private int field_4158_a;
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Block
 
-	public WorldGenHellLava(int var1) {
-		this.field_4158_a = var1;
-	}
+public class WorldGenHellLava extends WorldGenerator
+{
 
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		if(var1.getBlockId(var3, var4 + 1, var5) != Block.bloodStone.blockID) {
-			return false;
-		} else if(var1.getBlockId(var3, var4, var5) != 0 && var1.getBlockId(var3, var4, var5) != Block.bloodStone.blockID) {
-			return false;
-		} else {
-			int var6 = 0;
-			if(var1.getBlockId(var3 - 1, var4, var5) == Block.bloodStone.blockID) {
-				++var6;
-			}
+    private int hellLavaID;
 
-			if(var1.getBlockId(var3 + 1, var4, var5) == Block.bloodStone.blockID) {
-				++var6;
-			}
+    public WorldGenHellLava(int i)
+    {
+        hellLavaID = i;
+    }
 
-			if(var1.getBlockId(var3, var4, var5 - 1) == Block.bloodStone.blockID) {
-				++var6;
-			}
-
-			if(var1.getBlockId(var3, var4, var5 + 1) == Block.bloodStone.blockID) {
-				++var6;
-			}
-
-			if(var1.getBlockId(var3, var4 - 1, var5) == Block.bloodStone.blockID) {
-				++var6;
-			}
-
-			int var7 = 0;
-			if(var1.func_20084_d(var3 - 1, var4, var5)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3 + 1, var4, var5)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3, var4, var5 - 1)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3, var4, var5 + 1)) {
-				++var7;
-			}
-
-			if(var1.func_20084_d(var3, var4 - 1, var5)) {
-				++var7;
-			}
-
-			if(var6 == 4 && var7 == 1) {
-				var1.setBlockWithNotify(var3, var4, var5, this.field_4158_a);
-				var1.field_4214_a = true;
-				Block.blocksList[this.field_4158_a].updateTick(var1, var3, var4, var5, var2);
-				var1.field_4214_a = false;
-			}
-
-			return true;
-		}
-	}
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        if(world.getBlockId(i, j + 1, k) != Block.netherrack.blockID)
+        {
+            return false;
+        }
+        if(world.getBlockId(i, j, k) != 0 && world.getBlockId(i, j, k) != Block.netherrack.blockID)
+        {
+            return false;
+        }
+        int l = 0;
+        if(world.getBlockId(i - 1, j, k) == Block.netherrack.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i + 1, j, k) == Block.netherrack.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i, j, k - 1) == Block.netherrack.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i, j, k + 1) == Block.netherrack.blockID)
+        {
+            l++;
+        }
+        if(world.getBlockId(i, j - 1, k) == Block.netherrack.blockID)
+        {
+            l++;
+        }
+        int i1 = 0;
+        if(world.isAirBlock(i - 1, j, k))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i + 1, j, k))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i, j, k - 1))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i, j, k + 1))
+        {
+            i1++;
+        }
+        if(world.isAirBlock(i, j - 1, k))
+        {
+            i1++;
+        }
+        if(l == 4 && i1 == 1)
+        {
+            world.setBlockWithNotify(i, j, k, hellLavaID);
+            world.scheduledUpdatesAreImmediate = true;
+            Block.blocksList[hellLavaID].updateTick(world, i, j, k, random);
+            world.scheduledUpdatesAreImmediate = false;
+        }
+        return true;
+    }
 }

@@ -1,56 +1,86 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.Tessellator;
+import java.util.Random;
 
-public class EntityLavaFX extends EntityFX {
-	private float field_674_a;
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, World, Tessellator
 
-	public EntityLavaFX(World var1, double var2, double var4, double var6) {
-		super(var1, var2, var4, var6, 0.0D, 0.0D, 0.0D);
-		this.motionX *= (double)0.8F;
-		this.motionY *= (double)0.8F;
-		this.motionZ *= (double)0.8F;
-		this.motionY = (double)(this.rand.nextFloat() * 0.4F + 0.05F);
-		this.particleRed = this.particleBlue = this.particleGreen = 1.0F;
-		this.field_665_g *= this.rand.nextFloat() * 2.0F + 0.2F;
-		this.field_674_a = this.field_665_g;
-		this.field_666_f = (int)(16.0D / (Math.random() * 0.8D + 0.2D));
-		this.noClip = false;
-		this.field_670_b = 49;
-	}
+public class EntityLavaFX extends EntityFX
+{
 
-	public float getEntityBrightness(float var1) {
-		return 1.0F;
-	}
+    private float lavaParticleScale;
 
-	public void func_406_a(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-		float var8 = ((float)this.e + var2) / (float)this.field_666_f;
-		this.field_665_g = this.field_674_a * (1.0F - var8 * var8);
-		super.func_406_a(var1, var2, var3, var4, var5, var6, var7);
-	}
+    public EntityLavaFX(World world, double d, double d1, double d2)
+    {
+        super(world, d, d1, d2, 0.0D, 0.0D, 0.0D);
+        motionX *= 0.80000001192092896D;
+        motionY *= 0.80000001192092896D;
+        motionZ *= 0.80000001192092896D;
+        motionY = rand.nextFloat() * 0.4F + 0.05F;
+        particleRed = particleGreen = particleBlue = 1.0F;
+        particleScale *= rand.nextFloat() * 2.0F + 0.2F;
+        lavaParticleScale = particleScale;
+        particleMaxAge = (int)(16D / (Math.random() * 0.80000000000000004D + 0.20000000000000001D));
+        noClip = false;
+        func_40099_c(49);
+    }
 
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		if(this.e++ >= this.field_666_f) {
-			this.setEntityDead();
-		}
+    public int getEntityBrightnessForRender(float f)
+    {
+        float f1 = ((float)particleAge + f) / (float)particleMaxAge;
+        if(f1 < 0.0F)
+        {
+            f1 = 0.0F;
+        }
+        if(f1 > 1.0F)
+        {
+            f1 = 1.0F;
+        }
+        int i = super.getEntityBrightnessForRender(f);
+        char c = '\360';
+        int j = i >> 16 & 0xff;
+        return c | j << 16;
+    }
 
-		float var1 = (float)this.e / (float)this.field_666_f;
-		if(this.rand.nextFloat() > var1) {
-			this.worldObj.spawnParticle("smoke", this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ);
-		}
+    public float getEntityBrightness(float f)
+    {
+        return 1.0F;
+    }
 
-		this.motionY -= 0.03D;
-		this.moveEntity(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= (double)0.999F;
-		this.motionY *= (double)0.999F;
-		this.motionZ *= (double)0.999F;
-		if(this.onGround) {
-			this.motionX *= (double)0.7F;
-			this.motionZ *= (double)0.7F;
-		}
+    public void renderParticle(Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        float f6 = ((float)particleAge + f) / (float)particleMaxAge;
+        particleScale = lavaParticleScale * (1.0F - f6 * f6);
+        super.renderParticle(tessellator, f, f1, f2, f3, f4, f5);
+    }
 
-	}
+    public void onUpdate()
+    {
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        if(particleAge++ >= particleMaxAge)
+        {
+            setEntityDead();
+        }
+        float f = (float)particleAge / (float)particleMaxAge;
+        if(rand.nextFloat() > f)
+        {
+            worldObj.spawnParticle("smoke", posX, posY, posZ, motionX, motionY, motionZ);
+        }
+        motionY -= 0.029999999999999999D;
+        moveEntity(motionX, motionY, motionZ);
+        motionX *= 0.99900001287460327D;
+        motionY *= 0.99900001287460327D;
+        motionZ *= 0.99900001287460327D;
+        if(onGround)
+        {
+            motionX *= 0.69999998807907104D;
+            motionZ *= 0.69999998807907104D;
+        }
+    }
 }

@@ -1,44 +1,36 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ClippingHelper {
-	public float[][] frustum = new float[16][16];
-	public static float[] projectionMatrix = new float[16];
-	public static float[] modelviewMatrix = new float[16];
-	public float[] clippingMatrix = new float[16];
 
-	public boolean isBoxInFrustum(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		for(int i = 0; i < 6; ++i) {
-			float minXf = (float)minX;
-			float minYf = (float)minY;
-			float minZf = (float)minZ;
-			float maxXf = (float)maxX;
-			float maxYf = (float)maxY;
-			float maxZf = (float)maxZ;
-			if(this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F) {
-				return false;
-			}
-		}
+public class ClippingHelper
+{
 
-		return true;
-	}
+    public float frustum[][];
+    public float projectionMatrix[];
+    public float modelviewMatrix[];
+    public float clippingMatrix[];
 
-	public boolean isBoxInFrustumFully(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-		for(int i = 0; i < 6; ++i) {
-			float minXf = (float)minX;
-			float minYf = (float)minY;
-			float minZf = (float)minZ;
-			float maxXf = (float)maxX;
-			float maxYf = (float)maxY;
-			float maxZf = (float)maxZ;
-			if(i < 4) {
-				if(this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F || this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F) {
-					return false;
-				}
-			} else if(this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * minZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * minYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * minXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F && this.frustum[i][0] * maxXf + this.frustum[i][1] * maxYf + this.frustum[i][2] * maxZf + this.frustum[i][3] <= 0.0F) {
-				return false;
-			}
-		}
+    public ClippingHelper()
+    {
+        frustum = new float[16][16];
+        projectionMatrix = new float[16];
+        modelviewMatrix = new float[16];
+        clippingMatrix = new float[16];
+    }
 
-		return true;
-	}
+    public boolean isBoxInFrustum(double d, double d1, double d2, double d3, double d4, double d5)
+    {
+        for(int i = 0; i < 6; i++)
+        {
+            if((double)frustum[i][0] * d + (double)frustum[i][1] * d1 + (double)frustum[i][2] * d2 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d3 + (double)frustum[i][1] * d1 + (double)frustum[i][2] * d2 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d + (double)frustum[i][1] * d4 + (double)frustum[i][2] * d2 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d3 + (double)frustum[i][1] * d4 + (double)frustum[i][2] * d2 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d + (double)frustum[i][1] * d1 + (double)frustum[i][2] * d5 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d3 + (double)frustum[i][1] * d1 + (double)frustum[i][2] * d5 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d + (double)frustum[i][1] * d4 + (double)frustum[i][2] * d5 + (double)frustum[i][3] <= 0.0D && (double)frustum[i][0] * d3 + (double)frustum[i][1] * d4 + (double)frustum[i][2] * d5 + (double)frustum[i][3] <= 0.0D)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

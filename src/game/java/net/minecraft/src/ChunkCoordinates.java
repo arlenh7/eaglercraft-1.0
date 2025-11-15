@@ -1,24 +1,80 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-final class ChunkCoordinates {
-	public final int field_1518_a;
-	public final int field_1517_b;
 
-	public ChunkCoordinates(int var1, int var2) {
-		this.field_1518_a = var1;
-		this.field_1517_b = var2;
-	}
+public class ChunkCoordinates
+    implements Comparable
+{
 
-	public boolean equals(Object var1) {
-		if(!(var1 instanceof ChunkCoordinates)) {
-			return false;
-		} else {
-			ChunkCoordinates var2 = (ChunkCoordinates)var1;
-			return this.field_1518_a == var2.field_1518_a && this.field_1517_b == var2.field_1517_b;
-		}
-	}
+    public int posX;
+    public int posY;
+    public int posZ;
 
-	public int hashCode() {
-		return this.field_1518_a << 16 ^ this.field_1517_b;
-	}
+    public ChunkCoordinates()
+    {
+    }
+
+    public ChunkCoordinates(int i, int j, int k)
+    {
+        posX = i;
+        posY = j;
+        posZ = k;
+    }
+
+    public ChunkCoordinates(ChunkCoordinates chunkcoordinates)
+    {
+        posX = chunkcoordinates.posX;
+        posY = chunkcoordinates.posY;
+        posZ = chunkcoordinates.posZ;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(!(obj instanceof ChunkCoordinates))
+        {
+            return false;
+        } else
+        {
+            ChunkCoordinates chunkcoordinates = (ChunkCoordinates)obj;
+            return posX == chunkcoordinates.posX && posY == chunkcoordinates.posY && posZ == chunkcoordinates.posZ;
+        }
+    }
+
+    public int hashCode()
+    {
+        return posX + posZ << 8 + posY << 16;
+    }
+
+    public int compareChunkCoordinate(ChunkCoordinates chunkcoordinates)
+    {
+        if(posY == chunkcoordinates.posY)
+        {
+            if(posZ == chunkcoordinates.posZ)
+            {
+                return posX - chunkcoordinates.posX;
+            } else
+            {
+                return posZ - chunkcoordinates.posZ;
+            }
+        } else
+        {
+            return posY - chunkcoordinates.posY;
+        }
+    }
+
+    public double getSqDistanceTo(int i, int j, int k)
+    {
+        int l = posX - i;
+        int i1 = posY - j;
+        int j1 = posZ - k;
+        return Math.sqrt(l * l + i1 * i1 + j1 * j1);
+    }
+
+    public int compareTo(Object obj)
+    {
+        return compareChunkCoordinate((ChunkCoordinates)obj);
+    }
 }

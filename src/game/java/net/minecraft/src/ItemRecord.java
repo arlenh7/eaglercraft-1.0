@@ -1,22 +1,54 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemRecord extends Item {
-	private String recordName;
+import java.util.List;
 
-	protected ItemRecord(int var1, String var2) {
-		super(var1);
-		this.recordName = var2;
-		this.maxStackSize = 1;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, World, Block, BlockJukeBox, 
+//            ItemStack, EnumRarity, EntityPlayer
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var3.getBlockId(var4, var5, var6) == Block.jukebox.blockID && var3.getBlockMetadata(var4, var5, var6) == 0) {
-			var3.setBlockMetadataWithNotify(var4, var5, var6, this.shiftedIndex - Item.record13.shiftedIndex + 1);
-			var3.playRecord(this.recordName, var4, var5, var6);
-			--var1.stackSize;
-			return true;
-		} else {
-			return false;
-		}
-	}
+public class ItemRecord extends Item
+{
+
+    public final String recordName;
+
+    protected ItemRecord(int i, String s)
+    {
+        super(i);
+        recordName = s;
+        maxStackSize = 1;
+    }
+
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(world.getBlockId(i, j, k) == Block.jukebox.blockID && world.getBlockMetadata(i, j, k) == 0)
+        {
+            if(world.multiplayerWorld)
+            {
+                return true;
+            } else
+            {
+                ((BlockJukeBox)Block.jukebox).ejectRecord(world, i, j, k, shiftedIndex);
+                world.playAuxSFXAtEntity(null, 1005, i, j, k, shiftedIndex);
+                itemstack.stackSize--;
+                return true;
+            }
+        } else
+        {
+            return false;
+        }
+    }
+
+    public void func_40404_a(ItemStack itemstack, List list)
+    {
+        list.add((new StringBuilder()).append("C418 - ").append(recordName).toString());
+    }
+
+    public EnumRarity func_40398_f(ItemStack itemstack)
+    {
+        return EnumRarity.rare;
+    }
 }

@@ -1,55 +1,75 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemSign extends Item {
-	public ItemSign(int var1) {
-		super(var1);
-		this.maxDamage = 64;
-		this.maxStackSize = 1;
-	}
 
-	public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
-		if(var7 == 0) {
-			return false;
-		} else if(!var3.getBlockMaterial(var4, var5, var6).func_878_a()) {
-			return false;
-		} else {
-			if(var7 == 1) {
-				++var5;
-			}
+// Referenced classes of package net.minecraft.src:
+//            Item, World, Material, EntityPlayer, 
+//            Block, MathHelper, ItemStack, TileEntitySign
 
-			if(var7 == 2) {
-				--var6;
-			}
+public class ItemSign extends Item
+{
 
-			if(var7 == 3) {
-				++var6;
-			}
+    public ItemSign(int i)
+    {
+        super(i);
+        maxStackSize = 1;
+    }
 
-			if(var7 == 4) {
-				--var4;
-			}
-
-			if(var7 == 5) {
-				++var4;
-			}
-
-			if(!Block.signPost.canPlaceBlockAt(var3, var4, var5, var6)) {
-				return false;
-			} else {
-				if(var7 == 1) {
-					var3.setBlockAndMetadataWithNotify(var4, var5, var6, Block.signPost.blockID, MathHelper.floor_double((double)((var2.rotationYaw + 180.0F) * 16.0F / 360.0F) + 0.5D) & 15);
-				} else {
-					var3.setBlockAndMetadataWithNotify(var4, var5, var6, Block.signWall.blockID, var7);
-				}
-
-				--var1.stackSize;
-				TileEntitySign var8 = (TileEntitySign)var3.getBlockTileEntity(var4, var5, var6);
-				if(var8 != null) {
-					var2.displayGUIEditSign(var8);
-				}
-
-				return true;
-			}
-		}
-	}
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
+    {
+        if(l == 0)
+        {
+            return false;
+        }
+        if(!world.getBlockMaterial(i, j, k).isSolid())
+        {
+            return false;
+        }
+        if(l == 1)
+        {
+            j++;
+        }
+        if(l == 2)
+        {
+            k--;
+        }
+        if(l == 3)
+        {
+            k++;
+        }
+        if(l == 4)
+        {
+            i--;
+        }
+        if(l == 5)
+        {
+            i++;
+        }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
+        if(!Block.signPost.canPlaceBlockAt(world, i, j, k))
+        {
+            return false;
+        }
+        if(l == 1)
+        {
+            int i1 = MathHelper.floor_double((double)(((entityplayer.rotationYaw + 180F) * 16F) / 360F) + 0.5D) & 0xf;
+            world.setBlockAndMetadataWithNotify(i, j, k, Block.signPost.blockID, i1);
+        } else
+        {
+            world.setBlockAndMetadataWithNotify(i, j, k, Block.signWall.blockID, l);
+        }
+        itemstack.stackSize--;
+        TileEntitySign tileentitysign = (TileEntitySign)world.getBlockTileEntity(i, j, k);
+        if(tileentitysign != null)
+        {
+            entityplayer.displayGUIEditSign(tileentitysign);
+        }
+        return true;
+    }
 }

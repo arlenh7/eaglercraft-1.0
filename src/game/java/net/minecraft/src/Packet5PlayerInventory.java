@@ -1,31 +1,51 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet5PlayerInventory extends Packet {
-	public int type;
-	public int stacks;
-	public int field_20044_c;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.type = var1.readInt();
-		this.stacks = var1.readShort();
-		this.field_20044_c = var1.readShort();
-	}
+public class Packet5PlayerInventory extends Packet
+{
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeInt(this.type);
-		var1.writeShort(this.stacks);
-		var1.writeShort(this.field_20044_c);
-	}
+    public int entityID;
+    public int slot;
+    public int itemID;
+    public int itemDamage;
 
-	public void processPacket(NetHandler var1) {
-		var1.handlePlayerInventory(this);
-	}
+    public Packet5PlayerInventory()
+    {
+    }
 
-	public int getPacketSize() {
-		return 8;
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        entityID = datainputstream.readInt();
+        slot = datainputstream.readShort();
+        itemID = datainputstream.readShort();
+        itemDamage = datainputstream.readShort();
+    }
+
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        dataoutputstream.writeInt(entityID);
+        dataoutputstream.writeShort(slot);
+        dataoutputstream.writeShort(itemID);
+        dataoutputstream.writeShort(itemDamage);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handlePlayerInventory(this);
+    }
+
+    public int getPacketSize()
+    {
+        return 8;
+    }
 }

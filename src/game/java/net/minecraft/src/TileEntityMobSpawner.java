@@ -1,93 +1,127 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class TileEntityMobSpawner extends TileEntity {
-	public int delay = -1;
-	public String entityID = "Pig";
-	public double field_831_c;
-	public double field_830_d = 0.0D;
+import java.util.List;
+import java.util.Random;
 
-	public TileEntityMobSpawner() {
-		this.delay = 20;
-	}
+// Referenced classes of package net.minecraft.src:
+//            TileEntity, World, EntityList, EntityLiving, 
+//            AxisAlignedBB, NBTTagCompound
 
-	public boolean anyPlayerInRange() {
-		return this.worldObj.getClosestPlayer((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D, 16.0D) != null;
-	}
+public class TileEntityMobSpawner extends TileEntity
+{
 
-	public void updateEntity() {
-		this.field_830_d = this.field_831_c;
-		if(this.anyPlayerInRange()) {
-			double var1 = (double)((float)this.xCoord + this.worldObj.rand.nextFloat());
-			double var3 = (double)((float)this.yCoord + this.worldObj.rand.nextFloat());
-			double var5 = (double)((float)this.zCoord + this.worldObj.rand.nextFloat());
-			this.worldObj.spawnParticle("smoke", var1, var3, var5, 0.0D, 0.0D, 0.0D);
-			this.worldObj.spawnParticle("flame", var1, var3, var5, 0.0D, 0.0D, 0.0D);
+    public int delay;
+    private String mobID;
+    public double yaw;
+    public double yaw2;
 
-			for(this.field_831_c += (double)(1000.0F / ((float)this.delay + 200.0F)); this.field_831_c > 360.0D; this.field_830_d -= 360.0D) {
-				this.field_831_c -= 360.0D;
-			}
+    public TileEntityMobSpawner()
+    {
+        delay = -1;
+        yaw2 = 0.0D;
+        mobID = "Pig";
+        delay = 20;
+    }
 
-			if(this.delay == -1) {
-				this.updateDelay();
-			}
+    public String getMobID()
+    {
+        return mobID;
+    }
 
-			if(this.delay > 0) {
-				--this.delay;
-			} else {
-				byte var7 = 4;
+    public void setMobID(String s)
+    {
+        mobID = s;
+    }
 
-				for(int var8 = 0; var8 < var7; ++var8) {
-					EntityLiving var9 = (EntityLiving)((EntityLiving)EntityList.createEntityInWorld(this.entityID, this.worldObj));
-					if(var9 == null) {
-						return;
-					}
+    public boolean anyPlayerInRange()
+    {
+        return worldObj.getClosestPlayer((double)xCoord + 0.5D, (double)yCoord + 0.5D, (double)zCoord + 0.5D, 16D) != null;
+    }
 
-					int var10 = this.worldObj.getEntitiesWithinAABB(var9.getClass(), AxisAlignedBB.getBoundingBoxFromPool((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, (double)(this.xCoord + 1), (double)(this.yCoord + 1), (double)(this.zCoord + 1)).expand(8.0D, 4.0D, 8.0D)).size();
-					if(var10 >= 6) {
-						this.updateDelay();
-						return;
-					}
+    public void updateEntity()
+    {
+        yaw2 = yaw;
+        if(!anyPlayerInRange())
+        {
+            return;
+        }
+        double d = (float)xCoord + worldObj.rand.nextFloat();
+        double d1 = (float)yCoord + worldObj.rand.nextFloat();
+        double d2 = (float)zCoord + worldObj.rand.nextFloat();
+        worldObj.spawnParticle("smoke", d, d1, d2, 0.0D, 0.0D, 0.0D);
+        worldObj.spawnParticle("flame", d, d1, d2, 0.0D, 0.0D, 0.0D);
+        for(yaw += 1000F / ((float)delay + 200F); yaw > 360D;)
+        {
+            yaw -= 360D;
+            yaw2 -= 360D;
+        }
 
-					if(var9 != null) {
-						double var11 = (double)this.xCoord + (this.worldObj.rand.nextDouble() - this.worldObj.rand.nextDouble()) * 4.0D;
-						double var13 = (double)(this.yCoord + this.worldObj.rand.nextInt(3) - 1);
-						double var15 = (double)this.zCoord + (this.worldObj.rand.nextDouble() - this.worldObj.rand.nextDouble()) * 4.0D;
-						var9.setLocationAndAngles(var11, var13, var15, this.worldObj.rand.nextFloat() * 360.0F, 0.0F);
-						if(var9.getCanSpawnHere()) {
-							this.worldObj.entityJoinedWorld(var9);
+        if(!worldObj.multiplayerWorld)
+        {
+            if(delay == -1)
+            {
+                updateDelay();
+            }
+            if(delay > 0)
+            {
+                delay--;
+                return;
+            }
+            byte byte0 = 4;
+            for(int i = 0; i < byte0; i++)
+            {
+                EntityLiving entityliving = (EntityLiving)EntityList.createEntityInWorld(mobID, worldObj);
+                if(entityliving == null)
+                {
+                    return;
+                }
+                int j = worldObj.getEntitiesWithinAABB(entityliving.getClass(), AxisAlignedBB.getBoundingBoxFromPool(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1).expand(8D, 4D, 8D)).size();
+                if(j >= 6)
+                {
+                    updateDelay();
+                    return;
+                }
+                if(entityliving == null)
+                {
+                    continue;
+                }
+                double d3 = (double)xCoord + (worldObj.rand.nextDouble() - worldObj.rand.nextDouble()) * 4D;
+                double d4 = (yCoord + worldObj.rand.nextInt(3)) - 1;
+                double d5 = (double)zCoord + (worldObj.rand.nextDouble() - worldObj.rand.nextDouble()) * 4D;
+                entityliving.setLocationAndAngles(d3, d4, d5, worldObj.rand.nextFloat() * 360F, 0.0F);
+                if(entityliving.getCanSpawnHere())
+                {
+                    worldObj.entityJoinedWorld(entityliving);
+                    worldObj.playAuxSFX(2004, xCoord, yCoord, zCoord, 0);
+                    entityliving.spawnExplosionParticle();
+                    updateDelay();
+                }
+            }
 
-							for(int var17 = 0; var17 < 20; ++var17) {
-								var1 = (double)this.xCoord + 0.5D + ((double)this.worldObj.rand.nextFloat() - 0.5D) * 2.0D;
-								var3 = (double)this.yCoord + 0.5D + ((double)this.worldObj.rand.nextFloat() - 0.5D) * 2.0D;
-								var5 = (double)this.zCoord + 0.5D + ((double)this.worldObj.rand.nextFloat() - 0.5D) * 2.0D;
-								this.worldObj.spawnParticle("smoke", var1, var3, var5, 0.0D, 0.0D, 0.0D);
-								this.worldObj.spawnParticle("flame", var1, var3, var5, 0.0D, 0.0D, 0.0D);
-							}
+        }
+        super.updateEntity();
+    }
 
-							var9.spawnExplosionParticle();
-							this.updateDelay();
-						}
-					}
-				}
+    private void updateDelay()
+    {
+        delay = 200 + worldObj.rand.nextInt(600);
+    }
 
-				super.updateEntity();
-			}
-		}
-	}
+    public void readFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readFromNBT(nbttagcompound);
+        mobID = nbttagcompound.getString("EntityId");
+        delay = nbttagcompound.getShort("Delay");
+    }
 
-	private void updateDelay() {
-		this.delay = 200 + this.worldObj.rand.nextInt(600);
-	}
-
-	public void readFromNBT(NBTTagCompound var1) {
-		super.readFromNBT(var1);
-		this.entityID = var1.getString("EntityId");
-		this.delay = var1.getShort("Delay");
-	}
-
-	public void writeToNBT(NBTTagCompound var1) {
-		super.writeToNBT(var1);
-		var1.setString("EntityId", this.entityID);
-		var1.setShort("Delay", (short)this.delay);
-	}
+    public void writeToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeToNBT(nbttagcompound);
+        nbttagcompound.setString("EntityId", mobID);
+        nbttagcompound.setShort("Delay", (short)delay);
+    }
 }

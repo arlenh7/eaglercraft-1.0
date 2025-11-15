@@ -1,319 +1,410 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.List;
+import java.util.Random;
 
-public class EntityBoat extends Entity {
-	public int field_807_a;
-	public int field_806_b;
-	public int field_808_c;
-	private int field_9394_d;
-	private double field_9393_e;
-	private double field_9392_f;
-	private double field_9391_g;
-	private double field_9390_h;
-	private double field_9389_i;
-	private double field_9388_j;
-	private double field_9387_k;
-	private double field_9386_l;
+// Referenced classes of package net.minecraft.src:
+//            Entity, DataWatcher, World, Block, 
+//            Item, AxisAlignedBB, Material, MathHelper, 
+//            EntityPlayer, DamageSource, NBTTagCompound
 
-	public EntityBoat(World var1) {
-		super(var1);
-		this.field_807_a = 0;
-		this.field_806_b = 0;
-		this.field_808_c = 1;
-		this.preventEntitySpawning = true;
-		this.setSize(1.5F, 0.6F);
-		this.yOffset = this.height / 2.0F;
-		this.entityWalks = false;
-	}
+public class EntityBoat extends Entity
+{
 
-	public AxisAlignedBB func_383_b_(Entity var1) {
-		return var1.boundingBox;
-	}
+    private int boatPosRotationIncrements;
+    private double boatX;
+    private double boatY;
+    private double boatZ;
+    private double boatYaw;
+    private double boatPitch;
+    private double velocityX;
+    private double velocityY;
+    private double velocityZ;
 
-	public AxisAlignedBB func_372_f_() {
-		return this.boundingBox;
-	}
+    public EntityBoat(World world)
+    {
+        super(world);
+        preventEntitySpawning = true;
+        setSize(1.5F, 0.6F);
+        yOffset = height / 2.0F;
+    }
 
-	public boolean canBePushed() {
-		return true;
-	}
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
 
-	public EntityBoat(World var1, double var2, double var4, double var6) {
-		this(var1);
-		this.setPosition(var2, var4 + (double)this.yOffset, var6);
-		this.motionX = 0.0D;
-		this.motionY = 0.0D;
-		this.motionZ = 0.0D;
-		this.prevPosX = var2;
-		this.prevPosY = var4;
-		this.prevPosZ = var6;
-	}
+    protected void entityInit()
+    {
+        dataWatcher.addObject(17, new Integer(0));
+        dataWatcher.addObject(18, new Integer(1));
+        dataWatcher.addObject(19, new Integer(0));
+    }
 
-	public double getMountedYOffset() {
-		return (double)this.height * 0.0D - (double)0.3F;
-	}
+    public AxisAlignedBB getCollisionBox(Entity entity)
+    {
+        return entity.boundingBox;
+    }
 
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		if(!this.worldObj.multiplayerWorld && !this.isDead) {
-			this.field_808_c = -this.field_808_c;
-			this.field_806_b = 10;
-			this.field_807_a += var2 * 10;
-			this.setBeenAttacked();
-			if(this.field_807_a > 40) {
-				int var3;
-				for(var3 = 0; var3 < 3; ++var3) {
-					this.dropItemWithOffset(Block.planks.blockID, 1, 0.0F);
-				}
+    public AxisAlignedBB getBoundingBox()
+    {
+        return boundingBox;
+    }
 
-				for(var3 = 0; var3 < 2; ++var3) {
-					this.dropItemWithOffset(Item.stick.shiftedIndex, 1, 0.0F);
-				}
+    public boolean canBePushed()
+    {
+        return true;
+    }
 
-				this.setEntityDead();
-			}
+    public EntityBoat(World world, double d, double d1, double d2)
+    {
+        this(world);
+        setPosition(d, d1 + (double)yOffset, d2);
+        motionX = 0.0D;
+        motionY = 0.0D;
+        motionZ = 0.0D;
+        prevPosX = d;
+        prevPosY = d1;
+        prevPosZ = d2;
+    }
 
-			return true;
-		} else {
-			return true;
-		}
-	}
+    public double getMountedYOffset()
+    {
+        return (double)height * 0.0D - 0.30000001192092896D;
+    }
 
-	public void performHurtAnimation() {
-		this.field_808_c = -this.field_808_c;
-		this.field_806_b = 10;
-		this.field_807_a += this.field_807_a * 10;
-	}
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        if(worldObj.multiplayerWorld || isDead)
+        {
+            return true;
+        }
+        func_41017_d(-func_41016_i());
+        func_41019_c(10);
+        func_41015_b(func_41020_g() + i * 10);
+        setBeenAttacked();
+        if(func_41020_g() > 40)
+        {
+            if(riddenByEntity != null)
+            {
+                riddenByEntity.mountEntity(this);
+            }
+            for(int j = 0; j < 3; j++)
+            {
+                dropItemWithOffset(Block.planks.blockID, 1, 0.0F);
+            }
 
-	public boolean canBeCollidedWith() {
-		return !this.isDead;
-	}
+            for(int k = 0; k < 2; k++)
+            {
+                dropItemWithOffset(Item.stick.shiftedIndex, 1, 0.0F);
+            }
 
-	public void setPositionAndRotation2(double var1, double var3, double var5, float var7, float var8, int var9) {
-		this.field_9393_e = var1;
-		this.field_9392_f = var3;
-		this.field_9391_g = var5;
-		this.field_9390_h = (double)var7;
-		this.field_9389_i = (double)var8;
-		this.field_9394_d = var9 + 4;
-		this.motionX = this.field_9388_j;
-		this.motionY = this.field_9387_k;
-		this.motionZ = this.field_9386_l;
-	}
+            setEntityDead();
+        }
+        return true;
+    }
 
-	public void setVelocity(double var1, double var3, double var5) {
-		this.field_9388_j = this.motionX = var1;
-		this.field_9387_k = this.motionY = var3;
-		this.field_9386_l = this.motionZ = var5;
-	}
+    public void performHurtAnimation()
+    {
+        func_41017_d(-func_41016_i());
+        func_41019_c(10);
+        func_41015_b(func_41020_g() * 11);
+    }
 
-	public void onUpdate() {
-		super.onUpdate();
-		if(this.field_806_b > 0) {
-			--this.field_806_b;
-		}
+    public boolean canBeCollidedWith()
+    {
+        return !isDead;
+    }
 
-		if(this.field_807_a > 0) {
-			--this.field_807_a;
-		}
+    public void setPositionAndRotation2(double d, double d1, double d2, float f, 
+            float f1, int i)
+    {
+        boatX = d;
+        boatY = d1;
+        boatZ = d2;
+        boatYaw = f;
+        boatPitch = f1;
+        boatPosRotationIncrements = i + 4;
+        motionX = velocityX;
+        motionY = velocityY;
+        motionZ = velocityZ;
+    }
 
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		byte var1 = 5;
-		double var2 = 0.0D;
+    public void setVelocity(double d, double d1, double d2)
+    {
+        velocityX = motionX = d;
+        velocityY = motionY = d1;
+        velocityZ = motionZ = d2;
+    }
 
-		for(int var4 = 0; var4 < var1; ++var4) {
-			double var5 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var4 + 0) / (double)var1 - 0.125D;
-			double var7 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var4 + 1) / (double)var1 - 0.125D;
-			AxisAlignedBB var9 = AxisAlignedBB.getBoundingBoxFromPool(this.boundingBox.minX, var5, this.boundingBox.minZ, this.boundingBox.maxX, var7, this.boundingBox.maxZ);
-			if(this.worldObj.func_707_b(var9, Material.water)) {
-				var2 += 1.0D / (double)var1;
-			}
-		}
+    public void onUpdate()
+    {
+        super.onUpdate();
+        if(func_41018_h() > 0)
+        {
+            func_41019_c(func_41018_h() - 1);
+        }
+        if(func_41020_g() > 0)
+        {
+            func_41015_b(func_41020_g() - 1);
+        }
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        int i = 5;
+        double d = 0.0D;
+        for(int j = 0; j < i; j++)
+        {
+            double d2 = (boundingBox.minY + ((boundingBox.maxY - boundingBox.minY) * (double)(j + 0)) / (double)i) - 0.125D;
+            double d8 = (boundingBox.minY + ((boundingBox.maxY - boundingBox.minY) * (double)(j + 1)) / (double)i) - 0.125D;
+            AxisAlignedBB axisalignedbb = AxisAlignedBB.getBoundingBoxFromPool(boundingBox.minX, d2, boundingBox.minZ, boundingBox.maxX, d8, boundingBox.maxZ);
+            if(worldObj.isAABBInMaterial(axisalignedbb, Material.water))
+            {
+                d += 1.0D / (double)i;
+            }
+        }
 
-		double var6;
-		double var8;
-		double var10;
-		double var23;
-		if(this.worldObj.multiplayerWorld) {
-			if(this.field_9394_d > 0) {
-				var23 = this.posX + (this.field_9393_e - this.posX) / (double)this.field_9394_d;
-				var6 = this.posY + (this.field_9392_f - this.posY) / (double)this.field_9394_d;
-				var8 = this.posZ + (this.field_9391_g - this.posZ) / (double)this.field_9394_d;
+        double d1 = Math.sqrt(motionX * motionX + motionZ * motionZ);
+        if(d1 > 0.14999999999999999D)
+        {
+            double d3 = Math.cos(((double)rotationYaw * 3.1415926535897931D) / 180D);
+            double d9 = Math.sin(((double)rotationYaw * 3.1415926535897931D) / 180D);
+            for(int i1 = 0; (double)i1 < 1.0D + d1 * 60D; i1++)
+            {
+                double d16 = rand.nextFloat() * 2.0F - 1.0F;
+                double d19 = (double)(rand.nextInt(2) * 2 - 1) * 0.69999999999999996D;
+                if(rand.nextBoolean())
+                {
+                    double d21 = (posX - d3 * d16 * 0.80000000000000004D) + d9 * d19;
+                    double d23 = posZ - d9 * d16 * 0.80000000000000004D - d3 * d19;
+                    worldObj.spawnParticle("splash", d21, posY - 0.125D, d23, motionX, motionY, motionZ);
+                } else
+                {
+                    double d22 = posX + d3 + d9 * d16 * 0.69999999999999996D;
+                    double d24 = (posZ + d9) - d3 * d16 * 0.69999999999999996D;
+                    worldObj.spawnParticle("splash", d22, posY - 0.125D, d24, motionX, motionY, motionZ);
+                }
+            }
 
-				for(var10 = this.field_9390_h - (double)this.rotationYaw; var10 < -180.0D; var10 += 360.0D) {
-				}
+        }
+        if(worldObj.multiplayerWorld)
+        {
+            if(boatPosRotationIncrements > 0)
+            {
+                double d4 = posX + (boatX - posX) / (double)boatPosRotationIncrements;
+                double d10 = posY + (boatY - posY) / (double)boatPosRotationIncrements;
+                double d13 = posZ + (boatZ - posZ) / (double)boatPosRotationIncrements;
+                double d17;
+                for(d17 = boatYaw - (double)rotationYaw; d17 < -180D; d17 += 360D) { }
+                for(; d17 >= 180D; d17 -= 360D) { }
+                rotationYaw += d17 / (double)boatPosRotationIncrements;
+                rotationPitch += (boatPitch - (double)rotationPitch) / (double)boatPosRotationIncrements;
+                boatPosRotationIncrements--;
+                setPosition(d4, d10, d13);
+                setRotation(rotationYaw, rotationPitch);
+            } else
+            {
+                double d5 = posX + motionX;
+                double d11 = posY + motionY;
+                double d14 = posZ + motionZ;
+                setPosition(d5, d11, d14);
+                if(onGround)
+                {
+                    motionX *= 0.5D;
+                    motionY *= 0.5D;
+                    motionZ *= 0.5D;
+                }
+                motionX *= 0.99000000953674316D;
+                motionY *= 0.94999998807907104D;
+                motionZ *= 0.99000000953674316D;
+            }
+            return;
+        }
+        if(d < 1.0D)
+        {
+            double d6 = d * 2D - 1.0D;
+            motionY += 0.039999999105930328D * d6;
+        } else
+        {
+            if(motionY < 0.0D)
+            {
+                motionY /= 2D;
+            }
+            motionY += 0.0070000002160668373D;
+        }
+        if(riddenByEntity != null)
+        {
+            motionX += riddenByEntity.motionX * 0.20000000000000001D;
+            motionZ += riddenByEntity.motionZ * 0.20000000000000001D;
+        }
+        double d7 = 0.40000000000000002D;
+        if(motionX < -d7)
+        {
+            motionX = -d7;
+        }
+        if(motionX > d7)
+        {
+            motionX = d7;
+        }
+        if(motionZ < -d7)
+        {
+            motionZ = -d7;
+        }
+        if(motionZ > d7)
+        {
+            motionZ = d7;
+        }
+        if(onGround)
+        {
+            motionX *= 0.5D;
+            motionY *= 0.5D;
+            motionZ *= 0.5D;
+        }
+        moveEntity(motionX, motionY, motionZ);
+        if(isCollidedHorizontally && d1 > 0.20000000000000001D)
+        {
+            if(!worldObj.multiplayerWorld)
+            {
+                setEntityDead();
+                for(int k = 0; k < 3; k++)
+                {
+                    dropItemWithOffset(Block.planks.blockID, 1, 0.0F);
+                }
 
-				while(var10 >= 180.0D) {
-					var10 -= 360.0D;
-				}
+                for(int l = 0; l < 2; l++)
+                {
+                    dropItemWithOffset(Item.stick.shiftedIndex, 1, 0.0F);
+                }
 
-				this.rotationYaw = (float)((double)this.rotationYaw + var10 / (double)this.field_9394_d);
-				this.rotationPitch = (float)((double)this.rotationPitch + (this.field_9389_i - (double)this.rotationPitch) / (double)this.field_9394_d);
-				--this.field_9394_d;
-				this.setPosition(var23, var6, var8);
-				this.setRotation(this.rotationYaw, this.rotationPitch);
-			} else {
-				var23 = this.posX + this.motionX;
-				var6 = this.posY + this.motionY;
-				var8 = this.posZ + this.motionZ;
-				this.setPosition(var23, var6, var8);
-				if(this.onGround) {
-					this.motionX *= 0.5D;
-					this.motionY *= 0.5D;
-					this.motionZ *= 0.5D;
-				}
+            }
+        } else
+        {
+            motionX *= 0.99000000953674316D;
+            motionY *= 0.94999998807907104D;
+            motionZ *= 0.99000000953674316D;
+        }
+        rotationPitch = 0.0F;
+        double d12 = rotationYaw;
+        double d15 = prevPosX - posX;
+        double d18 = prevPosZ - posZ;
+        if(d15 * d15 + d18 * d18 > 0.001D)
+        {
+            d12 = (float)((Math.atan2(d18, d15) * 180D) / 3.1415926535897931D);
+        }
+        double d20;
+        for(d20 = d12 - (double)rotationYaw; d20 >= 180D; d20 -= 360D) { }
+        for(; d20 < -180D; d20 += 360D) { }
+        if(d20 > 20D)
+        {
+            d20 = 20D;
+        }
+        if(d20 < -20D)
+        {
+            d20 = -20D;
+        }
+        rotationYaw += d20;
+        setRotation(rotationYaw, rotationPitch);
+        List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+        if(list != null && list.size() > 0)
+        {
+            for(int j1 = 0; j1 < list.size(); j1++)
+            {
+                Entity entity = (Entity)list.get(j1);
+                if(entity != riddenByEntity && entity.canBePushed() && (entity instanceof EntityBoat))
+                {
+                    entity.applyEntityCollision(this);
+                }
+            }
 
-				this.motionX *= (double)0.99F;
-				this.motionY *= (double)0.95F;
-				this.motionZ *= (double)0.99F;
-			}
+        }
+        for(int k1 = 0; k1 < 4; k1++)
+        {
+            int l1 = MathHelper.floor_double(posX + ((double)(k1 % 2) - 0.5D) * 0.80000000000000004D);
+            int i2 = MathHelper.floor_double(posY);
+            int j2 = MathHelper.floor_double(posZ + ((double)(k1 / 2) - 0.5D) * 0.80000000000000004D);
+            if(worldObj.getBlockId(l1, i2, j2) == Block.snow.blockID)
+            {
+                worldObj.setBlockWithNotify(l1, i2, j2, 0);
+            }
+        }
 
-		} else {
-			var23 = var2 * 2.0D - 1.0D;
-			this.motionY += (double)0.04F * var23;
-			if(this.riddenByEntity != null) {
-				this.motionX += this.riddenByEntity.motionX * 0.2D;
-				this.motionZ += this.riddenByEntity.motionZ * 0.2D;
-			}
+        if(riddenByEntity != null && riddenByEntity.isDead)
+        {
+            riddenByEntity = null;
+        }
+    }
 
-			var6 = 0.4D;
-			if(this.motionX < -var6) {
-				this.motionX = -var6;
-			}
+    public void updateRiderPosition()
+    {
+        if(riddenByEntity == null)
+        {
+            return;
+        } else
+        {
+            double d = Math.cos(((double)rotationYaw * 3.1415926535897931D) / 180D) * 0.40000000000000002D;
+            double d1 = Math.sin(((double)rotationYaw * 3.1415926535897931D) / 180D) * 0.40000000000000002D;
+            riddenByEntity.setPosition(posX + d, posY + getMountedYOffset() + riddenByEntity.getYOffset(), posZ + d1);
+            return;
+        }
+    }
 
-			if(this.motionX > var6) {
-				this.motionX = var6;
-			}
+    protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+    }
 
-			if(this.motionZ < -var6) {
-				this.motionZ = -var6;
-			}
+    protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+    }
 
-			if(this.motionZ > var6) {
-				this.motionZ = var6;
-			}
+    public float getShadowSize()
+    {
+        return 0.0F;
+    }
 
-			if(this.onGround) {
-				this.motionX *= 0.5D;
-				this.motionY *= 0.5D;
-				this.motionZ *= 0.5D;
-			}
+    public boolean interact(EntityPlayer entityplayer)
+    {
+        if(riddenByEntity != null && (riddenByEntity instanceof EntityPlayer) && riddenByEntity != entityplayer)
+        {
+            return true;
+        }
+        if(!worldObj.multiplayerWorld)
+        {
+            entityplayer.mountEntity(this);
+        }
+        return true;
+    }
 
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			var8 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-			double var12;
-			if(var8 > 0.15D) {
-				var10 = Math.cos((double)this.rotationYaw * Math.PI / 180.0D);
-				var12 = Math.sin((double)this.rotationYaw * Math.PI / 180.0D);
+    public void func_41015_b(int i)
+    {
+        dataWatcher.updateObject(19, Integer.valueOf(i));
+    }
 
-				for(int var14 = 0; (double)var14 < 1.0D + var8 * 60.0D; ++var14) {
-					double var15 = (double)(this.rand.nextFloat() * 2.0F - 1.0F);
-					double var17 = (double)(this.rand.nextInt(2) * 2 - 1) * 0.7D;
-					double var19;
-					double var21;
-					if(this.rand.nextBoolean()) {
-						var19 = this.posX - var10 * var15 * 0.8D + var12 * var17;
-						var21 = this.posZ - var12 * var15 * 0.8D - var10 * var17;
-						this.worldObj.spawnParticle("splash", var19, this.posY - 0.125D, var21, this.motionX, this.motionY, this.motionZ);
-					} else {
-						var19 = this.posX + var10 + var12 * var15 * 0.7D;
-						var21 = this.posZ + var12 - var10 * var15 * 0.7D;
-						this.worldObj.spawnParticle("splash", var19, this.posY - 0.125D, var21, this.motionX, this.motionY, this.motionZ);
-					}
-				}
-			}
+    public int func_41020_g()
+    {
+        return dataWatcher.getWatchableObjectInt(19);
+    }
 
-			if(this.isCollidedHorizontally && var8 > 0.15D) {
-				if(!this.worldObj.multiplayerWorld) {
-					this.setEntityDead();
+    public void func_41019_c(int i)
+    {
+        dataWatcher.updateObject(17, Integer.valueOf(i));
+    }
 
-					int var24;
-					for(var24 = 0; var24 < 3; ++var24) {
-						this.dropItemWithOffset(Block.planks.blockID, 1, 0.0F);
-					}
+    public int func_41018_h()
+    {
+        return dataWatcher.getWatchableObjectInt(17);
+    }
 
-					for(var24 = 0; var24 < 2; ++var24) {
-						this.dropItemWithOffset(Item.stick.shiftedIndex, 1, 0.0F);
-					}
-				}
-			} else {
-				this.motionX *= (double)0.99F;
-				this.motionY *= (double)0.95F;
-				this.motionZ *= (double)0.99F;
-			}
+    public void func_41017_d(int i)
+    {
+        dataWatcher.updateObject(18, Integer.valueOf(i));
+    }
 
-			this.rotationPitch = 0.0F;
-			var10 = (double)this.rotationYaw;
-			var12 = this.prevPosX - this.posX;
-			double var25 = this.prevPosZ - this.posZ;
-			if(var12 * var12 + var25 * var25 > 0.001D) {
-				var10 = (double)((float)(Math.atan2(var25, var12) * 180.0D / Math.PI));
-			}
-
-			double var16;
-			for(var16 = var10 - (double)this.rotationYaw; var16 >= 180.0D; var16 -= 360.0D) {
-			}
-
-			while(var16 < -180.0D) {
-				var16 += 360.0D;
-			}
-
-			if(var16 > 20.0D) {
-				var16 = 20.0D;
-			}
-
-			if(var16 < -20.0D) {
-				var16 = -20.0D;
-			}
-
-			this.rotationYaw = (float)((double)this.rotationYaw + var16);
-			this.setRotation(this.rotationYaw, this.rotationPitch);
-			List<Entity> var18 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand((double)0.2F, 0.0D, (double)0.2F));
-			if(var18 != null && var18.size() > 0) {
-				for(int var26 = 0; var26 < var18.size(); ++var26) {
-					Entity var20 = (Entity)var18.get(var26);
-					if(var20 != this.riddenByEntity && var20.canBePushed() && var20 instanceof EntityBoat) {
-						var20.applyEntityCollision(this);
-					}
-				}
-			}
-
-			if(this.riddenByEntity != null && this.riddenByEntity.isDead) {
-				this.riddenByEntity = null;
-			}
-
-		}
-	}
-
-	public void func_366_i_() {
-		if(this.riddenByEntity != null) {
-			double var1 = Math.cos((double)this.rotationYaw * Math.PI / 180.0D) * 0.4D;
-			double var3 = Math.sin((double)this.rotationYaw * Math.PI / 180.0D) * 0.4D;
-			this.riddenByEntity.setPosition(this.posX + var1, this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ + var3);
-		}
-	}
-
-	protected void writeEntityToNBT(NBTTagCompound var1) {
-	}
-
-	protected void readEntityFromNBT(NBTTagCompound var1) {
-	}
-
-	public float func_392_h_() {
-		return 0.0F;
-	}
-
-	public boolean interact(EntityPlayer var1) {
-		if(this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer && this.riddenByEntity != var1) {
-			return true;
-		} else {
-			if(!this.worldObj.multiplayerWorld) {
-				var1.mountEntity(this);
-			}
-
-			return true;
-		}
-	}
+    public int func_41016_i()
+    {
+        return dataWatcher.getWatchableObjectInt(18);
+    }
 }

@@ -1,113 +1,135 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class MathHelper {
-	private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION;
-	public static final float SQRT_2 = sqrt_float(2.0F);
-	private static float[] SIN_TABLE = new float[4096];
+import java.util.Random;
 
-	public static final float sin(float var0) {
-		return SIN_TABLE[(int)(var0 * 651.8986F) & 4095];
-	}
+public class MathHelper
+{
 
-	public static final float cos(float var0) {
-		return SIN_TABLE[(int)((var0 + ((float)Math.PI / 2F)) * 651.8986F) & 4095]; 
-	}
+    private static float SIN_TABLE[];
 
-	public static final float sqrt_float(float var0) {
-		return (float)Math.sqrt((double)var0);
-	}
+    public MathHelper()
+    {
+    }
 
-	public static final float sqrt_double(double var0) {
-		return (float)Math.sqrt(var0);
-	}
+    public static final float sin(float f)
+    {
+        return SIN_TABLE[(int)(f * 10430.38F) & 0xffff];
+    }
 
-	public static int floor_float(float var0) {
-		int var1 = (int)var0;
-		return var0 < (float)var1 ? var1 - 1 : var1;
-	}
+    public static final float cos(float f)
+    {
+        return SIN_TABLE[(int)(f * 10430.38F + 16384F) & 0xffff];
+    }
 
-	public static int floor_double(double var0) {
-		int var2 = (int)var0;
-		return var0 < (double)var2 ? var2 - 1 : var2;
-	}
+    public static final float sqrt_float(float f)
+    {
+        return (float)Math.sqrt(f);
+    }
 
-	public static float abs(float var0) {
-		return var0 >= 0.0F ? var0 : -var0;
-	}
-	
-	public static int abs(int var0) {
-		return var0 >= 0 ? var0 : -var0;
-	}
+    public static final float sqrt_double(double d)
+    {
+        return (float)Math.sqrt(d);
+    }
 
-	public static double abs_max(double var0, double var2) {
-		if(var0 < 0.0D) {
-			var0 = -var0;
-		}
+    public static int floor_float(float f)
+    {
+        int i = (int)f;
+        return f >= (float)i ? i : i - 1;
+    }
 
-		if(var2 < 0.0D) {
-			var2 = -var2;
-		}
+    public static int func_40346_b(double d)
+    {
+        return (int)(d + 1024D) - 1024;
+    }
 
-		return var0 > var2 ? var0 : var2;
-	}
+    public static int floor_double(double d)
+    {
+        int i = (int)d;
+        return d >= (double)i ? i : i - 1;
+    }
 
-	public static int bucketInt(int var0, int var1) {
-		return var0 < 0 ? -((-var0 - 1) / var1) - 1 : var0 / var1;
-	}
-	
-	public static boolean stringNullOrLengthZero(String var0) {
-		return var0 == null || var0.length() == 0;
-	}
-	
-	public static int smallestEncompassingPowerOfTwo(int value) {
-		int i = value - 1;
-		i = i | i >> 1;
-		i = i | i >> 2;
-		i = i | i >> 4;
-		i = i | i >> 8;
-		i = i | i >> 16;
-		return i + 1;
-	}
+    public static long floor_double_long(double d)
+    {
+        long l = (long)d;
+        return d >= (double)l ? l : l - 1L;
+    }
 
-	private static boolean isPowerOfTwo(int value) {
-		return value != 0 && (value & value - 1) == 0;
-	}
+    public static float abs(float f)
+    {
+        return f < 0.0F ? -f : f;
+    }
 
-	public static int log2DeBruijn(int value) {
-		value = isPowerOfTwo(value) ? value : smallestEncompassingPowerOfTwo(value);
-		return MULTIPLY_DE_BRUIJN_BIT_POSITION[(int) ((long) value * 125613361L >> 27) & 31];
-	}
+    public static int abs_int(int i)
+    {
+        return i < 0 ? -i : i;
+    }
 
-	public static int log2(int value) {
-		return log2DeBruijn(value) - (isPowerOfTwo(value) ? 0 : 1);
-	}
-	
-	public static int clamp(int num, int min, int max) {
-		if (num < min) {
-			return min;
-		} else {
-			return num > max ? max : num;
-		}
-	}
-	
-	public static float clamp(float num, float min, float max) {
-		if (num < min) {
-			return min;
-		} else {
-			return num > max ? max : num;
-		}
-	}
+    public static int func_41084_a(int i, int j, int k)
+    {
+        if(i < j)
+        {
+            return j;
+        }
+        if(i > k)
+        {
+            return k;
+        } else
+        {
+            return i;
+        }
+    }
 
-	static {
-		for (int j = 0; j < 4096; ++j) {
-			SIN_TABLE[j] = (float)Math.sin((double)(((float)j + 0.5F) / 4096.0F * ((float)Math.PI * 2F)));
-		}
-		
-		for (int l = 0; l < 360; l += 90) {
-			SIN_TABLE[(int)((float)l * 11.377778F) & 4095] = (float)Math.sin((double)((float)l * 0.017453292F));
-		}
+    public static double abs_max(double d, double d1)
+    {
+        if(d < 0.0D)
+        {
+            d = -d;
+        }
+        if(d1 < 0.0D)
+        {
+            d1 = -d1;
+        }
+        return d <= d1 ? d1 : d;
+    }
 
-		MULTIPLY_DE_BRUIJN_BIT_POSITION = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27,
-				13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
-	}
+    public static int bucketInt(int i, int j)
+    {
+        if(i < 0)
+        {
+            return -((-i - 1) / j) - 1;
+        } else
+        {
+            return i / j;
+        }
+    }
+
+    public static boolean stringNullOrLengthZero(String s)
+    {
+        return s == null || s.length() == 0;
+    }
+
+    public static int getRandomIntegerInRange(Random random, int i, int j)
+    {
+        if(i >= j)
+        {
+            return i;
+        } else
+        {
+            return random.nextInt((j - i) + 1) + i;
+        }
+    }
+
+    static 
+    {
+        SIN_TABLE = new float[0x10000];
+        for(int i = 0; i < 0x10000; i++)
+        {
+            SIN_TABLE[i] = (float)Math.sin(((double)i * 3.1415926535897931D * 2D) / 65536D);
+        }
+
+    }
 }

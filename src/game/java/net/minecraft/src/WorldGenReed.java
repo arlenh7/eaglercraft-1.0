@@ -1,24 +1,43 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
-public class WorldGenReed extends WorldGenerator {
-	public boolean generate(World var1, Random var2, int var3, int var4, int var5) {
-		for(int var6 = 0; var6 < 20; ++var6) {
-			int var7 = var3 + var2.nextInt(4) - var2.nextInt(4);
-			int var8 = var4;
-			int var9 = var5 + var2.nextInt(4) - var2.nextInt(4);
-			if(var1.func_20084_d(var7, var4, var9) && (var1.getBlockMaterial(var7 - 1, var4 - 1, var9) == Material.water || var1.getBlockMaterial(var7 + 1, var4 - 1, var9) == Material.water || var1.getBlockMaterial(var7, var4 - 1, var9 - 1) == Material.water || var1.getBlockMaterial(var7, var4 - 1, var9 + 1) == Material.water)) {
-				int var10 = 2 + var2.nextInt(var2.nextInt(3) + 1);
+// Referenced classes of package net.minecraft.src:
+//            WorldGenerator, World, Material, Block
 
-				for(int var11 = 0; var11 < var10; ++var11) {
-					if(Block.reed.canBlockStay(var1, var7, var8 + var11, var9)) {
-						var1.setBlock(var7, var8 + var11, var9, Block.reed.blockID);
-					}
-				}
-			}
-		}
+public class WorldGenReed extends WorldGenerator
+{
 
-		return true;
-	}
+    public WorldGenReed()
+    {
+    }
+
+    public boolean generate(World world, Random random, int i, int j, int k)
+    {
+        for(int l = 0; l < 20; l++)
+        {
+            int i1 = (i + random.nextInt(4)) - random.nextInt(4);
+            int j1 = j;
+            int k1 = (k + random.nextInt(4)) - random.nextInt(4);
+            if(!world.isAirBlock(i1, j1, k1) || world.getBlockMaterial(i1 - 1, j1 - 1, k1) != Material.water && world.getBlockMaterial(i1 + 1, j1 - 1, k1) != Material.water && world.getBlockMaterial(i1, j1 - 1, k1 - 1) != Material.water && world.getBlockMaterial(i1, j1 - 1, k1 + 1) != Material.water)
+            {
+                continue;
+            }
+            int l1 = 2 + random.nextInt(random.nextInt(3) + 1);
+            for(int i2 = 0; i2 < l1; i2++)
+            {
+                if(Block.reed.canBlockStay(world, i1, j1 + i2, k1))
+                {
+                    world.setBlock(i1, j1 + i2, k1, Block.reed.blockID);
+                }
+            }
+
+        }
+
+        return true;
+    }
 }

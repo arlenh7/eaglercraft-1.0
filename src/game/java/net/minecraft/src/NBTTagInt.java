@@ -1,32 +1,66 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
-public class NBTTagInt extends NBTBase {
-	public int intValue;
+// Referenced classes of package net.minecraft.src:
+//            NBTBase
 
-	public NBTTagInt() {
-	}
+public class NBTTagInt extends NBTBase
+{
 
-	public NBTTagInt(int var1) {
-		this.intValue = var1;
-	}
+    public int intValue;
 
-	void writeTagContents(DataOutput var1) throws IOException {
-		var1.writeInt(this.intValue);
-	}
+    public NBTTagInt(String s)
+    {
+        super(s);
+    }
 
-	void readTagContents(DataInput var1) throws IOException {
-		this.intValue = var1.readInt();
-	}
+    public NBTTagInt(String s, int i)
+    {
+        super(s);
+        intValue = i;
+    }
 
-	public byte getType() {
-		return (byte)3;
-	}
+    void writeTagContents(DataOutput dataoutput)
+        throws IOException
+    {
+        dataoutput.writeInt(intValue);
+    }
 
-	public String toString() {
-		return "" + this.intValue;
-	}
+    void readTagContents(DataInput datainput)
+        throws IOException
+    {
+        intValue = datainput.readInt();
+    }
+
+    public byte getType()
+    {
+        return 3;
+    }
+
+    public String toString()
+    {
+        return (new StringBuilder()).append("").append(intValue).toString();
+    }
+
+    public NBTBase func_40195_b()
+    {
+        return new NBTTagInt(getKey(), intValue);
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(super.equals(obj))
+        {
+            NBTTagInt nbttagint = (NBTTagInt)obj;
+            return intValue == nbttagint.intValue;
+        } else
+        {
+            return false;
+        }
+    }
 }

@@ -1,207 +1,286 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
-import net.lax1dude.eaglercraft.internal.vfs2.VFile2;
+// Referenced classes of package net.minecraft.src:
+//            World, SaveHandlerMP, WorldProvider, IntHashMap, 
+//            ChunkCoordinates, NetClientHandler, Entity, WorldBlockPositionType, 
+//            ChunkProviderClient, Packet255KickDisconnect, WorldInfo, WorldSettings, 
+//            IChunkProvider
 
-public class WorldClient extends World {
-	private LinkedList<WorldBlockPositionType> field_1057_z = new LinkedList<>();
-	private NetClientHandler sendQueue;
-	private ChunkProviderClient C;
-	private MCHashTable field_1055_D = new MCHashTable();
-	private Set<Entity> E = new HashSet<>();
-	private Set<Entity> field_1053_F = new HashSet<>();
+public class WorldClient extends World
+{
 
-	public WorldClient(NetClientHandler var1, long var2, int var4) {
-		super("MpServer", WorldProvider.func_4101_a(var4), var2);
-		this.sendQueue = var1;
-		this.spawnX = 8;
-		this.spawnY = 64;
-		this.spawnZ = 8;
-	}
+    private LinkedList blocksToReceive;
+    private NetClientHandler sendQueue;
+    private ChunkProviderClient field_20915_C;
+    private IntHashMap entityHashSet;
+    private Set entityList;
+    private Set entitySpawnQueue;
 
-	public void tick() {
-		++this.worldTime;
-		int var1 = this.calculateSkylightSubtracted(1.0F);
-		int var2;
-		if(var1 != this.skylightSubtracted) {
-			this.skylightSubtracted = var1;
+    public WorldClient(NetClientHandler netclienthandler, WorldSettings worldsettings, int i, int j)
+    {
+        super(new SaveHandlerMP(), "MpServer", WorldProvider.getProviderForDimension(i), worldsettings);
+        blocksToReceive = new LinkedList();
+        entityHashSet = new IntHashMap();
+        entityList = new HashSet();
+        entitySpawnQueue = new HashSet();
+        sendQueue = netclienthandler;
+        difficultySetting = j;
+        setSpawnPoint(new ChunkCoordinates(8, 64, 8));
+        mapStorage = netclienthandler.mapStorage;
+    }
 
-			for(var2 = 0; var2 < this.worldAccesses.size(); ++var2) {
-				((IWorldAccess)this.worldAccesses.get(var2)).updateAllRenderers();
-			}
-		}
+    public void tick()
+    {
+        setWorldTime(getWorldTime() + 1L);
+        for(int i = 0; i < 10 && !entitySpawnQueue.isEmpty(); i++)
+        {
+            Entity entity = (Entity)entitySpawnQueue.iterator().next();
+            if(!loadedEntityList.contains(entity))
+            {
+                entityJoinedWorld(entity);
+            }
+        }
 
-		for(var2 = 0; var2 < 10 && !this.field_1053_F.isEmpty(); ++var2) {
-			Entity var3 = (Entity)this.field_1053_F.iterator().next();
-			if(!this.loadedEntityList.contains(var3)) {
-				this.entityJoinedWorld(var3);
-			}
-		}
+        sendQueue.processReadPackets();
+        for(int j = 0; j < blocksToReceive.size(); j++)
+        {
+            WorldBlockPositionType worldblockpositiontype = (WorldBlockPositionType)blocksToReceive.get(j);
+            if(--worldblockpositiontype.acceptCountdown == 0)
+            {
+                super.setBlockAndMetadata(worldblockpositiontype.posX, worldblockpositiontype.posY, worldblockpositiontype.posZ, worldblockpositiontype.blockID, worldblockpositiontype.metadata);
+                super.markBlockNeedsUpdate(worldblockpositiontype.posX, worldblockpositiontype.posY, worldblockpositiontype.posZ);
+                blocksToReceive.remove(j--);
+            }
+        }
 
-		this.sendQueue.processReadPackets();
+    }
 
-		for(var2 = 0; var2 < this.field_1057_z.size(); ++var2) {
-			WorldBlockPositionType var4 = (WorldBlockPositionType)this.field_1057_z.get(var2);
-			if(--var4.field_1206_d == 0) {
-				super.setBlockAndMetadata(var4.field_1202_a, var4.field_1201_b, var4.field_1207_c, var4.field_1205_e, var4.field_1204_f);
-				super.markBlockNeedsUpdate(var4.field_1202_a, var4.field_1201_b, var4.field_1207_c);
-				this.field_1057_z.remove(var2--);
-			}
-		}
+    public void invalidateBlockReceiveRegion(int i, int j, int k, int l, int i1, int j1)
+    {
+        for(int k1 = 0; k1 < blocksToReceive.size(); k1++)
+        {
+            WorldBlockPositionType worldblockpositiontype = (WorldBlockPositionType)blocksToReceive.get(k1);
+            if(worldblockpositiontype.posX >= i && worldblockpositiontype.posY >= j && worldblockpositiontype.posZ >= k && worldblockpositiontype.posX <= l && worldblockpositiontype.posY <= i1 && worldblockpositiontype.posZ <= j1)
+            {
+                blocksToReceive.remove(k1--);
+            }
+        }
 
-	}
+    }
 
-	public void func_711_c(int var1, int var2, int var3, int var4, int var5, int var6) {
-		for(int var7 = 0; var7 < this.field_1057_z.size(); ++var7) {
-			WorldBlockPositionType var8 = (WorldBlockPositionType)this.field_1057_z.get(var7);
-			if(var8.field_1202_a >= var1 && var8.field_1201_b >= var2 && var8.field_1207_c >= var3 && var8.field_1202_a <= var4 && var8.field_1201_b <= var5 && var8.field_1207_c <= var6) {
-				this.field_1057_z.remove(var7--);
-			}
-		}
+    protected IChunkProvider getChunkProvider()
+    {
+        field_20915_C = new ChunkProviderClient(this);
+        return field_20915_C;
+    }
 
-	}
+    public void setSpawnLocation()
+    {
+        setSpawnPoint(new ChunkCoordinates(8, 64, 8));
+    }
 
-	protected IChunkProvider func_4081_a(VFile2 var1) {
-		this.C = new ChunkProviderClient(this);
-		return this.C;
-	}
+    protected void updateBlocksAndPlayCaveSounds()
+    {
+    }
 
-	public void func_4076_b() {
-		this.spawnX = 8;
-		this.spawnY = 64;
-		this.spawnZ = 8;
-	}
+    public void scheduleBlockUpdate(int i, int j, int k, int l, int i1)
+    {
+    }
 
-	protected void func_4080_j() {
-	}
+    public boolean tickUpdates(boolean flag)
+    {
+        return false;
+    }
 
-	public void scheduleBlockUpdate(int var1, int var2, int var3, int var4) {
-	}
+    public void doPreChunk(int i, int j, boolean flag)
+    {
+        if(flag)
+        {
+            field_20915_C.loadChunk(i, j);
+        } else
+        {
+            field_20915_C.func_539_c(i, j);
+        }
+        if(!flag)
+        {
+            markBlocksDirty(i * 16, 0, j * 16, i * 16 + 15, field_35472_c, j * 16 + 15);
+        }
+    }
 
-	public boolean TickUpdates(boolean var1) {
-		return false;
-	}
+    public boolean entityJoinedWorld(Entity entity)
+    {
+        boolean flag = super.entityJoinedWorld(entity);
+        entityList.add(entity);
+        if(!flag)
+        {
+            entitySpawnQueue.add(entity);
+        }
+        return flag;
+    }
 
-	public void func_713_a(int var1, int var2, boolean var3) {
-		if(var3) {
-			this.C.func_538_d(var1, var2);
-		} else {
-			this.C.func_539_c(var1, var2);
-		}
+    public void setEntityDead(Entity entity)
+    {
+        super.setEntityDead(entity);
+        entityList.remove(entity);
+    }
 
-		if(!var3) {
-			this.func_701_b(var1 * 16, 0, var2 * 16, var1 * 16 + 15, 128, var2 * 16 + 15);
-		}
+    protected void obtainEntitySkin(Entity entity)
+    {
+        super.obtainEntitySkin(entity);
+        if(entitySpawnQueue.contains(entity))
+        {
+            entitySpawnQueue.remove(entity);
+        }
+    }
 
-	}
+    protected void releaseEntitySkin(Entity entity)
+    {
+        super.releaseEntitySkin(entity);
+        if(entityList.contains(entity))
+        {
+            entitySpawnQueue.add(entity);
+        }
+    }
 
-	public boolean entityJoinedWorld(Entity var1) {
-		boolean var2 = super.entityJoinedWorld(var1);
-		this.E.add(var1);
-		if(!var2) {
-			this.field_1053_F.add(var1);
-		}
+    public void func_712_a(int i, Entity entity)
+    {
+        Entity entity1 = func_709_b(i);
+        if(entity1 != null)
+        {
+            setEntityDead(entity1);
+        }
+        entityList.add(entity);
+        entity.entityId = i;
+        if(!entityJoinedWorld(entity))
+        {
+            entitySpawnQueue.add(entity);
+        }
+        entityHashSet.addKey(i, entity);
+    }
 
-		return var2;
-	}
+    public Entity func_709_b(int i)
+    {
+        return (Entity)entityHashSet.lookup(i);
+    }
 
-	public void setEntityDead(Entity var1) {
-		super.setEntityDead(var1);
-		this.E.remove(var1);
-	}
+    public Entity removeEntityFromWorld(int i)
+    {
+        Entity entity = (Entity)entityHashSet.removeObject(i);
+        if(entity != null)
+        {
+            entityList.remove(entity);
+            setEntityDead(entity);
+        }
+        return entity;
+    }
 
-	protected void obtainEntitySkin(Entity var1) {
-		super.obtainEntitySkin(var1);
-		if(this.field_1053_F.contains(var1)) {
-			this.field_1053_F.remove(var1);
-		}
+    public boolean setBlockMetadata(int i, int j, int k, int l)
+    {
+        int i1 = getBlockId(i, j, k);
+        int j1 = getBlockMetadata(i, j, k);
+        if(super.setBlockMetadata(i, j, k, l))
+        {
+            blocksToReceive.add(new WorldBlockPositionType(this, i, j, k, i1, j1));
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-	}
+    public boolean setBlockAndMetadata(int i, int j, int k, int l, int i1)
+    {
+        int j1 = getBlockId(i, j, k);
+        int k1 = getBlockMetadata(i, j, k);
+        if(super.setBlockAndMetadata(i, j, k, l, i1))
+        {
+            blocksToReceive.add(new WorldBlockPositionType(this, i, j, k, j1, k1));
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-	protected void releaseEntitySkin(Entity var1) {
-		super.releaseEntitySkin(var1);
-		if(this.E.contains(var1)) {
-			this.field_1053_F.add(var1);
-		}
+    public boolean setBlock(int i, int j, int k, int l)
+    {
+        int i1 = getBlockId(i, j, k);
+        int j1 = getBlockMetadata(i, j, k);
+        if(super.setBlock(i, j, k, l))
+        {
+            blocksToReceive.add(new WorldBlockPositionType(this, i, j, k, i1, j1));
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-	}
+    public boolean setBlockAndMetadataAndInvalidate(int i, int j, int k, int l, int i1)
+    {
+        invalidateBlockReceiveRegion(i, j, k, i, j, k);
+        if(super.setBlockAndMetadata(i, j, k, l, i1))
+        {
+            notifyBlockChange(i, j, k, l);
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
-	public void func_712_a(int var1, Entity var2) {
-		Entity var3 = this.func_709_b(var1);
-		if(var3 != null) {
-			this.setEntityDead(var3);
-		}
+    public void sendQuittingDisconnectingPacket()
+    {
+        sendQueue.func_28117_a(new Packet255KickDisconnect("Quitting"));
+    }
 
-		this.E.add(var2);
-		var2.field_620_ab = var1;
-		if(!this.entityJoinedWorld(var2)) {
-			this.field_1053_F.add(var2);
-		}
-
-		this.field_1055_D.addKey(var1, var2);
-	}
-
-	public Entity func_709_b(int var1) {
-		return (Entity)this.field_1055_D.lookup(var1);
-	}
-
-	public Entity removeEntityFromWorld(int var1) {
-		Entity var2 = (Entity)this.field_1055_D.removeObject(var1);
-		if(var2 != null) {
-			this.E.remove(var2);
-			this.setEntityDead(var2);
-		}
-
-		return var2;
-	}
-
-	public boolean setBlockMetadata(int var1, int var2, int var3, int var4) {
-		int var5 = this.getBlockId(var1, var2, var3);
-		int var6 = this.getBlockMetadata(var1, var2, var3);
-		if(super.setBlockMetadata(var1, var2, var3, var4)) {
-			this.field_1057_z.add(new WorldBlockPositionType(this, var1, var2, var3, var5, var6));
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean setBlockAndMetadata(int var1, int var2, int var3, int var4, int var5) {
-		int var6 = this.getBlockId(var1, var2, var3);
-		int var7 = this.getBlockMetadata(var1, var2, var3);
-		if(super.setBlockAndMetadata(var1, var2, var3, var4, var5)) {
-			this.field_1057_z.add(new WorldBlockPositionType(this, var1, var2, var3, var6, var7));
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean setBlock(int var1, int var2, int var3, int var4) {
-		int var5 = this.getBlockId(var1, var2, var3);
-		int var6 = this.getBlockMetadata(var1, var2, var3);
-		if(super.setBlock(var1, var2, var3, var4)) {
-			this.field_1057_z.add(new WorldBlockPositionType(this, var1, var2, var3, var5, var6));
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean func_714_c(int var1, int var2, int var3, int var4, int var5) {
-		this.func_711_c(var1, var2, var3, var1, var2, var3);
-		if(super.setBlockAndMetadata(var1, var2, var3, var4, var5)) {
-			this.notifyBlockChange(var1, var2, var3, var4);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public void sendQuittingDisconnectingPacket() {
-		this.sendQueue.addToSendQueue(new Packet255KickDisconnect("Quitting"));
-	}
+    protected void updateWeather()
+    {
+        if(worldProvider.hasNoSky)
+        {
+            return;
+        }
+        if(lastLightningBolt > 0)
+        {
+            lastLightningBolt--;
+        }
+        prevRainingStrength = rainingStrength;
+        if(worldInfo.getIsRaining())
+        {
+            rainingStrength += 0.01D;
+        } else
+        {
+            rainingStrength -= 0.01D;
+        }
+        if(rainingStrength < 0.0F)
+        {
+            rainingStrength = 0.0F;
+        }
+        if(rainingStrength > 1.0F)
+        {
+            rainingStrength = 1.0F;
+        }
+        prevThunderingStrength = thunderingStrength;
+        if(worldInfo.getIsThundering())
+        {
+            thunderingStrength += 0.01D;
+        } else
+        {
+            thunderingStrength -= 0.01D;
+        }
+        if(thunderingStrength < 0.0F)
+        {
+            thunderingStrength = 0.0F;
+        }
+        if(thunderingStrength > 1.0F)
+        {
+            thunderingStrength = 1.0F;
+        }
+    }
 }

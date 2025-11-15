@@ -1,267 +1,379 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-import net.peyton.eagler.minecraft.FontRenderer;
-import net.peyton.eagler.minecraft.Tessellator;
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            RenderLiving, ModelBiped, EntityPlayer, InventoryPlayer, 
+//            ItemStack, ItemArmor, ModelRenderer, EnumAction, 
+//            EntityPlayerSP, RenderManager, Tessellator, FontRenderer, 
+//            Item, Block, RenderBlocks, ItemRenderer, 
+//            MathHelper, ItemPotion, EntityLiving, Entity
 
-public class RenderPlayer extends RenderLiving {
-	private ModelBiped field_209_f = (ModelBiped)this.e;
-	private ModelBiped field_208_g = new ModelBiped(1.0F);
-	private ModelBiped field_207_h = new ModelBiped(0.5F);
-	private static final String[] armorFilenamePrefix = new String[]{"cloth", "chain", "iron", "diamond", "gold"};
+public class RenderPlayer extends RenderLiving
+{
 
-	public RenderPlayer() {
-		super(new ModelBiped(0.0F), 0.5F);
-	}
+    private ModelBiped modelBipedMain;
+    private ModelBiped modelArmorChestplate;
+    private ModelBiped modelArmor;
+    private static final String armorFilenamePrefix[] = {
+        "cloth", "chain", "iron", "diamond", "gold"
+    };
 
-	protected boolean a(EntityPlayer var1, int var2) {
-		ItemStack var3 = var1.inventory.armorItemInSlot(3 - var2);
-		if(var3 != null) {
-			Item var4 = var3.getItem();
-			if(var4 instanceof ItemArmor) {
-				ItemArmor var5 = (ItemArmor)var4;
-				this.loadTexture("/armor/" + armorFilenamePrefix[var5.renderIndex] + "_" + (var2 == 2 ? 2 : 1) + ".png");
-				ModelBiped var6 = var2 == 2 ? this.field_207_h : this.field_208_g;
-				var6.bipedHead.field_1403_h = var2 == 0;
-				var6.field_1285_b.field_1403_h = var2 == 0;
-				var6.field_1284_c.field_1403_h = var2 == 1 || var2 == 2;
-				var6.bipedRightArm.field_1403_h = var2 == 1;
-				var6.bipedLeftArm.field_1403_h = var2 == 1;
-				var6.bipedRightLeg.field_1403_h = var2 == 2 || var2 == 3;
-				var6.bipedLeftLeg.field_1403_h = var2 == 2 || var2 == 3;
-				this.setRenderPassModel(var6);
-				return true;
-			}
-		}
+    public RenderPlayer()
+    {
+        super(new ModelBiped(0.0F), 0.5F);
+        modelBipedMain = (ModelBiped)mainModel;
+        modelArmorChestplate = new ModelBiped(1.0F);
+        modelArmor = new ModelBiped(0.5F);
+    }
 
-		return false;
-	}
+    protected int setArmorModel(EntityPlayer entityplayer, int i, float f)
+    {
+        ItemStack itemstack = entityplayer.inventory.armorItemInSlot(3 - i);
+        if(itemstack != null)
+        {
+            Item item = itemstack.getItem();
+            if(item instanceof ItemArmor)
+            {
+                ItemArmor itemarmor = (ItemArmor)item;
+                loadTexture((new StringBuilder()).append("/armor/").append(armorFilenamePrefix[itemarmor.renderIndex]).append("_").append(i != 2 ? 1 : 2).append(".png").toString());
+                ModelBiped modelbiped = i != 2 ? modelArmorChestplate : modelArmor;
+                modelbiped.bipedHead.showModel = i == 0;
+                modelbiped.bipedHeadwear.showModel = i == 0;
+                modelbiped.bipedBody.showModel = i == 1 || i == 2;
+                modelbiped.bipedRightArm.showModel = i == 1;
+                modelbiped.bipedLeftArm.showModel = i == 1;
+                modelbiped.bipedRightLeg.showModel = i == 2 || i == 3;
+                modelbiped.bipedLeftLeg.showModel = i == 2 || i == 3;
+                setRenderPassModel(modelbiped);
+                return !itemstack.func_40711_u() ? 1 : 15;
+            }
+        }
+        return -1;
+    }
 
-	public void a(EntityPlayer var1, double var2, double var4, double var6, float var8, float var9) {
-		ItemStack var10 = var1.inventory.getCurrentItem();
-		this.field_208_g.field_1278_i = this.field_207_h.field_1278_i = this.field_209_f.field_1278_i = var10 != null;
-		this.field_208_g.field_1277_j = this.field_207_h.field_1277_j = this.field_209_f.field_1277_j = var1.isSneaking();
-		double var11 = var4 - (double)var1.yOffset;
-		if(var1.field_12240_bw) {
-			var11 -= 0.125D;
-		}
+    public void renderPlayer(EntityPlayer entityplayer, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        ItemStack itemstack = entityplayer.inventory.getCurrentItem();
+        modelArmorChestplate.field_1278_i = modelArmor.field_1278_i = modelBipedMain.field_1278_i = itemstack == null ? 0 : 1;
+        if(itemstack != null && entityplayer.func_35205_Y() > 0)
+        {
+            EnumAction enumaction = itemstack.getItemUseAction();
+            if(enumaction == EnumAction.block)
+            {
+                modelArmorChestplate.field_1278_i = modelArmor.field_1278_i = modelBipedMain.field_1278_i = 3;
+            } else
+            if(enumaction == EnumAction.bow)
+            {
+                modelArmorChestplate.field_40333_u = modelArmor.field_40333_u = modelBipedMain.field_40333_u = true;
+            }
+        }
+        modelArmorChestplate.isSneak = modelArmor.isSneak = modelBipedMain.isSneak = entityplayer.isSneaking();
+        double d3 = d1 - (double)entityplayer.yOffset;
+        if(entityplayer.isSneaking() && !(entityplayer instanceof EntityPlayerSP))
+        {
+            d3 -= 0.125D;
+        }
+        super.doRenderLiving(entityplayer, d, d3, d2, f, f1);
+        modelArmorChestplate.field_40333_u = modelArmor.field_40333_u = modelBipedMain.field_40333_u = false;
+        modelArmorChestplate.isSneak = modelArmor.isSneak = modelBipedMain.isSneak = false;
+        modelArmorChestplate.field_1278_i = modelArmor.field_1278_i = modelBipedMain.field_1278_i = 0;
+    }
 
-		super.a(var1, var2, var11, var6, var8, var9);
-		this.field_208_g.field_1277_j = this.field_207_h.field_1277_j = this.field_209_f.field_1277_j = false;
-		this.field_208_g.field_1278_i = this.field_207_h.field_1278_i = this.field_209_f.field_1278_i = false;
-		float var13 = 1.6F;
-		float var14 = (float)(1.0D / 60.0D) * var13;
-		float var15 = var1.getDistanceToEntity(this.renderManager.field_1226_h);
-		float var16 = var1.isSneaking() ? 32.0F : 64.0F;
-		if(var15 < var16) {
-			var14 = (float)((double)var14 * (Math.sqrt((double)var15) / 2.0D));
-			FontRenderer var17 = this.getFontRendererFromRenderManager();
-			GL11.glPushMatrix();
-			GL11.glTranslatef((float)var2 + 0.0F, (float)var4 + 2.3F, (float)var6);
-			GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(-this.renderManager.field_1225_i, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(this.renderManager.field_1224_j, 1.0F, 0.0F, 0.0F);
-			GL11.glScalef(-var14, -var14, var14);
-			String var18 = var1.field_771_i;
-			GL11.glDisable(GL11.GL_LIGHTING);
-			Tessellator var19;
-			if(!var1.isSneaking()) {
-				GL11.glDepthMask(false);
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				var19 = Tessellator.instance;
-				byte var20 = 0;
-				if(var1.field_771_i.equals("deadmau5")) {
-					var20 = -10;
-				}
+    protected void renderName(EntityPlayer entityplayer, double d, double d1, double d2)
+    {
+        if(Minecraft.isGuiEnabled() && entityplayer != renderManager.livingPlayer)
+        {
+            float f = 1.6F;
+            float f1 = 0.01666667F * f;
+            float f2 = entityplayer.getDistanceToEntity(renderManager.livingPlayer);
+            float f3 = entityplayer.isSneaking() ? 32F : 64F;
+            if(f2 < f3)
+            {
+                String s = entityplayer.username;
+                if(!entityplayer.isSneaking())
+                {
+                    if(entityplayer.isPlayerSleeping())
+                    {
+                        renderLivingLabel(entityplayer, s, d, d1 - 1.5D, d2, 64);
+                    } else
+                    {
+                        renderLivingLabel(entityplayer, s, d, d1, d2, 64);
+                    }
+                } else
+                {
+                    FontRenderer fontrenderer = getFontRendererFromRenderManager();
+                    GL11.glPushMatrix();
+                    GL11.glTranslatef((float)d + 0.0F, (float)d1 + 2.3F, (float)d2);
+                    GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+                    GL11.glScalef(-f1, -f1, f1);
+                    GL11.glDisable(2896 /*GL_LIGHTING*/);
+                    GL11.glTranslatef(0.0F, 0.25F / f1, 0.0F);
+                    GL11.glDepthMask(false);
+                    GL11.glEnable(3042 /*GL_BLEND*/);
+                    GL11.glBlendFunc(770, 771);
+                    Tessellator tessellator = Tessellator.instance;
+                    GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
+                    tessellator.startDrawingQuads();
+                    int i = fontrenderer.getStringWidth(s) / 2;
+                    tessellator.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+                    tessellator.addVertex(-i - 1, -1D, 0.0D);
+                    tessellator.addVertex(-i - 1, 8D, 0.0D);
+                    tessellator.addVertex(i + 1, 8D, 0.0D);
+                    tessellator.addVertex(i + 1, -1D, 0.0D);
+                    tessellator.draw();
+                    GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
+                    GL11.glDepthMask(true);
+                    fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, 0, 0x20ffffff);
+                    GL11.glEnable(2896 /*GL_LIGHTING*/);
+                    GL11.glDisable(3042 /*GL_BLEND*/);
+                    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                    GL11.glPopMatrix();
+                }
+            }
+        }
+    }
 
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				var19.startDrawingQuads();
-				int var21 = var17.getStringWidth(var18) / 2;
-				var19.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
-				var19.addVertex((double)(-var21 - 1), (double)(-1 + var20), 0.0D);
-				var19.addVertex((double)(-var21 - 1), (double)(8 + var20), 0.0D);
-				var19.addVertex((double)(var21 + 1), (double)(8 + var20), 0.0D);
-				var19.addVertex((double)(var21 + 1), (double)(-1 + var20), 0.0D);
-				var19.draw();
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				var17.drawString(var18, -var17.getStringWidth(var18) / 2, var20, 553648127);
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-				GL11.glDepthMask(true);
-				var17.drawString(var18, -var17.getStringWidth(var18) / 2, var20, -1);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				GL11.glDisable(GL11.GL_BLEND);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glPopMatrix();
-			} else {
-				GL11.glTranslatef(0.0F, 0.25F / var14, 0.0F);
-				GL11.glDepthMask(false);
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				var19 = Tessellator.instance;
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				var19.startDrawingQuads();
-				int var22 = var17.getStringWidth(var18) / 2;
-				var19.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
-				var19.addVertex((double)(-var22 - 1), -1.0D, 0.0D);
-				var19.addVertex((double)(-var22 - 1), 8.0D, 0.0D);
-				var19.addVertex((double)(var22 + 1), 8.0D, 0.0D);
-				var19.addVertex((double)(var22 + 1), -1.0D, 0.0D);
-				var19.draw();
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				GL11.glDepthMask(true);
-				var17.drawString(var18, -var17.getStringWidth(var18) / 2, 0, 553648127);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				GL11.glDisable(GL11.GL_BLEND);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glPopMatrix();
-			}
-		}
+    protected void renderSpecials(EntityPlayer entityplayer, float f)
+    {
+        super.renderEquippedItems(entityplayer, f);
+        ItemStack itemstack = entityplayer.inventory.armorItemInSlot(3);
+        if(itemstack != null && itemstack.getItem().shiftedIndex < 256)
+        {
+            GL11.glPushMatrix();
+            modelBipedMain.bipedHead.postRender(0.0625F);
+            if(RenderBlocks.renderItemIn3d(Block.blocksList[itemstack.itemID].getRenderType()))
+            {
+                float f1 = 0.625F;
+                GL11.glTranslatef(0.0F, -0.25F, 0.0F);
+                GL11.glRotatef(180F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(f1, -f1, f1);
+            }
+            renderManager.itemRenderer.renderItem(entityplayer, itemstack, 0);
+            GL11.glPopMatrix();
+        }
+        if(entityplayer.username.equals("deadmau5") && loadDownloadableImageTexture(entityplayer.skinUrl, null))
+        {
+            for(int i = 0; i < 2; i++)
+            {
+                float f2 = (entityplayer.prevRotationYaw + (entityplayer.rotationYaw - entityplayer.prevRotationYaw) * f) - (entityplayer.prevRenderYawOffset + (entityplayer.renderYawOffset - entityplayer.prevRenderYawOffset) * f);
+                float f3 = entityplayer.prevRotationPitch + (entityplayer.rotationPitch - entityplayer.prevRotationPitch) * f;
+                GL11.glPushMatrix();
+                GL11.glRotatef(f2, 0.0F, 1.0F, 0.0F);
+                GL11.glRotatef(f3, 1.0F, 0.0F, 0.0F);
+                GL11.glTranslatef(0.375F * (float)(i * 2 - 1), 0.0F, 0.0F);
+                GL11.glTranslatef(0.0F, -0.375F, 0.0F);
+                GL11.glRotatef(-f3, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(-f2, 0.0F, 1.0F, 0.0F);
+                float f8 = 1.333333F;
+                GL11.glScalef(f8, f8, f8);
+                modelBipedMain.renderEars(0.0625F);
+                GL11.glPopMatrix();
+            }
 
-	}
+        }
+        if(loadDownloadableImageTexture(entityplayer.playerCloakUrl, null))
+        {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0.0F, 0.0F, 0.125F);
+            double d = (entityplayer.field_20066_r + (entityplayer.field_20063_u - entityplayer.field_20066_r) * (double)f) - (entityplayer.prevPosX + (entityplayer.posX - entityplayer.prevPosX) * (double)f);
+            double d1 = (entityplayer.field_20065_s + (entityplayer.field_20062_v - entityplayer.field_20065_s) * (double)f) - (entityplayer.prevPosY + (entityplayer.posY - entityplayer.prevPosY) * (double)f);
+            double d2 = (entityplayer.field_20064_t + (entityplayer.field_20061_w - entityplayer.field_20064_t) * (double)f) - (entityplayer.prevPosZ + (entityplayer.posZ - entityplayer.prevPosZ) * (double)f);
+            float f12 = entityplayer.prevRenderYawOffset + (entityplayer.renderYawOffset - entityplayer.prevRenderYawOffset) * f;
+            double d3 = MathHelper.sin((f12 * 3.141593F) / 180F);
+            double d4 = -MathHelper.cos((f12 * 3.141593F) / 180F);
+            float f13 = (float)d1 * 10F;
+            if(f13 < -6F)
+            {
+                f13 = -6F;
+            }
+            if(f13 > 32F)
+            {
+                f13 = 32F;
+            }
+            float f14 = (float)(d * d3 + d2 * d4) * 100F;
+            float f15 = (float)(d * d4 - d2 * d3) * 100F;
+            if(f14 < 0.0F)
+            {
+                f14 = 0.0F;
+            }
+            float f16 = entityplayer.prevCameraYaw + (entityplayer.cameraYaw - entityplayer.prevCameraYaw) * f;
+            f13 += MathHelper.sin((entityplayer.prevDistanceWalkedModified + (entityplayer.distanceWalkedModified - entityplayer.prevDistanceWalkedModified) * f) * 6F) * 32F * f16;
+            if(entityplayer.isSneaking())
+            {
+                f13 += 25F;
+            }
+            GL11.glRotatef(6F + f14 / 2.0F + f13, 1.0F, 0.0F, 0.0F);
+            GL11.glRotatef(f15 / 2.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(-f15 / 2.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(180F, 0.0F, 1.0F, 0.0F);
+            modelBipedMain.renderCloak(0.0625F);
+            GL11.glPopMatrix();
+        }
+        ItemStack itemstack1 = entityplayer.inventory.getCurrentItem();
+        if(itemstack1 != null)
+        {
+            GL11.glPushMatrix();
+            modelBipedMain.bipedRightArm.postRender(0.0625F);
+            GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
+            if(entityplayer.fishEntity != null)
+            {
+                itemstack1 = new ItemStack(Item.stick);
+            }
+            EnumAction enumaction = null;
+            if(entityplayer.func_35205_Y() > 0)
+            {
+                enumaction = itemstack1.getItemUseAction();
+            }
+            if(itemstack1.itemID < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[itemstack1.itemID].getRenderType()))
+            {
+                float f4 = 0.5F;
+                GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
+                f4 *= 0.75F;
+                GL11.glRotatef(20F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(f4, -f4, f4);
+            } else
+            if(itemstack1.itemID == Item.bow.shiftedIndex)
+            {
+                float f5 = 0.625F;
+                GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
+                GL11.glRotatef(-20F, 0.0F, 1.0F, 0.0F);
+                GL11.glScalef(f5, -f5, f5);
+                GL11.glRotatef(-100F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+            } else
+            if(Item.itemsList[itemstack1.itemID].isFull3D())
+            {
+                float f6 = 0.625F;
+                if(Item.itemsList[itemstack1.itemID].shouldRotateAroundWhenRendering())
+                {
+                    GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
+                    GL11.glTranslatef(0.0F, -0.125F, 0.0F);
+                }
+                if(entityplayer.func_35205_Y() > 0 && enumaction == EnumAction.block)
+                {
+                    GL11.glTranslatef(0.05F, 0.0F, -0.1F);
+                    GL11.glRotatef(-50F, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(-10F, 1.0F, 0.0F, 0.0F);
+                    GL11.glRotatef(-60F, 0.0F, 0.0F, 1.0F);
+                }
+                GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+                GL11.glScalef(f6, -f6, f6);
+                GL11.glRotatef(-100F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(45F, 0.0F, 1.0F, 0.0F);
+            } else
+            {
+                float f7 = 0.375F;
+                GL11.glTranslatef(0.25F, 0.1875F, -0.1875F);
+                GL11.glScalef(f7, f7, f7);
+                GL11.glRotatef(60F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(-90F, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(20F, 0.0F, 0.0F, 1.0F);
+            }
+            if(itemstack1.itemID == Item.potion.shiftedIndex)
+            {
+                int j = itemstack1.getItem().getColorFromDamage(itemstack1.getItemDamage());
+                float f9 = (float)(j >> 16 & 0xff) / 255F;
+                float f10 = (float)(j >> 8 & 0xff) / 255F;
+                float f11 = (float)(j & 0xff) / 255F;
+                GL11.glColor4f(f9, f10, f11, 1.0F);
+                renderManager.itemRenderer.renderItem(entityplayer, itemstack1, 0);
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                renderManager.itemRenderer.renderItem(entityplayer, itemstack1, 1);
+            } else
+            {
+                renderManager.itemRenderer.renderItem(entityplayer, itemstack1, 0);
+            }
+            GL11.glPopMatrix();
+        }
+    }
 
-	protected void a(EntityPlayer var1, float var2) {
-		ItemStack var3 = var1.inventory.armorItemInSlot(3);
-		if(var3 != null && var3.getItem().shiftedIndex < 256) {
-			GL11.glPushMatrix();
-			this.field_209_f.bipedHead.func_926_b(1.0F / 16.0F);
-			if(RenderBlocks.func_1219_a(Block.blocksList[var3.itemID].getRenderType())) {
-				float var4 = 10.0F / 16.0F;
-				GL11.glTranslatef(0.0F, -0.25F, 0.0F);
-				GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-				GL11.glScalef(var4, -var4, var4);
-			}
+    protected void renderPlayerScale(EntityPlayer entityplayer, float f)
+    {
+        float f1 = 0.9375F;
+        GL11.glScalef(f1, f1, f1);
+    }
 
-			this.renderManager.field_4236_f.renderItem(var3);
-			GL11.glPopMatrix();
-		}
+    public void drawFirstPersonHand()
+    {
+        modelBipedMain.onGround = 0.0F;
+        modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+        modelBipedMain.bipedRightArm.render(0.0625F);
+    }
 
-		float var5;
-		if(var1.field_771_i.equals("deadmau5") && this.func_140_a((TextureLocation)null)) {
-			for(int var19 = 0; var19 < 2; ++var19) {
-				var5 = var1.prevRotationYaw + (var1.rotationYaw - var1.prevRotationYaw) * var2 - (var1.prevRenderYawOffset + (var1.renderYawOffset - var1.prevRenderYawOffset) * var2);
-				float var6 = var1.prevRotationPitch + (var1.rotationPitch - var1.prevRotationPitch) * var2;
-				GL11.glPushMatrix();
-				GL11.glRotatef(var5, 0.0F, 1.0F, 0.0F);
-				GL11.glRotatef(var6, 1.0F, 0.0F, 0.0F);
-				GL11.glTranslatef(6.0F / 16.0F * (float)(var19 * 2 - 1), 0.0F, 0.0F);
-				GL11.glTranslatef(0.0F, -(6.0F / 16.0F), 0.0F);
-				GL11.glRotatef(-var6, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(-var5, 0.0F, 1.0F, 0.0F);
-				float var7 = 4.0F / 3.0F;
-				GL11.glScalef(var7, var7, var7);
-				this.field_209_f.func_20095_a(1.0F / 16.0F);
-				GL11.glPopMatrix();
-			}
-		}
+    protected void renderPlayerSleep(EntityPlayer entityplayer, double d, double d1, double d2)
+    {
+        if(entityplayer.isEntityAlive() && entityplayer.isPlayerSleeping())
+        {
+            super.renderLivingAt(entityplayer, d + (double)entityplayer.field_22063_x, d1 + (double)entityplayer.field_22062_y, d2 + (double)entityplayer.field_22061_z);
+        } else
+        {
+            super.renderLivingAt(entityplayer, d, d1, d2);
+        }
+    }
 
-		if(this.func_140_a((TextureLocation)null)) {
-			GL11.glPushMatrix();
-			GL11.glTranslatef(0.0F, 0.0F, 2.0F / 16.0F);
-			double var20 = var1.field_20066_r + (var1.field_20063_u - var1.field_20066_r) * (double)var2 - (var1.prevPosX + (var1.posX - var1.prevPosX) * (double)var2);
-			double var22 = var1.field_20065_s + (var1.field_20062_v - var1.field_20065_s) * (double)var2 - (var1.prevPosY + (var1.posY - var1.prevPosY) * (double)var2);
-			double var8 = var1.field_20064_t + (var1.field_20061_w - var1.field_20064_t) * (double)var2 - (var1.prevPosZ + (var1.posZ - var1.prevPosZ) * (double)var2);
-			float var10 = var1.prevRenderYawOffset + (var1.renderYawOffset - var1.prevRenderYawOffset) * var2;
-			double var11 = (double)MathHelper.sin(var10 * (float)Math.PI / 180.0F);
-			double var13 = (double)(-MathHelper.cos(var10 * (float)Math.PI / 180.0F));
-			float var15 = (float)var22 * 10.0F;
-			if(var15 < -6.0F) {
-				var15 = -6.0F;
-			}
+    protected void rotatePlayer(EntityPlayer entityplayer, float f, float f1, float f2)
+    {
+        if(entityplayer.isEntityAlive() && entityplayer.isPlayerSleeping())
+        {
+            GL11.glRotatef(entityplayer.getBedOrientationInDegrees(), 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(getDeathMaxRotation(entityplayer), 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(270F, 0.0F, 1.0F, 0.0F);
+        } else
+        {
+            super.rotateCorpse(entityplayer, f, f1, f2);
+        }
+    }
 
-			if(var15 > 32.0F) {
-				var15 = 32.0F;
-			}
+    protected void passSpecialRender(EntityLiving entityliving, double d, double d1, double d2)
+    {
+        renderName((EntityPlayer)entityliving, d, d1, d2);
+    }
 
-			float var16 = (float)(var20 * var11 + var8 * var13) * 100.0F;
-			float var17 = (float)(var20 * var13 - var8 * var11) * 100.0F;
-			if(var16 < 0.0F) {
-				var16 = 0.0F;
-			}
+    protected void preRenderCallback(EntityLiving entityliving, float f)
+    {
+        renderPlayerScale((EntityPlayer)entityliving, f);
+    }
 
-			float var18 = var1.field_775_e + (var1.field_774_f - var1.field_775_e) * var2;
-			var15 += MathHelper.sin((var1.prevDistanceWalkedModified + (var1.distanceWalkedModified - var1.prevDistanceWalkedModified) * var2) * 6.0F) * 32.0F * var18;
-			GL11.glRotatef(6.0F + var16 / 2.0F + var15, 1.0F, 0.0F, 0.0F);
-			GL11.glRotatef(var17 / 2.0F, 0.0F, 0.0F, 1.0F);
-			GL11.glRotatef(-var17 / 2.0F, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-			this.field_209_f.func_20096_b(1.0F / 16.0F);
-			GL11.glPopMatrix();
-		}
+    protected int shouldRenderPass(EntityLiving entityliving, int i, float f)
+    {
+        return setArmorModel((EntityPlayer)entityliving, i, f);
+    }
 
-		ItemStack var21 = var1.inventory.getCurrentItem();
-		if(var21 != null) {
-			GL11.glPushMatrix();
-			this.field_209_f.bipedRightArm.func_926_b(1.0F / 16.0F);
-			GL11.glTranslatef(-(1.0F / 16.0F), 7.0F / 16.0F, 1.0F / 16.0F);
-			if(var1.fishEntity != null) {
-				var21 = new ItemStack(Item.stick.shiftedIndex);
-			}
+    protected void renderEquippedItems(EntityLiving entityliving, float f)
+    {
+        renderSpecials((EntityPlayer)entityliving, f);
+    }
 
-			if(var21.itemID < 256 && RenderBlocks.func_1219_a(Block.blocksList[var21.itemID].getRenderType())) {
-				var5 = 0.5F;
-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, -(5.0F / 16.0F));
-				var5 *= 12.0F / 16.0F;
-				GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-				GL11.glScalef(var5, -var5, var5);
-			} else if(Item.itemsList[var21.itemID].isFull3D()) {
-				var5 = 10.0F / 16.0F;
-				if(Item.itemsList[var21.itemID].shouldRotateAroundWhenRendering()) {
-					GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glTranslatef(0.0F, -(2.0F / 16.0F), 0.0F);
-				}
+    protected void rotateCorpse(EntityLiving entityliving, float f, float f1, float f2)
+    {
+        rotatePlayer((EntityPlayer)entityliving, f, f1, f2);
+    }
 
-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, 0.0F);
-				GL11.glScalef(var5, -var5, var5);
-				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
-			} else {
-				var5 = 6.0F / 16.0F;
-				GL11.glTranslatef(0.25F, 3.0F / 16.0F, -(3.0F / 16.0F));
-				GL11.glScalef(var5, var5, var5);
-				GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
-				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
-				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
-			}
+    protected void renderLivingAt(EntityLiving entityliving, double d, double d1, double d2)
+    {
+        renderPlayerSleep((EntityPlayer)entityliving, d, d1, d2);
+    }
 
-			this.renderManager.field_4236_f.renderItem(var21);
-			GL11.glPopMatrix();
-		}
+    public void doRenderLiving(EntityLiving entityliving, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        renderPlayer((EntityPlayer)entityliving, d, d1, d2, f, f1);
+    }
 
-	}
+    public void doRender(Entity entity, double d, double d1, double d2, 
+            float f, float f1)
+    {
+        renderPlayer((EntityPlayer)entity, d, d1, d2, f, f1);
+    }
 
-	protected void b(EntityPlayer var1, float var2) {
-		float var3 = 15.0F / 16.0F;
-		GL11.glScalef(var3, var3, var3);
-	}
-
-	public void drawFirstPersonHand() {
-		this.field_209_f.field_1244_k = 0.0F;
-		this.field_209_f.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F / 16.0F);
-		this.field_209_f.bipedRightArm.render(1.0F / 16.0F);
-	}
-
-	protected void preRenderCallback(EntityLiving var1, float var2) {
-		this.b((EntityPlayer)var1, var2);
-	}
-
-	protected boolean shouldRenderPass(EntityLiving var1, int var2) {
-		return this.a((EntityPlayer)var1, var2);
-	}
-
-	protected void renderEquippedItems(EntityLiving var1, float var2) {
-		this.a((EntityPlayer)var1, var2);
-	}
-
-	public void a(EntityLiving var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityPlayer)var1, var2, var4, var6, var8, var9);
-	}
-
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
-		this.a((EntityPlayer)var1, var2, var4, var6, var8, var9);
-	}
 }

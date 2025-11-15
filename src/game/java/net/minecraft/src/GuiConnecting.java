@@ -1,117 +1,91 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.EagRuntime;
-import net.lax1dude.eaglercraft.internal.EnumEaglerConnectionState;
-import net.lax1dude.eaglercraft.internal.IWebSocketClient;
-import net.lax1dude.eaglercraft.internal.PlatformNetworking;
+import java.io.PrintStream;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 
-public class GuiConnecting extends GuiScreen {
-	private boolean connected = false;
-	private NetClientHandler clientHandler;
-	private int timer = 0;
-	private String currentAddress;
-	private boolean cancelled = false;
-	private boolean successful = false;
-	private IWebSocketClient webSocket;
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, ThreadConnectToServer, NetClientHandler, StringTranslate, 
+//            GuiButton, GuiMainMenu
 
-	public GuiConnecting(Minecraft var1, String addr) {
-		this.currentAddress = addr;
-		var1.func_6261_a((World)null);
+public class GuiConnecting extends GuiScreen
+{
 
-		if (currentAddress.contains("ws://") && EagRuntime.requireSSL()) {
-			currentAddress = currentAddress.replace("ws://", "wss://");
-		} else if (!currentAddress.contains("://")) {
-			currentAddress = EagRuntime.requireSSL() ? "wss://" + currentAddress : "ws://" + currentAddress;
-		}
-		this.clientHandler = new NetClientHandler(var1);
-	}
+    private NetClientHandler clientHandler;
+    private boolean cancelled;
 
-	public void updateScreen() {
-		++timer;
-		if(timer > 1) {
-			if(this.webSocket == null) {
-				this.webSocket = PlatformNetworking.openWebSocket(this.currentAddress);
-				if(this.webSocket == null) {
-					this.mc.displayGuiScreen(new GuiConnectFailed("connect.failed", "disconnect.genericReason", new Object[] {"Could not open websocket to\"" + this.currentAddress + "\"!"}));
-				}
-			} else {
-				if(this.webSocket.getState() == EnumEaglerConnectionState.CONNECTED) {
-					if(!this.successful) {
-						this.clientHandler.netManager.setWebsocketClient(this.webSocket);
-						this.clientHandler.addToSendQueue(new Packet2Handshake(this.mc.session.playerName));
-						this.successful = true;
-						this.connected = true;
-					} else {
-						this.clientHandler.processReadPackets();
-					}
-				} else if(this.webSocket.getState() == EnumEaglerConnectionState.FAILED) {
-					if(this.webSocket != null) {
-						this.webSocket.close();
-						this.webSocket = null;
-					}
-					if (this.currentAddress.contains("ws://") && !EagRuntime.requireSSL()) {
-						currentAddress = currentAddress.replace("ws://", "wss://");
-						timer = 0;
-					} else {
-						this.mc.displayGuiScreen(new GuiConnectFailed("connect.failed", "disconnect.genericReason", new Object[]{"Connection Refused!"}));
-					}
-				}
-			}
-			if(timer > 200 && !this.connected) {
-				if(this.webSocket != null) {
-					this.webSocket.close();
-					this.webSocket = null;
-				}
-				this.mc.displayGuiScreen(new GuiConnectFailed("connect.failed", "disconnect.genericReason", new Object[] {"Connection timed out"}));
-			}
-		}
-	}
+    public GuiConnecting(Minecraft minecraft, String s, int i)
+    {
+        cancelled = false;
+        System.out.println((new StringBuilder()).append("Connecting to ").append(s).append(", ").append(i).toString());
+        minecraft.changeWorld1(null);
+        (new ThreadConnectToServer(this, minecraft, s, i)).start();
+    }
 
-	protected void keyTyped(char var1, int var2) {
-	}
+    public void updateScreen()
+    {
+        if(clientHandler != null)
+        {
+            clientHandler.processReadPackets();
+        }
+    }
 
-	public void initGui() {
-		StringTranslate var1 = StringTranslate.func_20162_a();
-		this.controlList.clear();
-		this.controlList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120 + 12, var1.func_20163_a("gui.cancel")));
-	}
+    protected void keyTyped(char c, int i)
+    {
+    }
 
-	protected void actionPerformed(GuiButton var1) {
-		if(var1.id == 0) {
-			this.cancelled = true;
-			if(this.clientHandler != null) {
-				this.clientHandler.disconnect();
-			}
+    public void initGui()
+    {
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        controlList.clear();
+        controlList.add(new GuiButton(0, width / 2 - 100, height / 4 + 120 + 12, stringtranslate.translateKey("gui.cancel")));
+    }
 
-			this.mc.displayGuiScreen(new GuiMainMenu());
-		}
+    protected void actionPerformed(GuiButton guibutton)
+    {
+        if(guibutton.id == 0)
+        {
+            cancelled = true;
+            if(clientHandler != null)
+            {
+                clientHandler.disconnect();
+            }
+            mc.displayGuiScreen(new GuiMainMenu());
+        }
+    }
 
-	}
+    public void drawScreen(int i, int j, float f)
+    {
+        drawDefaultBackground();
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        if(clientHandler == null)
+        {
+            drawCenteredString(fontRenderer, stringtranslate.translateKey("connect.connecting"), width / 2, height / 2 - 50, 0xffffff);
+            drawCenteredString(fontRenderer, "", width / 2, height / 2 - 10, 0xffffff);
+        } else
+        {
+            drawCenteredString(fontRenderer, stringtranslate.translateKey("connect.authorizing"), width / 2, height / 2 - 50, 0xffffff);
+            drawCenteredString(fontRenderer, clientHandler.field_1209_a, width / 2, height / 2 - 10, 0xffffff);
+        }
+        super.drawScreen(i, j, f);
+    }
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawDefaultBackground();
-		StringTranslate var4 = StringTranslate.func_20162_a();
-		if(this.clientHandler == null) {
-			this.drawCenteredString(this.fontRenderer, var4.func_20163_a("connect.connecting"), this.width / 2, this.height / 2 - 50, 16777215);
-			this.drawCenteredString(this.fontRenderer, "", this.width / 2, this.height / 2 - 10, 16777215);
-		} else {
-			this.drawCenteredString(this.fontRenderer, var4.func_20163_a("connect.authorizing"), this.width / 2, this.height / 2 - 50, 16777215);
-			this.drawCenteredString(this.fontRenderer, this.clientHandler.field_1209_a, this.width / 2, this.height / 2 - 10, 16777215);
-		}
+    static NetClientHandler setNetClientHandler(GuiConnecting guiconnecting, NetClientHandler netclienthandler)
+    {
+        return guiconnecting.clientHandler = netclienthandler;
+    }
 
-		super.drawScreen(var1, var2, var3);
-	}
+    static boolean isCancelled(GuiConnecting guiconnecting)
+    {
+        return guiconnecting.cancelled;
+    }
 
-	static NetClientHandler setNetClientHandler(GuiConnecting var0, NetClientHandler var1) {
-		return var0.clientHandler = var1;
-	}
-
-	static boolean isCancelled(GuiConnecting var0) {
-		return var0.cancelled;
-	}
-
-	static NetClientHandler getNetClientHandler(GuiConnecting var0) {
-		return var0.clientHandler;
-	}
+    static NetClientHandler getNetClientHandler(GuiConnecting guiconnecting)
+    {
+        return guiconnecting.clientHandler;
+    }
 }

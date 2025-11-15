@@ -1,66 +1,86 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class EntityFlying extends EntityLiving {
-	public EntityFlying(World var1) {
-		super(var1);
-	}
 
-	protected void fall(float var1) {
-	}
+// Referenced classes of package net.minecraft.src:
+//            EntityLiving, MathHelper, AxisAlignedBB, World, 
+//            Block
 
-	public void moveEntityWithHeading(float var1, float var2) {
-		if(this.handleWaterMovement()) {
-			this.func_351_a(var1, var2, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)0.8F;
-			this.motionY *= (double)0.8F;
-			this.motionZ *= (double)0.8F;
-		} else if(this.handleLavaMovement()) {
-			this.func_351_a(var1, var2, 0.02F);
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= 0.5D;
-			this.motionY *= 0.5D;
-			this.motionZ *= 0.5D;
-		} else {
-			float var3 = 0.91F;
-			if(this.onGround) {
-				var3 = 546.0F * 0.1F * 0.1F * 0.1F;
-				int var4 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.boundingBox.minY) - 1, MathHelper.floor_double(this.posZ));
-				if(var4 > 0) {
-					var3 = Block.blocksList[var4].slipperiness * 0.91F;
-				}
-			}
+public abstract class EntityFlying extends EntityLiving
+{
 
-			float var8 = 0.16277136F / (var3 * var3 * var3);
-			this.func_351_a(var1, var2, this.onGround ? 0.1F * var8 : 0.02F);
-			var3 = 0.91F;
-			if(this.onGround) {
-				var3 = 546.0F * 0.1F * 0.1F * 0.1F;
-				int var5 = this.worldObj.getBlockId(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.boundingBox.minY) - 1, MathHelper.floor_double(this.posZ));
-				if(var5 > 0) {
-					var3 = Block.blocksList[var5].slipperiness * 0.91F;
-				}
-			}
+    public EntityFlying(World world)
+    {
+        super(world);
+    }
 
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
-			this.motionX *= (double)var3;
-			this.motionY *= (double)var3;
-			this.motionZ *= (double)var3;
-		}
+    protected void fall(float f)
+    {
+    }
 
-		this.field_705_Q = this.field_704_R;
-		double var10 = this.posX - this.prevPosX;
-		double var9 = this.posZ - this.prevPosZ;
-		float var7 = MathHelper.sqrt_double(var10 * var10 + var9 * var9) * 4.0F;
-		if(var7 > 1.0F) {
-			var7 = 1.0F;
-		}
+    public void moveEntityWithHeading(float f, float f1)
+    {
+        if(isInWater())
+        {
+            moveFlying(f, f1, 0.02F);
+            moveEntity(motionX, motionY, motionZ);
+            motionX *= 0.80000001192092896D;
+            motionY *= 0.80000001192092896D;
+            motionZ *= 0.80000001192092896D;
+        } else
+        if(handleLavaMovement())
+        {
+            moveFlying(f, f1, 0.02F);
+            moveEntity(motionX, motionY, motionZ);
+            motionX *= 0.5D;
+            motionY *= 0.5D;
+            motionZ *= 0.5D;
+        } else
+        {
+            float f2 = 0.91F;
+            if(onGround)
+            {
+                f2 = 0.5460001F;
+                int i = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
+                if(i > 0)
+                {
+                    f2 = Block.blocksList[i].slipperiness * 0.91F;
+                }
+            }
+            float f3 = 0.1627714F / (f2 * f2 * f2);
+            moveFlying(f, f1, onGround ? 0.1F * f3 : 0.02F);
+            f2 = 0.91F;
+            if(onGround)
+            {
+                f2 = 0.5460001F;
+                int j = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
+                if(j > 0)
+                {
+                    f2 = Block.blocksList[j].slipperiness * 0.91F;
+                }
+            }
+            moveEntity(motionX, motionY, motionZ);
+            motionX *= f2;
+            motionY *= f2;
+            motionZ *= f2;
+        }
+        field_705_Q = field_704_R;
+        double d = posX - prevPosX;
+        double d1 = posZ - prevPosZ;
+        float f4 = MathHelper.sqrt_double(d * d + d1 * d1) * 4F;
+        if(f4 > 1.0F)
+        {
+            f4 = 1.0F;
+        }
+        field_704_R += (f4 - field_704_R) * 0.4F;
+        field_703_S += field_704_R;
+    }
 
-		this.field_704_R += (var7 - this.field_704_R) * 0.4F;
-		this.field_703_S += this.field_704_R;
-	}
-
-	public boolean isOnLadder() {
-		return false;
-	}
+    public boolean isOnLadder()
+    {
+        return false;
+    }
 }

@@ -1,121 +1,228 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.Random;
+import java.util.*;
 
-public class WorldChunkManager {
-	private NoiseGeneratorOctaves2 field_4194_e;
-	private NoiseGeneratorOctaves2 field_4193_f;
-	private NoiseGeneratorOctaves2 field_4192_g;
-	public double[] temperature;
-	public double[] humidity;
-	public double[] field_4196_c;
-	public MobSpawnerBase[] field_4195_d;
+// Referenced classes of package net.minecraft.src:
+//            BiomeCache, BiomeGenBase, World, GenLayer, 
+//            ChunkCoordIntPair, IntCache, ChunkPosition
 
-	protected WorldChunkManager() {
-	}
+public class WorldChunkManager
+{
 
-	public WorldChunkManager(World var1) {
-		this.field_4194_e = new NoiseGeneratorOctaves2(new Random(var1.randomSeed * 9871L), 4);
-		this.field_4193_f = new NoiseGeneratorOctaves2(new Random(var1.randomSeed * 39811L), 4);
-		this.field_4192_g = new NoiseGeneratorOctaves2(new Random(var1.randomSeed * 543321L), 2);
-	}
+    private GenLayer field_34903_b;
+    private GenLayer field_34902_c;
+    private GenLayer temperatureLayer;
+    private GenLayer rainfallLayer;
+    private BiomeCache biomeCache;
+    private List biomesToSpawnIn;
+    public BiomeGenBase field_4195_d[];
+    public float field_40541_b[];
 
-	public MobSpawnerBase func_4074_a(ChunkCoordIntPair var1) {
-		return this.func_4073_a(var1.chunkXPos, var1.chunkZPos);
-	}
-	
-	public MobSpawnerBase func_4074_a(int chunkXPos, int chunkZPos) {
-		return this.func_4073_a(chunkXPos, chunkZPos);
-	}
+    protected WorldChunkManager()
+    {
+        biomeCache = new BiomeCache(this);
+        biomesToSpawnIn = new ArrayList();
+        biomesToSpawnIn.add(BiomeGenBase.forest);
+        biomesToSpawnIn.add(BiomeGenBase.swampland);
+        biomesToSpawnIn.add(BiomeGenBase.taiga);
+    }
 
-	public MobSpawnerBase func_4073_a(int var1, int var2) {
-		return this.func_4069_a(var1, var2, 1, 1)[0];
-	}
+    public WorldChunkManager(World world)
+    {
+        this();
+        GenLayer agenlayer[] = GenLayer.func_35497_a(world.getWorldSeed());
+        field_34903_b = agenlayer[0];
+        field_34902_c = agenlayer[1];
+        temperatureLayer = agenlayer[2];
+        rainfallLayer = agenlayer[3];
+    }
 
-	public double func_4072_b(int var1, int var2) {
-		this.temperature = this.field_4194_e.func_4112_a(this.temperature, (double)var1, (double)var2, 1, 1, (double)0.025F, (double)0.025F, 0.5D);
-		return this.temperature[0];
-	}
+    public List getBiomesToSpawnIn()
+    {
+        return biomesToSpawnIn;
+    }
 
-	public MobSpawnerBase[] func_4069_a(int var1, int var2, int var3, int var4) {
-		this.field_4195_d = this.loadBlockGeneratorData(this.field_4195_d, var1, var2, var3, var4);
-		return this.field_4195_d;
-	}
+    public BiomeGenBase getBiomeGenAtChunkCoord(ChunkCoordIntPair chunkcoordintpair)
+    {
+        return getBiomeGenAt(chunkcoordintpair.chunkXPos << 4, chunkcoordintpair.chunkZPos << 4);
+    }
 
-	public double[] getTemperatures(double[] var1, int var2, int var3, int var4, int var5) {
-		if(var1 == null || var1.length < var4 * var5) {
-			var1 = new double[var4 * var5];
-		}
+    public BiomeGenBase getBiomeGenAt(int i, int j)
+    {
+        return biomeCache.func_35725_a(i, j);
+    }
 
-		var1 = this.field_4194_e.func_4112_a(var1, (double)var2, (double)var3, var4, var4, (double)0.025F, (double)0.025F, 0.25D);
-		this.field_4196_c = this.field_4192_g.func_4112_a(this.field_4196_c, (double)var2, (double)var3, var4, var4, 0.25D, 0.25D, 0.5882352941176471D);
-		int var6 = 0;
+    public float func_35558_c(int i, int j)
+    {
+        return biomeCache.func_35727_c(i, j);
+    }
 
-		for(int var7 = 0; var7 < var4; ++var7) {
-			for(int var8 = 0; var8 < var5; ++var8) {
-				double var9 = this.field_4196_c[var6] * 1.1D + 0.5D;
-				double var11 = 0.01D;
-				double var13 = 1.0D - var11;
-				double var15 = (var1[var6] * 0.15D + 0.7D) * var13 + var9 * var11;
-				var15 = 1.0D - (1.0D - var15) * (1.0D - var15);
-				if(var15 < 0.0D) {
-					var15 = 0.0D;
-				}
+    public float[] getRainfall(float af[], int i, int j, int k, int l)
+    {
+        IntCache.func_35268_a();
+        if(af == null || af.length < k * l)
+        {
+            af = new float[k * l];
+        }
+        int ai[] = rainfallLayer.func_35500_a(i, j, k, l);
+        for(int i1 = 0; i1 < k * l; i1++)
+        {
+            float f = (float)ai[i1] / 65536F;
+            if(f > 1.0F)
+            {
+                f = 1.0F;
+            }
+            af[i1] = f;
+        }
 
-				if(var15 > 1.0D) {
-					var15 = 1.0D;
-				}
+        return af;
+    }
 
-				var1[var6] = var15;
-				++var6;
-			}
-		}
+    public float func_35554_b(int i, int j, int k)
+    {
+        return func_40540_a(biomeCache.func_35722_b(i, k), j);
+    }
 
-		return var1;
-	}
+    public float func_40540_a(float f, int i)
+    {
+        return f;
+    }
 
-	public MobSpawnerBase[] loadBlockGeneratorData(MobSpawnerBase[] var1, int var2, int var3, int var4, int var5) {
-		if(var1 == null || var1.length < var4 * var5) {
-			var1 = new MobSpawnerBase[var4 * var5];
-		}
+    public float[] func_40539_b(int i, int j, int k, int l)
+    {
+        field_40541_b = getTemperatures(field_40541_b, i, j, k, l);
+        return field_40541_b;
+    }
 
-		this.temperature = this.field_4194_e.func_4112_a(this.temperature, (double)var2, (double)var3, var4, var4, (double)0.025F, (double)0.025F, 0.25D);
-		this.humidity = this.field_4193_f.func_4112_a(this.humidity, (double)var2, (double)var3, var4, var4, (double)0.05F, (double)0.05F, 1.0D / 3.0D);
-		this.field_4196_c = this.field_4192_g.func_4112_a(this.field_4196_c, (double)var2, (double)var3, var4, var4, 0.25D, 0.25D, 0.5882352941176471D);
-		int var6 = 0;
+    public float[] getTemperatures(float af[], int i, int j, int k, int l)
+    {
+        IntCache.func_35268_a();
+        if(af == null || af.length < k * l)
+        {
+            af = new float[k * l];
+        }
+        int ai[] = temperatureLayer.func_35500_a(i, j, k, l);
+        for(int i1 = 0; i1 < k * l; i1++)
+        {
+            float f = (float)ai[i1] / 65536F;
+            if(f > 1.0F)
+            {
+                f = 1.0F;
+            }
+            af[i1] = f;
+        }
 
-		for(int var7 = 0; var7 < var4; ++var7) {
-			for(int var8 = 0; var8 < var5; ++var8) {
-				double var9 = this.field_4196_c[var6] * 1.1D + 0.5D;
-				double var11 = 0.01D;
-				double var13 = 1.0D - var11;
-				double var15 = (this.temperature[var6] * 0.15D + 0.7D) * var13 + var9 * var11;
-				var11 = 0.002D;
-				var13 = 1.0D - var11;
-				double var17 = (this.humidity[var6] * 0.15D + 0.5D) * var13 + var9 * var11;
-				var15 = 1.0D - (1.0D - var15) * (1.0D - var15);
-				if(var15 < 0.0D) {
-					var15 = 0.0D;
-				}
+        return af;
+    }
 
-				if(var17 < 0.0D) {
-					var17 = 0.0D;
-				}
+    public BiomeGenBase[] func_35557_b(BiomeGenBase abiomegenbase[], int i, int j, int k, int l)
+    {
+        IntCache.func_35268_a();
+        if(abiomegenbase == null || abiomegenbase.length < k * l)
+        {
+            abiomegenbase = new BiomeGenBase[k * l];
+        }
+        int ai[] = field_34903_b.func_35500_a(i, j, k, l);
+        for(int i1 = 0; i1 < k * l; i1++)
+        {
+            abiomegenbase[i1] = BiomeGenBase.biomeList[ai[i1]];
+        }
 
-				if(var15 > 1.0D) {
-					var15 = 1.0D;
-				}
+        return abiomegenbase;
+    }
 
-				if(var17 > 1.0D) {
-					var17 = 1.0D;
-				}
+    public BiomeGenBase[] func_4069_a(int i, int j, int k, int l)
+    {
+        if(k == 16 && l == 16 && (i & 0xf) == 0 && (j & 0xf) == 0)
+        {
+            return biomeCache.func_35723_d(i, j);
+        } else
+        {
+            field_4195_d = loadBlockGeneratorData(field_4195_d, i, j, k, l);
+            return field_4195_d;
+        }
+    }
 
-				this.temperature[var6] = var15;
-				this.humidity[var6] = var17;
-				var1[var6++] = MobSpawnerBase.getBiomeFromLookup(var15, var17);
-			}
-		}
+    public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase abiomegenbase[], int i, int j, int k, int l)
+    {
+        return func_35555_a(abiomegenbase, i, j, k, l, true);
+    }
 
-		return var1;
-	}
+    public BiomeGenBase[] func_35555_a(BiomeGenBase abiomegenbase[], int i, int j, int k, int l, boolean flag)
+    {
+        IntCache.func_35268_a();
+        if(abiomegenbase == null || abiomegenbase.length < k * l)
+        {
+            abiomegenbase = new BiomeGenBase[k * l];
+        }
+        if(flag && k == 16 && l == 16 && (i & 0xf) == 0 && (j & 0xf) == 0)
+        {
+            BiomeGenBase abiomegenbase1[] = biomeCache.func_35723_d(i, j);
+            System.arraycopy(abiomegenbase1, 0, abiomegenbase, 0, k * l);
+            return abiomegenbase;
+        }
+        int ai[] = field_34902_c.func_35500_a(i, j, k, l);
+        for(int i1 = 0; i1 < k * l; i1++)
+        {
+            abiomegenbase[i1] = BiomeGenBase.biomeList[ai[i1]];
+        }
+
+        return abiomegenbase;
+    }
+
+    public boolean areBiomesViable(int i, int j, int k, List list)
+    {
+        int l = i - k >> 2;
+        int i1 = j - k >> 2;
+        int j1 = i + k >> 2;
+        int k1 = j + k >> 2;
+        int l1 = (j1 - l) + 1;
+        int i2 = (k1 - i1) + 1;
+        int ai[] = field_34903_b.func_35500_a(l, i1, l1, i2);
+        for(int j2 = 0; j2 < l1 * i2; j2++)
+        {
+            BiomeGenBase biomegenbase = BiomeGenBase.biomeList[ai[j2]];
+            if(!list.contains(biomegenbase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public ChunkPosition func_35556_a(int i, int j, int k, List list, Random random)
+    {
+        int l = i - k >> 2;
+        int i1 = j - k >> 2;
+        int j1 = i + k >> 2;
+        int k1 = j + k >> 2;
+        int l1 = (j1 - l) + 1;
+        int i2 = (k1 - i1) + 1;
+        int ai[] = field_34903_b.func_35500_a(l, i1, l1, i2);
+        ChunkPosition chunkposition = null;
+        int j2 = 0;
+        for(int k2 = 0; k2 < ai.length; k2++)
+        {
+            int l2 = l + k2 % l1 << 2;
+            int i3 = i1 + k2 / l1 << 2;
+            BiomeGenBase biomegenbase = BiomeGenBase.biomeList[ai[k2]];
+            if(list.contains(biomegenbase) && (chunkposition == null || random.nextInt(j2 + 1) == 0))
+            {
+                chunkposition = new ChunkPosition(l2, 0, i3);
+                j2++;
+            }
+        }
+
+        return chunkposition;
+    }
+
+    public void func_35561_b()
+    {
+        biomeCache.func_35724_a();
+    }
 }

@@ -1,62 +1,92 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.peyton.eagler.minecraft.Tessellator;
+import java.util.Random;
 
-public class EntityPortalFX extends EntityFX {
-	private float field_4083_a;
-	private double field_4086_p;
-	private double field_4085_q;
-	private double field_4084_r;
+// Referenced classes of package net.minecraft.src:
+//            EntityFX, World, Tessellator
 
-	public EntityPortalFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
-		super(var1, var2, var4, var6, var8, var10, var12);
-		this.motionX = var8;
-		this.motionY = var10;
-		this.motionZ = var12;
-		this.field_4086_p = this.posX = var2;
-		this.field_4085_q = this.posY = var4;
-		this.field_4084_r = this.posZ = var6;
-		float var14 = this.rand.nextFloat() * 0.6F + 0.4F;
-		this.field_4083_a = this.field_665_g = this.rand.nextFloat() * 0.2F + 0.5F;
-		this.particleRed = this.particleBlue = this.particleGreen = 1.0F * var14;
-		this.particleBlue *= 0.3F;
-		this.particleRed *= 0.9F;
-		this.field_666_f = (int)(Math.random() * 10.0D) + 40;
-		this.noClip = true;
-		this.field_670_b = (int)(Math.random() * 8.0D);
-	}
+public class EntityPortalFX extends EntityFX
+{
 
-	public void func_406_a(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-		float var8 = ((float)this.e + var2) / (float)this.field_666_f;
-		var8 = 1.0F - var8;
-		var8 *= var8;
-		var8 = 1.0F - var8;
-		this.field_665_g = this.field_4083_a * var8;
-		super.func_406_a(var1, var2, var3, var4, var5, var6, var7);
-	}
+    private float portalParticleScale;
+    private double portalPosX;
+    private double portalPosY;
+    private double portalPosZ;
 
-	public float getEntityBrightness(float var1) {
-		float var2 = super.getEntityBrightness(var1);
-		float var3 = (float)this.e / (float)this.field_666_f;
-		var3 *= var3;
-		var3 *= var3;
-		return var2 * (1.0F - var3) + var3;
-	}
+    public EntityPortalFX(World world, double d, double d1, double d2, 
+            double d3, double d4, double d5)
+    {
+        super(world, d, d1, d2, d3, d4, d5);
+        motionX = d3;
+        motionY = d4;
+        motionZ = d5;
+        portalPosX = posX = d;
+        portalPosY = posY = d1;
+        portalPosZ = posZ = d2;
+        float f = rand.nextFloat() * 0.6F + 0.4F;
+        portalParticleScale = particleScale = rand.nextFloat() * 0.2F + 0.5F;
+        particleRed = particleGreen = particleBlue = 1.0F * f;
+        particleGreen *= 0.3F;
+        particleRed *= 0.9F;
+        particleMaxAge = (int)(Math.random() * 10D) + 40;
+        noClip = true;
+        func_40099_c((int)(Math.random() * 8D));
+    }
 
-	public void onUpdate() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		float var1 = (float)this.e / (float)this.field_666_f;
-		float var2 = var1;
-		var1 = -var1 + var1 * var1 * 2.0F;
-		var1 = 1.0F - var1;
-		this.posX = this.field_4086_p + this.motionX * (double)var1;
-		this.posY = this.field_4085_q + this.motionY * (double)var1 + (double)(1.0F - var2);
-		this.posZ = this.field_4084_r + this.motionZ * (double)var1;
-		if(this.e++ >= this.field_666_f) {
-			this.setEntityDead();
-		}
+    public void renderParticle(Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5)
+    {
+        float f6 = ((float)particleAge + f) / (float)particleMaxAge;
+        f6 = 1.0F - f6;
+        f6 *= f6;
+        f6 = 1.0F - f6;
+        particleScale = portalParticleScale * f6;
+        super.renderParticle(tessellator, f, f1, f2, f3, f4, f5);
+    }
 
-	}
+    public int getEntityBrightnessForRender(float f)
+    {
+        int i = super.getEntityBrightnessForRender(f);
+        float f1 = (float)particleAge / (float)particleMaxAge;
+        f1 *= f1;
+        f1 *= f1;
+        int j = i & 0xff;
+        int k = i >> 16 & 0xff;
+        k += (int)(f1 * 15F * 16F);
+        if(k > 240)
+        {
+            k = 240;
+        }
+        return j | k << 16;
+    }
+
+    public float getEntityBrightness(float f)
+    {
+        float f1 = super.getEntityBrightness(f);
+        float f2 = (float)particleAge / (float)particleMaxAge;
+        f2 *= f2;
+        f2 *= f2;
+        return f1 * (1.0F - f2) + f2;
+    }
+
+    public void onUpdate()
+    {
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        float f = (float)particleAge / (float)particleMaxAge;
+        float f1 = f;
+        f = -f + f * f * 2.0F;
+        f = 1.0F - f;
+        posX = portalPosX + motionX * (double)f;
+        posY = portalPosY + motionY * (double)f + (double)(1.0F - f1);
+        posZ = portalPosZ + motionZ * (double)f;
+        if(particleAge++ >= particleMaxAge)
+        {
+            setEntityDead();
+        }
+    }
 }

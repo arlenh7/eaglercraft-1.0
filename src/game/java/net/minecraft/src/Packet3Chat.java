@@ -1,32 +1,51 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Packet3Chat extends Packet {
-	public String message;
+// Referenced classes of package net.minecraft.src:
+//            Packet, NetHandler
 
-	public Packet3Chat() {
-	}
+public class Packet3Chat extends Packet
+{
 
-	public Packet3Chat(String var1) {
-		this.message = var1;
-	}
+    public String message;
 
-	public void readPacketData(DataInputStream var1) throws IOException {
-		this.message = var1.readUTF();
-	}
+    public Packet3Chat()
+    {
+    }
 
-	public void writePacketData(DataOutputStream var1) throws IOException {
-		var1.writeUTF(this.message);
-	}
+    public Packet3Chat(String s)
+    {
+        if(s.length() > 119)
+        {
+            s = s.substring(0, 119);
+        }
+        message = s;
+    }
 
-	public void processPacket(NetHandler var1) {
-		var1.handleChat(this);
-	}
+    public void readPacketData(DataInputStream datainputstream)
+        throws IOException
+    {
+        message = readString(datainputstream, 119);
+    }
 
-	public int getPacketSize() {
-		return this.message.length();
-	}
+    public void writePacketData(DataOutputStream dataoutputstream)
+        throws IOException
+    {
+        writeString(message, dataoutputstream);
+    }
+
+    public void processPacket(NetHandler nethandler)
+    {
+        nethandler.handleChat(this);
+    }
+
+    public int getPacketSize()
+    {
+        return message.length();
+    }
 }

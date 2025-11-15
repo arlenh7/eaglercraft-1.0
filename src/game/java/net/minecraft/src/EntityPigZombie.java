@@ -1,96 +1,149 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.List;
+import java.util.Random;
 
-import net.peyton.eagler.minecraft.TextureLocation;
+// Referenced classes of package net.minecraft.src:
+//            EntityZombie, World, NBTTagCompound, DamageSource, 
+//            EntityPlayer, AxisAlignedBB, Entity, Item, 
+//            ItemStack
 
-public class EntityPigZombie extends EntityZombie {
-	private int angerLevel = 0;
-	private int randomSoundDelay = 0;
-	private static final ItemStack defaultHeldItem = new ItemStack(Item.swordGold, 1);
-	
-	private static final TextureLocation pigZombie = new TextureLocation("/mob/pigzombie.png");
+public class EntityPigZombie extends EntityZombie
+{
 
-	public EntityPigZombie(World var1) {
-		super(var1);
-		this.texture = pigZombie;
-		this.moveSpeed = 0.5F;
-		this.attackStrength = 5;
-		this.isImmuneToFire = true;
-	}
+    private int angerLevel;
+    private int randomSoundDelay;
+    private static final ItemStack defaultHeldItem;
 
-	public void onUpdate() {
-		this.moveSpeed = this.playerToAttack != null ? 0.95F : 0.5F;
-		if(this.randomSoundDelay > 0 && --this.randomSoundDelay == 0) {
-			this.worldObj.playSoundAtEntity(this, "mob.zombiepig.zpigangry", this.getSoundVolume() * 2.0F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 1.8F);
-		}
+    public EntityPigZombie(World world)
+    {
+        super(world);
+        angerLevel = 0;
+        randomSoundDelay = 0;
+        texture = "/mob/pigzombie.png";
+        moveSpeed = 0.5F;
+        attackStrength = 5;
+        isImmuneToFire = true;
+    }
 
-		super.onUpdate();
-	}
+    public void onUpdate()
+    {
+        moveSpeed = entityToAttack == null ? 0.5F : 0.95F;
+        if(randomSoundDelay > 0 && --randomSoundDelay == 0)
+        {
+            worldObj.playSoundAtEntity(this, "mob.zombiepig.zpigangry", getSoundVolume() * 2.0F, ((rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F) * 1.8F);
+        }
+        super.onUpdate();
+    }
 
-	public boolean getCanSpawnHere() {
-		return this.worldObj.difficultySetting > 0 && this.worldObj.checkIfAABBIsClear(this.boundingBox) && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() == 0 && !this.worldObj.getIsAnyLiquid(this.boundingBox);
-	}
+    public boolean getCanSpawnHere()
+    {
+        return worldObj.difficultySetting > 0 && worldObj.checkIfAABBIsClear(boundingBox) && worldObj.getCollidingBoundingBoxes(this, boundingBox).size() == 0 && !worldObj.getIsAnyLiquid(boundingBox);
+    }
 
-	public void writeEntityToNBT(NBTTagCompound var1) {
-		super.writeEntityToNBT(var1);
-		var1.setShort("Anger", (short)this.angerLevel);
-	}
+    public void writeEntityToNBT(NBTTagCompound nbttagcompound)
+    {
+        super.writeEntityToNBT(nbttagcompound);
+        nbttagcompound.setShort("Anger", (short)angerLevel);
+    }
 
-	public void readEntityFromNBT(NBTTagCompound var1) {
-		super.readEntityFromNBT(var1);
-		this.angerLevel = var1.getShort("Anger");
-	}
+    public void readEntityFromNBT(NBTTagCompound nbttagcompound)
+    {
+        super.readEntityFromNBT(nbttagcompound);
+        angerLevel = nbttagcompound.getShort("Anger");
+    }
 
-	protected Entity findPlayerToAttack() {
-		return this.angerLevel == 0 ? null : super.findPlayerToAttack();
-	}
+    protected Entity findPlayerToAttack()
+    {
+        if(angerLevel == 0)
+        {
+            return null;
+        } else
+        {
+            return super.findPlayerToAttack();
+        }
+    }
 
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
-	}
+    public void onLivingUpdate()
+    {
+        super.onLivingUpdate();
+    }
 
-	public boolean attackEntityFrom(Entity var1, int var2) {
-		if(var1 instanceof EntityPlayer) {
-			List<Entity> var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(32.0D, 32.0D, 32.0D));
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
+    {
+        Entity entity = damagesource.getEntity();
+        if(entity instanceof EntityPlayer)
+        {
+            List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.expand(32D, 32D, 32D));
+            for(int j = 0; j < list.size(); j++)
+            {
+                Entity entity1 = (Entity)list.get(j);
+                if(entity1 instanceof EntityPigZombie)
+                {
+                    EntityPigZombie entitypigzombie = (EntityPigZombie)entity1;
+                    entitypigzombie.becomeAngryAt(entity);
+                }
+            }
 
-			for(int var4 = 0; var4 < var3.size(); ++var4) {
-				Entity var5 = (Entity)var3.get(var4);
-				if(var5 instanceof EntityPigZombie) {
-					EntityPigZombie var6 = (EntityPigZombie)var5;
-					var6.becomeAngryAt(var1);
-				}
-			}
+            becomeAngryAt(entity);
+        }
+        return super.attackEntityFrom(damagesource, i);
+    }
 
-			this.becomeAngryAt(var1);
-		}
+    private void becomeAngryAt(Entity entity)
+    {
+        entityToAttack = entity;
+        angerLevel = 400 + rand.nextInt(400);
+        randomSoundDelay = rand.nextInt(40);
+    }
 
-		return super.attackEntityFrom(var1, var2);
-	}
+    protected String getLivingSound()
+    {
+        return "mob.zombiepig.zpig";
+    }
 
-	private void becomeAngryAt(Entity var1) {
-		this.playerToAttack = var1;
-		this.angerLevel = 400 + this.rand.nextInt(400);
-		this.randomSoundDelay = this.rand.nextInt(40);
-	}
+    protected String getHurtSound()
+    {
+        return "mob.zombiepig.zpighurt";
+    }
 
-	protected String getLivingSound() {
-		return "mob.zombiepig.zpig";
-	}
+    protected String getDeathSound()
+    {
+        return "mob.zombiepig.zpigdeath";
+    }
 
-	protected String getHurtSound() {
-		return "mob.zombiepig.zpighurt";
-	}
+    protected void dropFewItems(boolean flag, int i)
+    {
+        int j = rand.nextInt(2 + i);
+        for(int k = 0; k < j; k++)
+        {
+            dropItem(Item.rottenFlesh.shiftedIndex, 1);
+        }
 
-	protected String getDeathSound() {
-		return "mob.zombiepig.zpigdeath";
-	}
+        j = rand.nextInt(2 + i);
+        for(int l = 0; l < j; l++)
+        {
+            dropItem(Item.goldNugget.shiftedIndex, 1);
+        }
 
-	protected int getDropItemId() {
-		return Item.porkCooked.shiftedIndex;
-	}
+    }
 
-	public ItemStack getHeldItem() {
-		return defaultHeldItem;
-	}
+    protected int getDropItemId()
+    {
+        return Item.rottenFlesh.shiftedIndex;
+    }
+
+    public ItemStack getHeldItem()
+    {
+        return defaultHeldItem;
+    }
+
+    static 
+    {
+        defaultHeldItem = new ItemStack(Item.swordGold, 1);
+    }
 }

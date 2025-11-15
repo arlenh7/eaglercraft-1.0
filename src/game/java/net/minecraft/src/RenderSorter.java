@@ -1,31 +1,54 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
 import java.util.Comparator;
 
-public class RenderSorter implements Comparator<WorldRenderer> {
-	public static RenderSorter instance = new RenderSorter();
-	
-	private EntityPlayer field_4274_a;
+// Referenced classes of package net.minecraft.src:
+//            WorldRenderer, EntityLiving
 
-	public RenderSorter() {
-	}
-	
-	public RenderSorter setPlayer(EntityPlayer var1) {
-		this.field_4274_a = var1;
-		return this;
-	}
+public class RenderSorter
+    implements Comparator
+{
 
-	public int compare(WorldRenderer var1, WorldRenderer var2) {
-		boolean var3 = var1.isInFrustrum;
-		boolean var4 = var2.isInFrustrum;
-		if (var3 && !var4) {
-			return 1;
-		} else if (var4 && !var3) {
-			return -1;
-		} else {
-			double var5 = (double) var1.distanceToEntity(this.field_4274_a);
-			double var7 = (double) var2.distanceToEntity(this.field_4274_a);
-			return var5 < var7 ? 1 : (var5 > var7 ? -1 : (var1.field_1735_w < var2.field_1735_w ? 1 : -1));
-		}
-	}
+    private EntityLiving baseEntity;
+
+    public RenderSorter(EntityLiving entityliving)
+    {
+        baseEntity = entityliving;
+    }
+
+    public int doCompare(WorldRenderer worldrenderer, WorldRenderer worldrenderer1)
+    {
+        boolean flag = worldrenderer.isInFrustum;
+        boolean flag1 = worldrenderer1.isInFrustum;
+        if(flag && !flag1)
+        {
+            return 1;
+        }
+        if(flag1 && !flag)
+        {
+            return -1;
+        }
+        double d = worldrenderer.distanceToEntitySquared(baseEntity);
+        double d1 = worldrenderer1.distanceToEntitySquared(baseEntity);
+        if(d < d1)
+        {
+            return 1;
+        }
+        if(d > d1)
+        {
+            return -1;
+        } else
+        {
+            return worldrenderer.chunkIndex >= worldrenderer1.chunkIndex ? -1 : 1;
+        }
+    }
+
+    public int compare(Object obj, Object obj1)
+    {
+        return doCompare((WorldRenderer)obj, (WorldRenderer)obj1);
+    }
 }

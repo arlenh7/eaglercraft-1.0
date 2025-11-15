@@ -1,20 +1,43 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class ItemArmor extends Item {
-	private static final int[] damageReduceAmmountArray = new int[]{3, 8, 6, 3};
-	private static final int[] maxDamageArray = new int[]{11, 16, 15, 13};
-	public final int armorLevel;
-	public final int armorType;
-	public final int damageReduceAmmount;
-	public final int renderIndex;
 
-	public ItemArmor(int var1, int var2, int var3, int var4) {
-		super(var1);
-		this.armorLevel = var2;
-		this.armorType = var4;
-		this.renderIndex = var3;
-		this.damageReduceAmmount = damageReduceAmmountArray[var4];
-		this.maxDamage = maxDamageArray[var4] * 3 << var2;
-		this.maxStackSize = 1;
-	}
+// Referenced classes of package net.minecraft.src:
+//            Item, EnumArmorMaterial
+
+public class ItemArmor extends Item
+{
+
+    private static final int maxDamageArray[] = {
+        11, 16, 15, 13
+    };
+    public final int armorType;
+    public final int damageReduceAmount;
+    public final int renderIndex;
+    private final EnumArmorMaterial material;
+
+    public ItemArmor(int i, EnumArmorMaterial enumarmormaterial, int j, int k)
+    {
+        super(i);
+        material = enumarmormaterial;
+        armorType = k;
+        renderIndex = j;
+        damageReduceAmount = enumarmormaterial.func_40574_b(k);
+        setMaxDamage(enumarmormaterial.func_40576_a(k));
+        maxStackSize = 1;
+    }
+
+    public int getItemEnchantability()
+    {
+        return material.getEnchantability();
+    }
+
+    static int[] func_40436_c()
+    {
+        return maxDamageArray;
+    }
+
 }

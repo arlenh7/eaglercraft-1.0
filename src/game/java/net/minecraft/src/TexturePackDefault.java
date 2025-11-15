@@ -1,46 +1,59 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.opengl.ImageData;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
-public class TexturePackDefault extends TexturePackBase {
-	private int texturePackName = -1;
-	private ImageData texturePackThumbnail;
-	private static Logger LOGGER = LogManager.getLogger();
+// Referenced classes of package net.minecraft.src:
+//            TexturePackBase, RenderEngine
 
-	public TexturePackDefault() {
-		this.texturePackFileName = "Default";
-		this.firstDescriptionLine = "The default look of Minecraft";
+public class TexturePackDefault extends TexturePackBase
+{
 
-		try {
-			this.texturePackThumbnail = ImageData.loadImageFile("/pack.png").swapRB();
-		} catch (Exception var2) {
-			LOGGER.error(var2);
-		}
+    private int texturePackName;
+    private BufferedImage texturePackThumbnail;
 
-	}
+    public TexturePackDefault()
+    {
+        texturePackName = -1;
+        texturePackFileName = "Default";
+        firstDescriptionLine = "The default look of Minecraft";
+        try
+        {
+            texturePackThumbnail = ImageIO.read((net.minecraft.src.TexturePackDefault.class).getResource("/pack.png"));
+        }
+        catch(IOException ioexception)
+        {
+            ioexception.printStackTrace();
+        }
+    }
 
-	public void func_6484_b(Minecraft var1) {
-		if(this.texturePackThumbnail != null) {
-			var1.renderEngine.deleteTexture(this.texturePackName);
-		}
+    public void func_6484_b(Minecraft minecraft)
+    {
+        if(texturePackThumbnail != null)
+        {
+            minecraft.renderEngine.deleteTexture(texturePackName);
+        }
+    }
 
-	}
-
-	public void func_6483_c(Minecraft var1) {
-		if(this.texturePackThumbnail != null && this.texturePackName < 0) {
-			this.texturePackName = var1.renderEngine.allocateAndSetupTexture(this.texturePackThumbnail);
-		}
-
-		if(this.texturePackThumbnail != null) {
-			var1.renderEngine.bindTexture(this.texturePackName);
-		} else {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, var1.renderEngine.getTexture("/gui/unknown_pack.png"));
-		}
-
-	}
+    public void bindThumbnailTexture(Minecraft minecraft)
+    {
+        if(texturePackThumbnail != null && texturePackName < 0)
+        {
+            texturePackName = minecraft.renderEngine.allocateAndSetupTexture(texturePackThumbnail);
+        }
+        if(texturePackThumbnail != null)
+        {
+            minecraft.renderEngine.bindTexture(texturePackName);
+        } else
+        {
+            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, minecraft.renderEngine.getTexture("/gui/unknown_pack.png"));
+        }
+    }
 }

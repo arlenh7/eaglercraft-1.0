@@ -1,39 +1,58 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+
 package net.minecraft.src;
 
-public class GuiDownloadTerrain extends GuiScreen {
-	private NetClientHandler netHandler;
-	private int updateCounter = 0;
+import java.util.List;
 
-	public GuiDownloadTerrain(NetClientHandler var1) {
-		this.netHandler = var1;
-	}
+// Referenced classes of package net.minecraft.src:
+//            GuiScreen, Packet0KeepAlive, NetClientHandler, StringTranslate, 
+//            GuiButton
 
-	protected void keyTyped(char var1, int var2) {
-	}
+public class GuiDownloadTerrain extends GuiScreen
+{
 
-	public void initGui() {
-		this.controlList.clear();
-	}
+    private NetClientHandler netHandler;
+    private int updateCounter;
 
-	public void updateScreen() {
-		++this.updateCounter;
-		if(this.updateCounter % 20 == 0) {
-			this.netHandler.addToSendQueue(new Packet0KeepAlive());
-		}
+    public GuiDownloadTerrain(NetClientHandler netclienthandler)
+    {
+        updateCounter = 0;
+        netHandler = netclienthandler;
+    }
 
-		if(this.netHandler != null) {
-			this.netHandler.processReadPackets();
-		}
+    protected void keyTyped(char c, int i)
+    {
+    }
 
-	}
+    public void initGui()
+    {
+        controlList.clear();
+    }
 
-	protected void actionPerformed(GuiButton var1) {
-	}
+    public void updateScreen()
+    {
+        updateCounter++;
+        if(updateCounter % 20 == 0)
+        {
+            netHandler.addToSendQueue(new Packet0KeepAlive());
+        }
+        if(netHandler != null)
+        {
+            netHandler.processReadPackets();
+        }
+    }
 
-	public void drawScreen(int var1, int var2, float var3) {
-		this.drawBackground(0);
-		StringTranslate var4 = StringTranslate.func_20162_a();
-		this.drawCenteredString(this.fontRenderer, var4.func_20163_a("multiplayer.downloadingTerrain"), this.width / 2, this.height / 2 - 50, 16777215);
-		super.drawScreen(var1, var2, var3);
-	}
+    protected void actionPerformed(GuiButton guibutton)
+    {
+    }
+
+    public void drawScreen(int i, int j, float f)
+    {
+        drawBackground(0);
+        StringTranslate stringtranslate = StringTranslate.getInstance();
+        drawCenteredString(fontRenderer, stringtranslate.translateKey("multiplayer.downloadingTerrain"), width / 2, height / 2 - 50, 0xffffff);
+        super.drawScreen(i, j, f);
+    }
 }
