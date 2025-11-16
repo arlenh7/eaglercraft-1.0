@@ -48,6 +48,7 @@ import net.minecraft.src.GuiAchievement;
 import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiConflictWarning;
 import net.minecraft.src.GuiConnecting;
+import net.minecraft.src.GuiEditProfile;
 import net.minecraft.src.GuiErrorScreen;
 import net.minecraft.src.GuiGameOver;
 import net.minecraft.src.GuiIngame;
@@ -305,7 +306,7 @@ public abstract class Minecraft
             displayGuiScreen(new GuiConnecting(this, serverName, serverPort));
         } else
         {
-            displayGuiScreen(new GuiMainMenu());
+            displayGuiScreen(new GuiEditProfile());
         }
         loadingScreen = new LoadingScreenRenderer(this);
     }

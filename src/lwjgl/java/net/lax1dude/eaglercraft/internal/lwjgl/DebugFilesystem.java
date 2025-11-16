@@ -61,7 +61,7 @@ public class DebugFilesystem implements IEaglerFilesystem {
 	public boolean eaglerDelete(String pathName) {
 		File f = getJREFile(pathName);
 		if (!f.exists()) {
-			PlatformFilesystem.logger.warn("Tried to delete file that doesn't exist: \"{}\"", pathName);
+			// PlatformFilesystem.logger.warn("Tried to delete file that doesn't exist: \"{}\"", pathName);
 			return false;
 		}
 		if (f.delete()) {
@@ -104,7 +104,7 @@ public class DebugFilesystem implements IEaglerFilesystem {
 				}
 			}
 		} else {
-			PlatformFilesystem.logger.warn("Tried to read file that doesn't exist: \"{}\"", f.getAbsolutePath());
+			// PlatformFilesystem.logger.warn("Tried to read file that doesn't exist: \"{}\"", f.getAbsolutePath());
 			return null;
 		}
 	}
@@ -143,8 +143,7 @@ public class DebugFilesystem implements IEaglerFilesystem {
 		File f1 = getJREFile(pathNameOld);
 		File f2 = getJREFile(pathNameNew);
 		if (f2.exists()) {
-			PlatformFilesystem.logger
-					.warn("Tried to rename file \"{}\" to \"{}\" which already exists! File will be replaced");
+			// PlatformFilesystem.logger.warn("Tried to rename file \"{}\" to \"{}\" which already exists! File will be replaced");
 			if (!f2.delete()) {
 				return false;
 			}

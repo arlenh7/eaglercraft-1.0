@@ -1,3 +1,4 @@
+/* 
 package net.lax1dude.eaglercraft.minecraft;
 
 import static net.lax1dude.eaglercraft.opengl.RealOpenGLEnums.*;
@@ -18,21 +19,6 @@ import net.minecraft.src.World;
 import net.peyton.eagler.minecraft.TextureLocation;
 import net.peyton.eagler.v1_12.vec.Vec3D_112;
 
-/**
- * Copyright (c) 2025 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- * 
- */
 public class EaglerCloudRenderer {
 
 	private static final TextureLocation locationCloudsPNG = new TextureLocation("/environment/clouds.png");
@@ -61,18 +47,18 @@ public class EaglerCloudRenderer {
 	}
 
 	public void renderClouds(float partialTicks, int pass) {
-		if (mc.theWorld.worldProvider.field_4220_c) {
-			return;
-		}
+		// if (mc.theWorld.worldProvider.field_4220_c) {
+		// 	return;
+		// }
 		
 		if(this.mc.gameSettings.fancyGraphics) {
 			pass = 2;
 		}
 		
-		int c = mc.gameSettings.shouldRenderClouds();
-		if(c == 0) {
-			return;
-		}
+		// int c = mc.gameSettings.shouldRenderClouds();
+		// if(c == 0) {
+			// return;
+		// }
 		
 		int newState;
 		Entity rve = this.mc.thePlayer;
@@ -117,13 +103,13 @@ public class EaglerCloudRenderer {
 		
 		if(newState != RENDER_STATE_FAST) {
 			GlStateManager.enableCull();
-			double d0 = this.mc.renderGlobal.getCloudCounter(partialTicks);
-			double d1 = (rve.prevPosX + (rve.posX - rve.prevPosX) * (double) partialTicks + d0 * 0.029999999329447746D) / 12.0D;
-			double d2 = (rve.prevPosZ + (rve.posZ - rve.prevPosZ) * (double) partialTicks) / 12.0D + 0.33000001311302185D;
+			// double d0 = this.mc.renderGlobal.getCloudCounter(partialTicks);
+			// double d1 = (rve.prevPosX + (rve.posX - rve.prevPosX) * (double) partialTicks + d0 * 0.029999999329447746D) / 12.0D;
+			//double d2 = (rve.prevPosZ + (rve.posZ - rve.prevPosZ) * (double) partialTicks) / 12.0D + 0.33000001311302185D;
 			int i = MathHelper.floor_double(d1 / 2048.0D);
 			int j = MathHelper.floor_double(d2 / 2048.0D);
-			d1 = d1 - (double) (i * 2048);
-			d2 = d2 - (double) (j * 2048);
+			//d1 = d1 - (double) (i * 2048);
+			//d2 = d2 - (double) (j * 2048);
 			float f17 = (float) MathHelper.floor_double(d1) * 0.00390625F;
 			float f18 = (float) MathHelper.floor_double(d2) * 0.00390625F;
 			float f19 = (float) (d1 - (double) MathHelper.floor_double(d1));
@@ -412,3 +398,4 @@ public class EaglerCloudRenderer {
 	}
 
 }
+*/

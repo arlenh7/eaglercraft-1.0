@@ -8,6 +8,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftApplet;
 import net.peyton.eagler.minecraft.ResourceLoader;
 
 /**
@@ -77,7 +78,7 @@ public class LWJGLEntryPoint {
 			}
 		}
 
-		new Minecraft().run();
+		new MinecraftApplet().init();
 	}
 	
 	private static void loadResources(File file) {
@@ -103,15 +104,15 @@ public class LWJGLEntryPoint {
 	private static void getPlatformOptionsFromArgs(String[] args) {
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equalsIgnoreCase("fullscreen")) {
-				PlatformInput.setStartupFullscreen(true);
+				// PlatformInput.setStartupFullscreen(true);
 			} else if (args[i].equalsIgnoreCase("gles=200")) {
-				PlatformRuntime.requestGL(200);
+				// PlatformRuntime.requestGL(200);
 			} else if (args[i].equalsIgnoreCase("gles=300")) {
-				PlatformRuntime.requestGL(300);
+				// PlatformRuntime.requestGL(300);
 			} else if (args[i].equalsIgnoreCase("gles=310")) {
-				PlatformRuntime.requestGL(310);
+				// PlatformRuntime.requestGL(310);
 			} else if (args[i].equalsIgnoreCase("disableKHRDebug")) {
-				PlatformRuntime.requestDisableKHRDebug(true);
+				// PlatformRuntime.requestDisableKHRDebug(true);
 			} else {
 				EnumPlatformANGLE angle = EnumPlatformANGLE.fromId(args[i]);
 				if (angle != EnumPlatformANGLE.DEFAULT) {

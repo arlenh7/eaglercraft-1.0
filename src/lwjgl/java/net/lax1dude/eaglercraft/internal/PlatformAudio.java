@@ -113,12 +113,15 @@ public class PlatformAudio {
 	}
 
 	public static IAudioResource loadAudioData(String filename, boolean holdInCache) {
+		/* 
 		URL ret = PlatformAssets.getDesktopResourceURL(filename);
 		if (ret != null) {
 			return new PaulscodeAudioResource(ret);
 		} else {
 			return null;
 		}
+		*/
+		return null;
 	}
 
 	public static void clearAudioCache() {

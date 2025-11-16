@@ -445,8 +445,7 @@ public class EaglercraftGPU extends GlStateManager {
 
 	public static void glTexStorage2D(int target, int levels, int internalFormat, int w, int h) {
 		GlStateManager.setTextureCachedSize(target, w, h);
-		if (texStorageCapable
-				&& (glesVers >= 300 || levels == 1 || (MathHelper.log2DeBruijn(Math.max(w, h)) + 1) == levels)) {
+		if (texStorageCapable) {
 			_wglTexStorage2D(target, levels, internalFormat, w, h);
 		} else {
 			int tv = TextureFormatHelper.trivializeInternalFormatToGLES20(internalFormat);

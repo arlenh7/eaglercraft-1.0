@@ -248,7 +248,7 @@ public class JDBCFilesystem implements IEaglerFilesystem {
 				deleteStatement.setString(1, pathName);
 				int ret = deleteStatement.executeUpdate();
 				if (ret == 0) {
-					PlatformFilesystem.logger.warn("Tried to delete file that doesn't exist: \"{}\"", pathName);
+					// PlatformFilesystem.logger.warn("Tried to delete file that doesn't exist: \"{}\"", pathName);
 				}
 				return ret > 0;
 			}
@@ -272,7 +272,7 @@ public class JDBCFilesystem implements IEaglerFilesystem {
 					}
 				}
 				if (has == null) {
-					PlatformFilesystem.logger.warn("Tried to read file that doesn't exist: \"{}\"", pathName);
+					// PlatformFilesystem.logger.warn("Tried to read file that doesn't exist: \"{}\"", pathName);
 					return null;
 				}
 				ByteBuffer byteBuf = PlatformRuntime.allocateByteBuffer(has.length);

@@ -1,252 +1,185 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) braces deadcode fieldsfirst 
+// Merged SoundManager preserving Eaglercraft audio system and keeping legacy voids
+// NOTE: All actual audio functionality uses the Eaglercraft system.
+// Legacy methods are preserved as no-op or wrappers.
 
 package net.minecraft.src;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Random;
-import paulscode.sound.SoundSystem;
-import paulscode.sound.SoundSystemConfig;
-import paulscode.sound.codecs.CodecJOrbis;
-import paulscode.sound.codecs.CodecWav;
+import java.util.HashMap;
+import java.util.Map;
 
+import net.lax1dude.eaglercraft.EagRuntime;
+import net.lax1dude.eaglercraft.EaglerInputStream;
+import net.lax1dude.eaglercraft.Random;
+import net.lax1dude.eaglercraft.internal.EnumPlatformType;
+import net.lax1dude.eaglercraft.internal.IAudioCacheLoader;
+import net.lax1dude.eaglercraft.internal.IAudioHandle;
+import net.lax1dude.eaglercraft.internal.IAudioResource;
+import net.lax1dude.eaglercraft.internal.PlatformAudio;
+import net.peyton.eagler.minecraft.AudioUtils;
 
-// Referenced classes of package net.minecraft.src:
-//            SoundPool, GameSettings, CodecMus, SoundPoolEntry, 
-//            EntityLiving, MathHelper
+public class SoundManager {
 
-public class SoundManager
-{
-
-    private static SoundSystem sndSystem;
-    private SoundPool soundPoolSounds;
-    private SoundPool soundPoolStreaming;
-    private SoundPool soundPoolMusic;
-    private int latestSoundID;
     private GameSettings options;
-    private static boolean loaded = false;
-    private Random rand;
-    private int ticksBeforeMusic;
+    private Random rand = new Random();
+    private int field_583_i = this.rand.nextInt(12000);
 
-    public SoundManager()
-    {
-        soundPoolSounds = new SoundPool();
-        soundPoolStreaming = new SoundPool();
-        soundPoolMusic = new SoundPool();
-        latestSoundID = 0;
-        rand = new Random();
-        ticksBeforeMusic = rand.nextInt(12000);
+    private Map<String, IAudioResource> sounds = new HashMap<>();
+    private Map<String, IAudioResource> music = new HashMap<>();
+
+    private IAudioHandle musicHandle;
+
+    private String[] newMusic = new String[] {
+            "hal1.ogg", "hal2.ogg", "hal3.ogg", "hal4.ogg",
+            "nuance1.ogg", "nuance2.ogg",
+            "piano1.ogg", "piano2.ogg", "piano3.ogg"
+    };
+
+    private boolean loaded = true; 
+
+    public void init(GameSettings var1) {
+        this.options = var1;
     }
 
-    public void loadSoundSettings(GameSettings gamesettings)
-    {
-        soundPoolStreaming.isGetRandomSound = false;
-        options = gamesettings;
-        if(!loaded && (gamesettings == null || gamesettings.soundVolume != 0.0F || gamesettings.musicVolume != 0.0F))
-        {
-            tryToSetLibraryAndCodecs();
-        }
+    public void loadSoundSettings(GameSettings g) {
+        this.options = g;
     }
 
-    private void tryToSetLibraryAndCodecs()
-    {
-        try
-        {
-            float f = options.soundVolume;
-            float f1 = options.musicVolume;
-            options.soundVolume = 0.0F;
-            options.musicVolume = 0.0F;
-            options.saveOptions();
-            SoundSystemConfig.addLibrary(paulscode.sound.libraries.LibraryLWJGLOpenAL.class);
-            SoundSystemConfig.setCodec("ogg", paulscode.sound.codecs.CodecJOrbis.class);
-            SoundSystemConfig.setCodec("mus", net.minecraft.src.CodecMus.class);
-            SoundSystemConfig.setCodec("wav", paulscode.sound.codecs.CodecWav.class);
-            sndSystem = new SoundSystem();
-            options.soundVolume = f;
-            options.musicVolume = f1;
-            options.saveOptions();
-        }
-        catch(Throwable throwable)
-        {
-            throwable.printStackTrace();
-            System.err.println("error linking with the LibraryJavaSound plug-in");
-        }
-        loaded = true;
-    }
-
-    public void onSoundOptionsChanged()
-    {
-        if(!loaded && (options.soundVolume != 0.0F || options.musicVolume != 0.0F))
-        {
-            tryToSetLibraryAndCodecs();
-        }
-        if(loaded)
-        {
-            if(options.musicVolume == 0.0F)
-            {
-                sndSystem.stop("BgMusic");
-            } else
-            {
-                sndSystem.setVolume("BgMusic", options.musicVolume);
+    public void onSoundOptionsChanged() {
+        if (this.options.musicVolume == 0.0F) {
+            if (this.musicHandle != null && !this.musicHandle.shouldFree()) {
+                musicHandle.end();
+            }
+        } else {
+            if (this.musicHandle != null && !this.musicHandle.shouldFree()) {
+                musicHandle.gain(this.options.musicVolume);
             }
         }
     }
 
-    public void closeMinecraft()
-    {
-        if(loaded)
-        {
-            sndSystem.cleanup();
-        }
-    }
+    public void func_4033_c() {
+        if (this.options.musicVolume != 0.0F) {
+            if (this.musicHandle == null || this.musicHandle.shouldFree()) {
+                if (this.field_583_i > 0) {
+                    --this.field_583_i;
+                    return;
+                }
 
-    public void addSound(String s, File file)
-    {
-        soundPoolSounds.addSound(s, file);
-    }
+                int idx = rand.nextInt(newMusic.length);
+                this.field_583_i = this.rand.nextInt(12000) + 12000;
+                String name = "/newmusic/" + newMusic[idx];
 
-    public void addStreaming(String s, File file)
-    {
-        soundPoolStreaming.addSound(s, file);
-    }
+                IAudioResource trk = this.music.get(name);
+                if (trk == null) {
+                    if (EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP) {
+                        trk = PlatformAudio.loadAudioDataNew(name, false, browserResourceLoader);
+                    } else {
+                        trk = PlatformAudio.loadAudioData(name, false);
+                    }
+                    if (trk != null) music.put(name, trk);
+                }
 
-    public void addMusic(String s, File file)
-    {
-        soundPoolMusic.addSound(s, file);
-    }
-
-    public void playRandomMusicIfReady()
-    {
-        if(!loaded || options.musicVolume == 0.0F)
-        {
-            return;
-        }
-        if(!sndSystem.playing("BgMusic") && !sndSystem.playing("streaming"))
-        {
-            if(ticksBeforeMusic > 0)
-            {
-                ticksBeforeMusic--;
-                return;
-            }
-            SoundPoolEntry soundpoolentry = soundPoolMusic.getRandomSound();
-            if(soundpoolentry != null)
-            {
-                ticksBeforeMusic = rand.nextInt(12000) + 12000;
-                sndSystem.backgroundMusic("BgMusic", soundpoolentry.soundUrl, soundpoolentry.soundName, false);
-                sndSystem.setVolume("BgMusic", options.musicVolume);
-                sndSystem.play("BgMusic");
+                if (trk != null) {
+                    musicHandle = PlatformAudio.beginPlaybackStatic(trk, this.options.musicVolume, 1.0f, false);
+                }
             }
         }
     }
 
-    public void func_338_a(EntityLiving entityliving, float f)
-    {
-        if(!loaded || options.soundVolume == 0.0F)
-        {
-            return;
-        }
-        if(entityliving == null)
-        {
-            return;
-        } else
-        {
-            float f1 = entityliving.prevRotationYaw + (entityliving.rotationYaw - entityliving.prevRotationYaw) * f;
-            double d = entityliving.prevPosX + (entityliving.posX - entityliving.prevPosX) * (double)f;
-            double d1 = entityliving.prevPosY + (entityliving.posY - entityliving.prevPosY) * (double)f;
-            double d2 = entityliving.prevPosZ + (entityliving.posZ - entityliving.prevPosZ) * (double)f;
-            float f2 = MathHelper.cos(-f1 * 0.01745329F - 3.141593F);
-            float f3 = MathHelper.sin(-f1 * 0.01745329F - 3.141593F);
-            float f4 = -f3;
-            float f5 = 0.0F;
-            float f6 = -f2;
-            float f7 = 0.0F;
-            float f8 = 1.0F;
-            float f9 = 0.0F;
-            sndSystem.setListenerPosition((float)d, (float)d1, (float)d2);
-            sndSystem.setListenerOrientation(f4, f5, f6, f7, f8, f9);
-            return;
+    public void func_338_a(EntityLiving var1, float var2) {
+        if (var1 != null && this.options.soundVolume != 0.0F) {
+            try {
+                float pitch = var1.prevRotationPitch + (var1.rotationPitch - var1.prevRotationPitch) * var2;
+                float yaw = var1.prevRotationYaw + (var1.rotationYaw - var1.prevRotationYaw) * var2;
+                double x = var1.prevPosX + (var1.posX - var1.prevPosX) * var2;
+                double y = var1.prevPosY + (var1.posY - var1.prevPosY) * var2;
+                double z = var1.prevPosZ + (var1.posZ - var1.prevPosZ) * var2;
+
+                PlatformAudio.setListener((float)x, (float)y, (float)z, pitch, yaw);
+            } catch (Throwable ignored) {
+            }
         }
     }
 
-    public void playStreaming(String s, float f, float f1, float f2, float f3, float f4)
-    {
-        if(!loaded || options.soundVolume == 0.0F)
-        {
-            return;
-        }
-        String s1 = "streaming";
-        if(sndSystem.playing("streaming"))
-        {
-            sndSystem.stop("streaming");
-        }
-        if(s == null)
-        {
-            return;
-        }
-        SoundPoolEntry soundpoolentry = soundPoolStreaming.getRandomSoundFromSoundPool(s);
-        if(soundpoolentry != null && f3 > 0.0F)
-        {
-            if(sndSystem.playing("BgMusic"))
-            {
-                sndSystem.stop("BgMusic");
+    public void func_331_a(String var1, float var2, float var3, float var4, float var5, float var6) {
+       
+    }
+
+    public void playSound(String var1, float var2, float var3, float var4, float var5, float var6) {
+        if (this.options.soundVolume != 0.0F) {
+            if (var5 > 0.0F) {
+                if (var1 == null) return;
+
+                String sound = AudioUtils.getSound(var1);
+                if (sound == null) return;
+
+                IAudioResource trk = this.sounds.get(sound);
+                if (trk == null) {
+                    if (EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP) {
+                        trk = PlatformAudio.loadAudioDataNew(sound, true, browserResourceLoader);
+                    } else {
+                        trk = PlatformAudio.loadAudioData(sound, true);
+                    }
+                    if (trk != null) sounds.put(sound, trk);
+                }
+
+                if (trk != null) {
+                    PlatformAudio.beginPlayback(trk, var2, var3, var4, var5 * this.options.soundVolume, var6, false);
+                }
             }
-            float f5 = 16F;
-            sndSystem.newStreamingSource(true, s1, soundpoolentry.soundUrl, soundpoolentry.soundName, false, f, f1, f2, 2, f5 * 4F);
-            sndSystem.setVolume(s1, 0.5F * options.soundVolume);
-            sndSystem.play(s1);
         }
     }
 
-    public void playSound(String s, float f, float f1, float f2, float f3, float f4)
-    {
-        if(!loaded || options.soundVolume == 0.0F)
-        {
-            return;
-        }
-        SoundPoolEntry soundpoolentry = soundPoolSounds.getRandomSoundFromSoundPool(s);
-        if(soundpoolentry != null && f3 > 0.0F)
-        {
-            latestSoundID = (latestSoundID + 1) % 256;
-            String s1 = (new StringBuilder()).append("sound_").append(latestSoundID).toString();
-            float f5 = 16F;
-            if(f3 > 1.0F)
-            {
-                f5 *= f3;
+
+    public void func_337_a(String var1, float var2, float var3) {
+        if (this.options.soundVolume != 0.0F) {
+            if (var2 > 1.0F) var2 = 1.0F;
+            var2 *= 0.25F;
+
+            if (var1 == null) return;
+            String sound = AudioUtils.getSound(var1);
+            if (sound == null) return;
+
+            IAudioResource trk = this.sounds.get(sound);
+            if (trk == null) {
+                if (EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP) {
+                    trk = PlatformAudio.loadAudioDataNew(sound, true, browserResourceLoader);
+                } else {
+                    trk = PlatformAudio.loadAudioData(sound, true);
+                }
+                if (trk != null) sounds.put(sound, trk);
             }
-            sndSystem.newSource(f3 > 1.0F, s1, soundpoolentry.soundUrl, soundpoolentry.soundName, false, f, f1, f2, 2, f5);
-            sndSystem.setPitch(s1, f4);
-            if(f3 > 1.0F)
-            {
-                f3 = 1.0F;
+
+            if (trk != null) {
+                PlatformAudio.beginPlaybackStatic(trk, var2 * this.options.soundVolume, var3, false);
             }
-            sndSystem.setVolume(s1, f3 * options.soundVolume);
-            sndSystem.play(s1);
         }
     }
 
-    public void playSoundFX(String s, float f, float f1)
-    {
-        if(!loaded || options.soundVolume == 0.0F)
-        {
-            return;
-        }
-        SoundPoolEntry soundpoolentry = soundPoolSounds.getRandomSoundFromSoundPool(s);
-        if(soundpoolentry != null)
-        {
-            latestSoundID = (latestSoundID + 1) % 256;
-            String s1 = (new StringBuilder()).append("sound_").append(latestSoundID).toString();
-            sndSystem.newSource(false, s1, soundpoolentry.soundUrl, soundpoolentry.soundName, false, 0.0F, 0.0F, 0.0F, 0, 0.0F);
-            if(f > 1.0F)
-            {
-                f = 1.0F;
-            }
-            f *= 0.25F;
-            sndSystem.setPitch(s1, f1);
-            sndSystem.setVolume(s1, f * options.soundVolume);
-            sndSystem.play(s1);
-        }
-    }
+    public void addSound(String s, java.io.File f) {
 
+    }
+    public void addStreaming(String s, java.io.File f) {
+
+    }
+    public void addMusic(String s, java.io.File f) {
+
+    }
+    public void playRandomMusicIfReady() { 
+        func_4033_c(); 
+    }
+    public void playStreaming(String s, float a,float b,float c,float d,float e) { 
+        func_331_a(s,a,b,c,d,e); 
+    }
+    public void playSoundFX(String s, float v, float p) {
+        func_337_a(s, v, p); 
+    }
+    public void closeMinecraft() {}
+
+    private final IAudioCacheLoader browserResourceLoader = filename -> {
+        try {
+            return EaglerInputStream.inputStreamToBytesQuiet(EagRuntime.getRequiredResourceStream(filename));
+        } catch (Throwable t) {
+            return null;
+        }
+    };
 }

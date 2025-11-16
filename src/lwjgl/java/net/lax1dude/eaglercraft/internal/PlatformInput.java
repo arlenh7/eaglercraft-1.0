@@ -532,7 +532,7 @@ public class PlatformInput {
 	private static int[] lastPos = new int[4];
 
 	public static void toggleFullscreen() {
-		long win = PlatformRuntime.getWindowHandle();
+		// long win = PlatformRuntime.getWindowHandle();
 		long mon = getCurrentMonitor(win);
 		GLFWVidMode mode = glfwGetVideoMode(mon);
 		if (fullscreen) {

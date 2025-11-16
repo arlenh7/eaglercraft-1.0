@@ -228,7 +228,7 @@ public class PlatformRuntime {
 		EGL.createDisplayCapabilities(glfw_eglHandle, major[0], minor[0]);
 		glfwMakeContextCurrent(windowHandle);
 		GLESCapabilities caps = GLES.createCapabilities();
-		PlatformOpenGL.setCurrentContext(myGLVersion, caps);
+		// PlatformOpenGL.setCurrentContext(myGLVersion, caps);
 
 		logger.info("OpenGL Version: {}", (glVersion = GLES30.glGetString(GLES30.GL_VERSION)));
 		logger.info("OpenGL Renderer: {}", (glRenderer = GLES30.glGetString(GLES30.GL_RENDERER)));
@@ -246,7 +246,7 @@ public class PlatformRuntime {
 				throw new PlatformIncompatibleException("Unsupported OpenGL ES version detected: " + realGLVersion);
 			}
 			myGLVersion = realGLVersion;
-			PlatformOpenGL.setCurrentContext(myGLVersion, caps);
+			// PlatformOpenGL.setCurrentContext(myGLVersion, caps);
 		}
 
 		if (requestedANGLEPlatform != EnumPlatformANGLE.DEFAULT && rendererANGLEPlatform != requestedANGLEPlatform) {
@@ -352,15 +352,15 @@ public class PlatformRuntime {
 		}
 
 		logger.info("Initializing Audio...");
-		PlatformAudio.platformInitialize();
+		// PlatformAudio.platformInitialize();
 
 		logger.info("Initializing Hooks...");
-		PlatformInput.initHooks(windowHandle);
-		PlatformApplication.initHooks(windowHandle);
+		// PlatformInput.initHooks(windowHandle);
+		// PlatformApplication.initHooks(windowHandle);
 	}
 
 	public static void destroy() {
-		PlatformAudio.platformShutdown();
+		// PlatformAudio.platformShutdown();
 		Filesystem.closeAllHandles();
 		GLES.destroy();
 		EGL.destroy();

@@ -98,13 +98,12 @@ class OpenGLObjects {
 		
 		boolean nearest = false;
 		boolean anisotropic = false;
-
-		TextureGL(WebGLTexture ptr) {
+		public TextureGL(WebGLTexture ptr) {
 			this.ptr = ptr;
 			this.hash = ++hashGen;
 		}
 
-		public int hashCode() {
+        public int hashCode() {
 			return hash;
 		}
 

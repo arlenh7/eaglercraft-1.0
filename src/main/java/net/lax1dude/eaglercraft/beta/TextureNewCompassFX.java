@@ -18,7 +18,7 @@ public class TextureNewCompassFX extends TextureFX {
 	public TextureNewCompassFX() {
 		super(Item.compass.getIconIndex(null));
 		mc = Minecraft.getMinecraft();
-		field_1128_f = 1;
+		// field_1128_f = 1;
 		this.compassSpriteSheet = ImageData.loadImageFile(EagRuntime.getRequiredResourceBytes("/sprite_sheet/compass.png")).swapRB().pixels;
 		this.compassSpriteSheetLength = compassSpriteSheet.length / 256;
 	}
@@ -37,14 +37,14 @@ public class TextureNewCompassFX extends TextureFX {
 		double var10 = 0.0D;
 
 		if (par1World != null && !par8) {
-			double var13 = (double)par1World.spawnX - this.mc.thePlayer.posX;
-			double var15 = (double)par1World.spawnZ - this.mc.thePlayer.posZ;
+			// double var13 = (double)par1World.spawnX - this.mc.thePlayer.posX;
+			// double var15 = (double)par1World.spawnZ - this.mc.thePlayer.posZ;
 			par6 %= 360.0D;
-			var10 = -((par6 - 90.0D) * Math.PI / 180.0D - Math.atan2(var15, var13));
+			// var10 = -((par6 - 90.0D) * Math.PI / 180.0D - Math.atan2(var15, var13));
 
-			if (this.mc.theWorld.worldProvider.field_4220_c) {
-				var10 = Math.random() * Math.PI * 2.0D;
-			}
+			// if (this.mc.theWorld.worldProvider.field_4220_c) {
+			// 	var10 = Math.random() * Math.PI * 2.0D;
+			// }
 		}
 
 		if (par9) {
@@ -81,10 +81,10 @@ public class TextureNewCompassFX extends TextureFX {
 		
 		int offset = var18 * 256;
 		for(int i = 0; i < 256; ++i) {
-			this.field_1127_a[i * 4] = (byte)((compassSpriteSheet[offset + i] >> 16) & 0xFF);
-			this.field_1127_a[i * 4 + 1] = (byte)((compassSpriteSheet[offset + i] >> 8) & 0xFF);
-			this.field_1127_a[i * 4 + 2] = (byte)((compassSpriteSheet[offset + i]) & 0xFF);
-			this.field_1127_a[i * 4 + 3] = (byte)((compassSpriteSheet[offset + i] >> 24) & 0xFF);
+			// this.field_1127_a[i * 4] = (byte)((compassSpriteSheet[offset + i] >> 16) & 0xFF);
+			// this.field_1127_a[i * 4 + 1] = (byte)((compassSpriteSheet[offset + i] >> 8) & 0xFF);
+			// this.field_1127_a[i * 4 + 2] = (byte)((compassSpriteSheet[offset + i]) & 0xFF);
+			// this.field_1127_a[i * 4 + 3] = (byte)((compassSpriteSheet[offset + i] >> 24) & 0xFF);
 		}
 	}
 }

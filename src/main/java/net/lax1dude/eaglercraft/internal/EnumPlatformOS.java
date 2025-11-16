@@ -1,6 +1,6 @@
 package net.lax1dude.eaglercraft.internal;
 
-import net.minecraft.src.EnumOS1;
+import net.minecraft.src.EnumOS2;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
@@ -19,13 +19,13 @@ import net.minecraft.src.EnumOS1;
  * 
  */
 public enum EnumPlatformOS {
-	WINDOWS("Windows", EnumOS1.windows), MACOS("MacOS", EnumOS1.macos), LINUX("Linux", EnumOS1.linux),
-	CHROMEBOOK_LINUX("ChromeOS", EnumOS1.linux), OTHER("Unknown", EnumOS1.unknown);
+	WINDOWS("Windows", EnumOS2.windows), MACOS("MacOS", EnumOS2.macos), LINUX("Linux", EnumOS2.linux),
+	CHROMEBOOK_LINUX("ChromeOS", EnumOS2.linux), OTHER("Unknown", EnumOS2.unknown);
 
 	private final String name;
-	private final EnumOS1 minecraftEnum;
+	private final EnumOS2 minecraftEnum;
 
-	private EnumPlatformOS(String name, EnumOS1 minecraftEnum) {
+	private EnumPlatformOS(String name, EnumOS2 minecraftEnum) {
 		this.name = name;
 		this.minecraftEnum = minecraftEnum;
 	}
@@ -34,7 +34,7 @@ public enum EnumPlatformOS {
 		return name;
 	}
 
-	public EnumOS1 getMinecraftEnum() {
+	public EnumOS2 getMinecraftEnum() {
 		return minecraftEnum;
 	}
 

@@ -4,7 +4,10 @@
 
 package net.minecraft.src;
 
-import java.nio.*;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.opengl.EaglercraftGPU;
+import net.lax1dude.eaglercraft.opengl.GlStateManager;
+
 import org.lwjgl.opengl.*;
 
 // Referenced classes of package net.minecraft.src:
@@ -65,11 +68,9 @@ public class Tessellator
         floatBuffer = byteBuffer.asFloatBuffer();
         shortBuffer = byteBuffer.asShortBuffer();
         rawBuffer = new int[i];
-        useVBO = tryVBO && GLContext.getCapabilities().GL_ARB_vertex_buffer_object;
         if(useVBO)
         {
             vertexBuffers = GLAllocation.createDirectIntBuffer(vboCount);
-            ARBVertexBufferObject.glGenBuffersARB(vertexBuffers);
         }
     }
 
@@ -89,93 +90,91 @@ public class Tessellator
             if(useVBO)
             {
                 vboIndex = (vboIndex + 1) % vboCount;
-                ARBVertexBufferObject.glBindBufferARB(34962 /*GL_ARRAY_BUFFER_ARB*/, vertexBuffers.get(vboIndex));
-                ARBVertexBufferObject.glBufferDataARB(34962 /*GL_ARRAY_BUFFER_ARB*/, byteBuffer, 35040 /*GL_STREAM_DRAW_ARB*/);
             }
             if(hasTexture)
             {
                 if(useVBO)
                 {
-                    GL11.glTexCoordPointer(2, 5126 /*GL_FLOAT*/, 32, 12L);
+                    // GL11.glTexCoordPointer(2, 5126 /*GL_FLOAT*/, 32, 12L);
                 } else
                 {
                     floatBuffer.position(3);
-                    GL11.glTexCoordPointer(2, 32, floatBuffer);
+                    // GL11.glTexCoordPointer(2, 32, floatBuffer);
                 }
-                GL11.glEnableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
+                // GL11.glEnableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
             }
             if(hasBrightness)
             {
                 OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapEnabled);
                 if(useVBO)
                 {
-                    GL11.glTexCoordPointer(2, 5122 /*GL_SHORT*/, 32, 28L);
+                    // GL11.glTexCoordPointer(2, 5122 /*GL_SHORT*/, 32, 28L);
                 } else
                 {
                     shortBuffer.position(14);
-                    GL11.glTexCoordPointer(2, 32, shortBuffer);
+                    // GL11.glTexCoordPointer(2, 32, shortBuffer);
                 }
-                GL11.glEnableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
+                // GL11.glEnableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
                 OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapDisabled);
             }
             if(hasColor)
             {
                 if(useVBO)
                 {
-                    GL11.glColorPointer(4, 5121 /*GL_UNSIGNED_BYTE*/, 32, 20L);
+                    // GL11.glColorPointer(4, 5121 /*GL_UNSIGNED_BYTE*/, 32, 20L);
                 } else
                 {
                     byteBuffer.position(20);
-                    GL11.glColorPointer(4, true, 32, byteBuffer);
+                    // GL11.glColorPointer(4, true, 32, byteBuffer);
                 }
-                GL11.glEnableClientState(32886 /*GL_COLOR_ARRAY_EXT*/);
+                // GL11.glEnableClientState(32886 /*GL_COLOR_ARRAY_EXT*/);
             }
             if(hasNormals)
             {
                 if(useVBO)
                 {
-                    GL11.glNormalPointer(5121 /*GL_UNSIGNED_BYTE*/, 32, 24L);
+                    // GL11.glNormalPointer(5121 /*GL_UNSIGNED_BYTE*/, 32, 24L);
                 } else
                 {
                     byteBuffer.position(24);
-                    GL11.glNormalPointer(32, byteBuffer);
+                    // GL11.glNormalPointer(32, byteBuffer);
                 }
-                GL11.glEnableClientState(32885 /*GL_NORMAL_ARRAY_EXT*/);
+                // GL11.glEnableClientState(32885 /*GL_NORMAL_ARRAY_EXT*/);
             }
             if(useVBO)
             {
-                GL11.glVertexPointer(3, 5126 /*GL_FLOAT*/, 32, 0L);
+                // GL11.glVertexPointer(3, 5126 /*GL_FLOAT*/, 32, 0L);
             } else
             {
                 floatBuffer.position(0);
-                GL11.glVertexPointer(3, 32, floatBuffer);
+                // GL11.glVertexPointer(3, 32, floatBuffer);
             }
-            GL11.glEnableClientState(32884 /*GL_VERTEX_ARRAY_EXT*/);
+            // GL11.glEnableClientState(32884 /*GL_VERTEX_ARRAY_EXT*/);
             if(drawMode == 7 && convertQuadsToTriangles)
             {
-                GL11.glDrawArrays(4, 0, vertexCount);
+                // GL11.glDrawArrays(4, 0, vertexCount);
             } else
             {
-                GL11.glDrawArrays(drawMode, 0, vertexCount);
+                // GL11.glDrawArrays(drawMode, 0, vertexCount);
             }
-            GL11.glDisableClientState(32884 /*GL_VERTEX_ARRAY_EXT*/);
+            // GL11.glDisableClientState(32884 /*GL_VERTEX_ARRAY_EXT*/);
             if(hasTexture)
             {
-                GL11.glDisableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
+                // GL11.glDisableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
             }
             if(hasBrightness)
             {
                 OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapEnabled);
-                GL11.glDisableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
+                // GL11.glDisableClientState(32888 /*GL_TEXTURE_COORD_ARRAY_EXT*/);
                 OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapDisabled);
             }
             if(hasColor)
             {
-                GL11.glDisableClientState(32886 /*GL_COLOR_ARRAY_EXT*/);
+                // GL11.glDisableClientState(32886 /*GL_COLOR_ARRAY_EXT*/);
             }
             if(hasNormals)
             {
-                GL11.glDisableClientState(32885 /*GL_NORMAL_ARRAY_EXT*/);
+                // GL11.glDisableClientState(32885 /*GL_NORMAL_ARRAY_EXT*/);
             }
         }
         int i = rawBufferIndex * 4;
@@ -282,6 +281,7 @@ public class Tessellator
             l = 0;
         }
         hasColor = true;
+        /*
         if(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)
         {
             color = l << 24 | k << 16 | j << 8 | i;
@@ -289,6 +289,7 @@ public class Tessellator
         {
             color = i << 24 | j << 16 | k << 8 | l;
         }
+        */
     }
 
     public void addVertexWithUV(double d, double d1, double d2, double d3, double d4)
