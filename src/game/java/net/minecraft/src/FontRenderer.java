@@ -6,8 +6,8 @@ package net.minecraft.src;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.IntBuffer;
-import java.util.Random;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.Random;
 import javax.imageio.ImageIO;
 import org.lwjgl.opengl.GL11;
 

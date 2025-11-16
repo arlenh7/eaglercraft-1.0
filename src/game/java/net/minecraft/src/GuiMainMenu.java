@@ -12,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import net.lax1dude.eaglercraft.opengl.EaglercraftGPU;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -222,7 +224,7 @@ public class GuiMainMenu extends GuiScreen
     private void rotateAndBlurSkybox(float f)
     {
         GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, viewportTexture);
-        GL11.glCopyTexSubImage2D(3553 /*GL_TEXTURE_2D*/, 0, 0, 0, 0, 0, 256, 256);
+        EaglercraftGPU.glCopyTexSubImage2D(3553 /*GL_TEXTURE_2D*/, 0, 0, 0, 0, 0, 256, 256);
         GL11.glEnable(3042 /*GL_BLEND*/);
         GL11.glBlendFunc(770, 771);
         GL11.glColorMask(true, true, true, false);

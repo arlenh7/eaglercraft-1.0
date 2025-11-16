@@ -5,14 +5,12 @@
 package net.minecraft.src;
 
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
-import java.util.Random;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.Random;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.ContextCapabilities;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.GLU;
 
 // Referenced classes of package net.minecraft.src:
@@ -1372,10 +1370,6 @@ public class EntityRenderer
             GL11.glFogi(2917 /*GL_FOG_MODE*/, 9729 /*GL_LINEAR*/);
             GL11.glFogf(2915 /*GL_FOG_START*/, 0.0F);
             GL11.glFogf(2916 /*GL_FOG_END*/, 8F);
-            if(GLContext.getCapabilities().GL_NV_fog_distance)
-            {
-                GL11.glFogi(34138, 34139);
-            }
             GL11.glFogf(2915 /*GL_FOG_START*/, 0.0F);
             return;
         }
@@ -1400,10 +1394,6 @@ public class EntityRenderer
             {
                 GL11.glFogf(2915 /*GL_FOG_START*/, f1 * 0.25F);
                 GL11.glFogf(2916 /*GL_FOG_END*/, f1);
-            }
-            if(GLContext.getCapabilities().GL_NV_fog_distance)
-            {
-                GL11.glFogi(34138, 34139);
             }
         } else
         if(cloudFog)
@@ -1495,10 +1485,6 @@ public class EntityRenderer
             {
                 GL11.glFogf(2915 /*GL_FOG_START*/, f5 * 0.25F);
                 GL11.glFogf(2916 /*GL_FOG_END*/, f5);
-            }
-            if(GLContext.getCapabilities().GL_NV_fog_distance)
-            {
-                GL11.glFogi(34138, 34139);
             }
             if(mc.theWorld.worldProvider.isNether)
             {

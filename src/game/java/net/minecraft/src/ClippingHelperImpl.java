@@ -4,8 +4,7 @@
 
 package net.minecraft.src;
 
-import java.nio.Buffer;
-import java.nio.FloatBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.*;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:
@@ -46,8 +45,8 @@ public class ClippingHelperImpl extends ClippingHelper
         projectionMatrixBuffer.clear();
         modelviewMatrixBuffer.clear();
         field_1691_h.clear();
-        GL11.glGetFloat(2983 /*GL_PROJECTION_MATRIX*/, projectionMatrixBuffer);
-        GL11.glGetFloat(2982 /*GL_MODELVIEW_MATRIX*/, modelviewMatrixBuffer);
+        GL11.glGetFloat(2983 /*GL_PROJECTION_MATRIX*/, projectionMatrixBuffer.array());
+        GL11.glGetFloat(2982 /*GL_MODELVIEW_MATRIX*/, modelviewMatrixBuffer.array());
         projectionMatrixBuffer.flip().limit(16);
         projectionMatrixBuffer.get(projectionMatrix);
         modelviewMatrixBuffer.flip().limit(16);

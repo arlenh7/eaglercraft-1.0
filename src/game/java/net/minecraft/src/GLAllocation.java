@@ -31,7 +31,7 @@ public class GLAllocation
 
     public static synchronized void generateTextureNames(IntBuffer intbuffer)
     {
-        GlStateManager.generateTexture(intbuffer);
+        GlStateManager.generateTexture();
         for(int i = intbuffer.position(); i < intbuffer.limit(); i++)
         {
             textureNames.add(Integer.valueOf(intbuffer.get(i)));
@@ -42,7 +42,7 @@ public class GLAllocation
     public static synchronized void deleteDisplayLists(int i)
     {
         int j = displayLists.indexOf(Integer.valueOf(i));
-        GL11.glDeleteLists(((Integer)displayLists.get(j)).intValue(), ((Integer)displayLists.get(j + 1)).intValue());
+        GL11.glDeleteLists(((Integer)displayLists.get(j)).intValue());
         displayLists.remove(j);
         displayLists.remove(j);
     }
@@ -51,28 +51,30 @@ public class GLAllocation
     {
         for(int i = 0; i < displayLists.size(); i += 2)
         {
-            GL11.glDeleteLists(((Integer)displayLists.get(i)).intValue(), ((Integer)displayLists.get(i + 1)).intValue());
+            GL11.glDeleteLists(((Integer)displayLists.get(i)).intValue());
         }
 
         IntBuffer intbuffer = createDirectIntBuffer(textureNames.size());
         intbuffer.flip();
-        GL11.glDeleteTextures(intbuffer);
+        GlStateManager.deleteTexture(intbuffer.get());
         for(int j = 0; j < textureNames.size(); j++)
         {
             intbuffer.put(((Integer)textureNames.get(j)).intValue());
         }
 
         intbuffer.flip();
-        GL11.glDeleteTextures(intbuffer);
+        GlStateManager.deleteTexture(intbuffer.get());
         displayLists.clear();
         textureNames.clear();
     }
 
+    /* 
     public static synchronized ByteBuffer createDirectByteBuffer(int i)
     {
-        ByteBuffer bytebuffer = ByteBuffer.allocateDirect(i).order(ByteOrder.nativeOrder());
+        ByteBuffer bytebuffer = bytebuffer.allocateDirect(i).order(ByteOrder.nativeOrder());
         return bytebuffer;
     }
+    */
 
     public static IntBuffer createDirectIntBuffer(int i)
     {
@@ -83,5 +85,6 @@ public class GLAllocation
     {
         return createDirectByteBuffer(i << 2).asFloatBuffer();
     }
+
 
 }

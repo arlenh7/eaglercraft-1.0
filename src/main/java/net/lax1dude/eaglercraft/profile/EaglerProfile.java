@@ -57,7 +57,7 @@ public class EaglerProfile {
 			return;
 		}
 
-		if (profile == null || profile.hasNoTags()) {
+		if (profile == null) {
 			return;
 		}
 
