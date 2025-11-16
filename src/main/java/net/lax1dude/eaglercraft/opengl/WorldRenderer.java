@@ -311,10 +311,10 @@ public class WorldRenderer {
 	 */
 	public void putColorRGB_F(float red, float green, float blue, int parInt1) {
 		int i = this.getColorIndex(parInt1);
-		int j = MathHelper.clamp((int) (red * 255.0F), 0, 255);
-		int k = MathHelper.clamp((int) (green * 255.0F), 0, 255);
-		int l = MathHelper.clamp((int) (blue * 255.0F), 0, 255);
-		this.putColorRGBA(i, j, k, l, 255);
+		// int j = MathHelper.clamp((int) (red * 255.0F), 0, 255);
+		// int k = MathHelper.clamp((int) (green * 255.0F), 0, 255);
+		// int l = MathHelper.clamp((int) (blue * 255.0F), 0, 255);
+		// this.putColorRGBA(i, j, k, l, 255);
 	}
 
 	/**

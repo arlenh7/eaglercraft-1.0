@@ -4,7 +4,7 @@
 
 package net.minecraft.src;
 
-import java.nio.FloatBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.FloatBuffer;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:
@@ -38,17 +38,17 @@ public class RenderHelper
         float f1 = 0.6F;
         float f2 = 0.0F;
         Vec3D vec3d = Vec3D.createVector(0.20000000298023224D, 1.0D, -0.69999998807907104D).normalize();
-        GL11.glLight(16384 /*GL_LIGHT0*/, 4611 /*GL_POSITION*/, setColorBuffer(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord, 0.0D));
-        GL11.glLight(16384 /*GL_LIGHT0*/, 4609 /*GL_DIFFUSE*/, setColorBuffer(f1, f1, f1, 1.0F));
-        GL11.glLight(16384 /*GL_LIGHT0*/, 4608 /*GL_AMBIENT*/, setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GL11.glLight(16384 /*GL_LIGHT0*/, 4610 /*GL_SPECULAR*/, setColorBuffer(f2, f2, f2, 1.0F));
+        // GL11.glLight(16384 /*GL_LIGHT0*/, 4611 /*GL_POSITION*/, setColorBuffer(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord, 0.0D));
+        // GL11.glLight(16384 /*GL_LIGHT0*/, 4609 /*GL_DIFFUSE*/, setColorBuffer(f1, f1, f1, 1.0F));
+        // GL11.glLight(16384 /*GL_LIGHT0*/, 4608 /*GL_AMBIENT*/, setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        // GL11.glLight(16384 /*GL_LIGHT0*/, 4610 /*GL_SPECULAR*/, setColorBuffer(f2, f2, f2, 1.0F));
         vec3d = Vec3D.createVector(-0.20000000298023224D, 1.0D, 0.69999998807907104D).normalize();
-        GL11.glLight(16385 /*GL_LIGHT1*/, 4611 /*GL_POSITION*/, setColorBuffer(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord, 0.0D));
-        GL11.glLight(16385 /*GL_LIGHT1*/, 4609 /*GL_DIFFUSE*/, setColorBuffer(f1, f1, f1, 1.0F));
-        GL11.glLight(16385 /*GL_LIGHT1*/, 4608 /*GL_AMBIENT*/, setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GL11.glLight(16385 /*GL_LIGHT1*/, 4610 /*GL_SPECULAR*/, setColorBuffer(f2, f2, f2, 1.0F));
+        // GL11.glLight(16385 /*GL_LIGHT1*/, 4611 /*GL_POSITION*/, setColorBuffer(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord, 0.0D));
+        // GL11.glLight(16385 /*GL_LIGHT1*/, 4609 /*GL_DIFFUSE*/, setColorBuffer(f1, f1, f1, 1.0F));
+        // GL11.glLight(16385 /*GL_LIGHT1*/, 4608 /*GL_AMBIENT*/, setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        // GL11.glLight(16385 /*GL_LIGHT1*/, 4610 /*GL_SPECULAR*/, setColorBuffer(f2, f2, f2, 1.0F));
         GL11.glShadeModel(7424 /*GL_FLAT*/);
-        GL11.glLightModel(2899 /*GL_LIGHT_MODEL_AMBIENT*/, setColorBuffer(f, f, f, 1.0F));
+        // GL11.glLightModel(2899 /*GL_LIGHT_MODEL_AMBIENT*/, setColorBuffer(f, f, f, 1.0F));
     }
 
     private static FloatBuffer setColorBuffer(double d, double d1, double d2, double d3)

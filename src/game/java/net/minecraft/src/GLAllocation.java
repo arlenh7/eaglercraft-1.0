@@ -4,6 +4,7 @@
 
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.internal.buffer.*;
 import net.lax1dude.eaglercraft.opengl.GlStateManager;
 
@@ -68,23 +69,25 @@ public class GLAllocation
         textureNames.clear();
     }
 
-    /* 
-    public static synchronized ByteBuffer createDirectByteBuffer(int i)
-    {
-        ByteBuffer bytebuffer = bytebuffer.allocateDirect(i).order(ByteOrder.nativeOrder());
-        return bytebuffer;
-    }
-    */
+    public static ByteBuffer createDirectByteBuffer(int capacity) {
+		return EagRuntime.allocateByteBuffer(capacity);
+	}
 
-    public static IntBuffer createDirectIntBuffer(int i)
-    {
-        return createDirectByteBuffer(i << 2).asIntBuffer();
-    }
+	/**+
+	 * Creates and returns a direct int buffer with the specified
+	 * capacity. Applies native ordering to speed up access.
+	 */
+	public static IntBuffer createDirectIntBuffer(int capacity) {
+		return EagRuntime.allocateIntBuffer(capacity);
+	}
 
-    public static FloatBuffer createDirectFloatBuffer(int i)
-    {
-        return createDirectByteBuffer(i << 2).asFloatBuffer();
-    }
+	/**+
+	 * Creates and returns a direct float buffer with the specified
+	 * capacity. Applies native ordering to speed up access.
+	 */
+	public static FloatBuffer createDirectFloatBuffer(int capacity) {
+		return EagRuntime.allocateFloatBuffer(capacity);
+	}
 
 
 }

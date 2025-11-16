@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:
@@ -35,7 +34,7 @@ public class PanelCrashReport extends Panel
             s2 = (new StringBuilder()).append(s2).append("OS: ").append(System.getProperty("os.name")).append(" (").append(System.getProperty("os.arch")).append(") version ").append(System.getProperty("os.version")).append("\n").toString();
             s2 = (new StringBuilder()).append(s2).append("Java: ").append(System.getProperty("java.version")).append(", ").append(System.getProperty("java.vendor")).append("\n").toString();
             s2 = (new StringBuilder()).append(s2).append("VM: ").append(System.getProperty("java.vm.name")).append(" (").append(System.getProperty("java.vm.info")).append("), ").append(System.getProperty("java.vm.vendor")).append("\n").toString();
-            s2 = (new StringBuilder()).append(s2).append("LWJGL: ").append(Sys.getVersion()).append("\n").toString();
+            s2 = (new StringBuilder()).append(s2).append("LWJGL: ").append("NONE").append("\n").toString();
             s1 = GL11.glGetString(7936 /*GL_VENDOR*/);
             s2 = (new StringBuilder()).append(s2).append("OpenGL: ").append(GL11.glGetString(7937 /*GL_RENDERER*/)).append(" version ").append(GL11.glGetString(7938 /*GL_VERSION*/)).append(", ").append(GL11.glGetString(7936 /*GL_VENDOR*/)).append("\n").toString();
         }

@@ -5,9 +5,8 @@
 package net.minecraft.src;
 
 import java.awt.Component;
-import java.nio.IntBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.*;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
 
 // Referenced classes of package net.minecraft.src:
@@ -17,7 +16,6 @@ public class MouseHelper
 {
 
     private Component windowComponent;
-    private Cursor cursor;
     public int deltaX;
     public int deltaY;
     private int field_1115_e;
@@ -30,14 +28,6 @@ public class MouseHelper
         intbuffer.put(0);
         intbuffer.flip();
         IntBuffer intbuffer1 = GLAllocation.createDirectIntBuffer(1024);
-        try
-        {
-            cursor = new Cursor(32, 32, 16, 16, 1, intbuffer1, intbuffer);
-        }
-        catch(LWJGLException lwjglexception)
-        {
-            lwjglexception.printStackTrace();
-        }
     }
 
     public void grabMouseCursor()

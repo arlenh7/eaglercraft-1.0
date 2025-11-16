@@ -12,6 +12,14 @@ import java.io.*;
 public class NBTTagLong extends NBTBase
 {
 
+    public void write(DataOutput var1) throws IOException {
+
+    }
+
+	public void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException {
+        
+    }
+
     public long longValue;
 
     public NBTTagLong(String s)

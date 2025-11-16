@@ -74,7 +74,6 @@ import net.minecraft.src.MouseHelper;
 import net.minecraft.src.MovementInputFromOptions;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NetClientHandler;
-import net.minecraft.src.OpenGlCapsChecker;
 import net.minecraft.src.OpenGlHelper;
 import net.minecraft.src.PlayerController;
 import net.minecraft.src.PlayerControllerCreative;
@@ -86,7 +85,6 @@ import net.minecraft.src.RenderGlobal;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.SaveConverterMcRegion;
 import net.minecraft.src.ScaledResolution;
-import net.minecraft.src.ScreenShotHelper;
 import net.minecraft.src.Session;
 import net.minecraft.src.SoundManager;
 import net.minecraft.src.StatFileWriter;
@@ -129,7 +127,6 @@ public abstract class Minecraft
     private boolean hasCrashed;
     public int displayWidth;
     public int displayHeight;
-    private OpenGlCapsChecker glCapabilities;
     private Timer timer;
     public World theWorld;
     public RenderGlobal renderGlobal;
@@ -282,7 +279,6 @@ public abstract class Minecraft
         GL11.glLoadIdentity();
         GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
         checkGLError("Startup");
-        glCapabilities = new OpenGlCapsChecker();
         sndManager.loadSoundSettings(gameSettings);
         renderEngine.registerTextureFX(textureLavaFX);
         renderEngine.registerTextureFX(textureWaterFX);
@@ -746,17 +742,7 @@ public abstract class Minecraft
 
     private void screenshotListener()
     {
-        if(Keyboard.isKeyDown(60))
-        {
-            if(!isTakingScreenshot)
-            {
-                isTakingScreenshot = true;
-                ingameGUI.addChatMessage(ScreenShotHelper.saveScreenshot(minecraftDir, displayWidth, displayHeight));
-            }
-        } else
-        {
-            isTakingScreenshot = false;
-        }
+        
     }
 
     private void func_40003_b(int i)

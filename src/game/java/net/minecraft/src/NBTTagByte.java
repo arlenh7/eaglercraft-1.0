@@ -14,6 +14,14 @@ public class NBTTagByte extends NBTBase
 
     public byte byteValue;
 
+    public void write(DataOutput var1) throws IOException {
+
+    }
+
+	public void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException {
+        
+    }
+
     public NBTTagByte(String s)
     {
         super(s);

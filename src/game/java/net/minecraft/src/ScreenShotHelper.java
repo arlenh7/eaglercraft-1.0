@@ -1,3 +1,4 @@
+/* 
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode fieldsfirst 
@@ -6,13 +7,17 @@ package net.minecraft.src;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.ByteBuffer;
+
+import net.lax1dude.eaglercraft.EagRuntime;
+import net.lax1dude.eaglercraft.internal.buffer.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+
+import net.lax1dude.eaglercraft.opengl.EaglercraftGPU;
 
 public class ScreenShotHelper
 {
@@ -42,10 +47,10 @@ public class ScreenShotHelper
                 pixelData = new byte[i * j * 3];
                 imageData = new int[i * j];
             }
-            GL11.glPixelStorei(3333 /*GL_PACK_ALIGNMENT*/, 1);
-            GL11.glPixelStorei(3317 /*GL_UNPACK_ALIGNMENT*/, 1);
+            //GL11.glPixelStorei(3333 , 1);
+            //GL11.glPixelStorei(3317 , 1);
             buffer.clear();
-            GL11.glReadPixels(0, 0, i, j, 6407 /*GL_RGB*/, 5121 /*GL_UNSIGNED_BYTE*/, buffer);
+            EaglercraftGPU.glReadPixels(0, 0, i, j, 6407 , 5121, buffer);
             buffer.clear();
             String s1 = (new StringBuilder()).append("").append(dateFormat.format(new Date())).toString();
             File file2;
@@ -84,3 +89,4 @@ public class ScreenShotHelper
     }
 
 }
+*/

@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import net.lax1dude.eaglercraft.EaglerZLIB;
+
 // Referenced classes of package net.minecraft.src:
 //            NBTBase, NBTTagCompound
 
@@ -17,6 +19,41 @@ public class CompressedStreamTools
     public CompressedStreamTools()
     {
     }
+
+    public static NBTTagCompound readCompressed(InputStream is) throws IOException {
+		DataInputStream datainputstream = new DataInputStream(
+				new BufferedInputStream(EaglerZLIB.newGZIPInputStream(is)));
+
+		NBTTagCompound nbttagcompound;
+		try {
+			nbttagcompound = read(datainputstream, NBTSizeTracker.INFINITE);
+		} finally {
+			datainputstream.close();
+		}
+
+		return nbttagcompound;
+	}
+
+    public static NBTTagCompound read(DataInputStream inputStream) throws IOException {
+		/**+
+		 * Reads the given DataInput, constructs, and returns an
+		 * NBTTagCompound with the data from the DataInput
+		 */
+		return read(inputStream, NBTSizeTracker.INFINITE);
+	}
+
+	/**+
+	 * Reads the given DataInput, constructs, and returns an
+	 * NBTTagCompound with the data from the DataInput
+	 */
+	public static NBTTagCompound read(DataInput parDataInput, NBTSizeTracker parNBTSizeTracker) throws IOException {
+		NBTBase nbtbase = func_152455_a(parDataInput, 0, parNBTSizeTracker);
+		if (nbtbase instanceof NBTTagCompound) {
+			return (NBTTagCompound) nbtbase;
+		} else {
+			throw new IOException("Root tag must be a named compound tag");
+		}
+	}
 
     public static NBTTagCompound loadGzippedCompoundFromOutputStream(InputStream inputstream)
         throws IOException
@@ -152,4 +189,29 @@ public class CompressedStreamTools
     {
         NBTBase.writeTag(nbttagcompound, dataoutput);
     }
+
+    private static NBTBase func_152455_a(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker)
+			throws IOException {
+		byte b0 = parDataInput.readByte();
+		if (b0 == 0) {
+			return new NBTTagEnd();
+		} else {
+			parDataInput.readUTF();
+			NBTBase nbtbase = NBTBase.createNewByType(b0);
+
+			try {
+				nbtbase.read(parDataInput, parInt1, parNBTSizeTracker);
+				return nbtbase;
+			} catch (IOException ioexception) {
+                /* 
+				CrashReport crashreport = CrashReport.makeCrashReport(ioexception, "Loading NBT data");
+				CrashReportCategory crashreportcategory = crashreport.makeCategory("NBT Tag");
+				crashreportcategory.addCrashSection("Tag name", "[UNNAMED TAG]");
+				crashreportcategory.addCrashSection("Tag type", Byte.valueOf(b0));
+				throw new ReportedException(crashreport);
+                */
+                return nbtbase;
+            }
+		}
+	}
 }

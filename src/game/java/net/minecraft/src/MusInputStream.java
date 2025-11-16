@@ -1,3 +1,4 @@
+/*
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode fieldsfirst 
@@ -17,7 +18,7 @@ class MusInputStream extends InputStream
     private int hash;
     private InputStream inputStream;
     byte buffer[];
-    final CodecMus codec; /* synthetic field */
+    final CodecMus codec; /
 
     public MusInputStream(CodecMus codecmus, URL url, InputStream inputstream)
     {
@@ -61,3 +62,4 @@ class MusInputStream extends InputStream
         return j;
     }
 }
+*/

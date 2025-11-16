@@ -13,6 +13,14 @@ import java.util.*;
 public class NBTTagList extends NBTBase
 {
 
+    public void write(DataOutput var1) throws IOException {
+
+    }
+
+	public void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException {
+        
+    }
+
     private List tagList;
     private byte tagType;
 

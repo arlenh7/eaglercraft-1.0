@@ -4,10 +4,9 @@
 
 package net.minecraft.src;
 
-import java.nio.IntBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.IntBuffer;
 import java.util.*;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.opengl.ARBOcclusionQuery;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:
@@ -101,7 +100,7 @@ public class RenderGlobal
         byte byte0 = 34;
         byte byte1 = 8;
         glRenderListBase = GLAllocation.generateDisplayLists(byte0 * byte0 * byte1 * 3);
-        occlusionEnabled = OpenGlCapsChecker.checkARBOcclusion();
+        // occlusionEnabled = OpenGlCapsChecker.checkARBOcclusion();
         if(occlusionEnabled)
         {
             occlusionResult.clear();
@@ -109,7 +108,7 @@ public class RenderGlobal
             glOcclusionQueryBase.clear();
             glOcclusionQueryBase.position(0);
             glOcclusionQueryBase.limit(byte0 * byte0 * byte1);
-            ARBOcclusionQuery.glGenQueriesARB(glOcclusionQueryBase);
+            // ARBOcclusionQuery.glGenQueriesARB(glOcclusionQueryBase);
         }
         starGLCallList = GLAllocation.generateDisplayLists(3);
         GL11.glPushMatrix();
@@ -576,9 +575,9 @@ public class RenderGlobal
                         f2 += f9;
                     }
                     Profiler.startSection("bb");
-                    ARBOcclusionQuery.glBeginQueryARB(35092 /*GL_SAMPLES_PASSED_ARB*/, sortedWorldRenderers[k1].glOcclusionQuery);
+                    // ARBOcclusionQuery.glBeginQueryARB(35092 /*GL_SAMPLES_PASSED_ARB*/, sortedWorldRenderers[k1].glOcclusionQuery);
                     sortedWorldRenderers[k1].callOcclusionQueryList();
-                    ARBOcclusionQuery.glEndQueryARB(35092 /*GL_SAMPLES_PASSED_ARB*/);
+                    // ARBOcclusionQuery.glEndQueryARB(35092 /*GL_SAMPLES_PASSED_ARB*/);
                     Profiler.endSection();
                     sortedWorldRenderers[k1].isWaitingOnOcclusionQuery = true;
                 }
@@ -622,12 +621,12 @@ public class RenderGlobal
                 continue;
             }
             occlusionResult.clear();
-            ARBOcclusionQuery.glGetQueryObjectuARB(sortedWorldRenderers[k].glOcclusionQuery, 34919 /*GL_QUERY_RESULT_AVAILABLE_ARB*/, occlusionResult);
+            // ARBOcclusionQuery.glGetQueryObjectuARB(sortedWorldRenderers[k].glOcclusionQuery, 34919 /*GL_QUERY_RESULT_AVAILABLE_ARB*/, occlusionResult);
             if(occlusionResult.get(0) != 0)
             {
                 sortedWorldRenderers[k].isWaitingOnOcclusionQuery = false;
                 occlusionResult.clear();
-                ARBOcclusionQuery.glGetQueryObjectuARB(sortedWorldRenderers[k].glOcclusionQuery, 34918 /*GL_QUERY_RESULT_ARB*/, occlusionResult);
+                // ARBOcclusionQuery.glGetQueryObjectuARB(sortedWorldRenderers[k].glOcclusionQuery, 34918 /*GL_QUERY_RESULT_ARB*/, occlusionResult);
                 sortedWorldRenderers[k].isVisible = occlusionResult.get(0) != 0;
             }
         }

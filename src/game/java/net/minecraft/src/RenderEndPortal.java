@@ -4,8 +4,8 @@
 
 package net.minecraft.src;
 
-import java.nio.FloatBuffer;
-import java.util.Random;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.Random;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:
@@ -59,14 +59,16 @@ public class RenderEndPortal extends TileEntitySpecialRenderer
             float f11 = f9 / f10;
             f11 = (float)(d1 + (double)f4) + f11;
             GL11.glTranslatef(f1, f11, f3);
-            GL11.glTexGeni(8192 /*GL_S*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
-            GL11.glTexGeni(8193 /*GL_T*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
-            GL11.glTexGeni(8194 /*GL_R*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
-            GL11.glTexGeni(8195 /*GL_Q*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9216 /*GL_EYE_LINEAR*/);
-            GL11.glTexGen(8192 /*GL_S*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(1.0F, 0.0F, 0.0F, 0.0F));
-            GL11.glTexGen(8193 /*GL_T*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(0.0F, 0.0F, 1.0F, 0.0F));
-            GL11.glTexGen(8194 /*GL_R*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(0.0F, 0.0F, 0.0F, 1.0F));
-            GL11.glTexGen(8195 /*GL_Q*/, 9474 /*GL_EYE_PLANE*/, func_40447_a(0.0F, 1.0F, 0.0F, 0.0F));
+            
+            // GL11.glTexGeni(8192 /*GL_S*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
+            // GL11.glTexGeni(8193 /*GL_T*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
+            // GL11.glTexGeni(8194 /*GL_R*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9217 /*GL_OBJECT_LINEAR*/);
+            // GL11.glTexGeni(8195 /*GL_Q*/, 9472 /*GL_TEXTURE_GEN_MODE*/, 9216 /*GL_EYE_LINEAR*/);
+            // GL11.glTexGen(8192 /*GL_S*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(1.0F, 0.0F, 0.0F, 0.0F));
+            // GL11.glTexGen(8193 /*GL_T*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(0.0F, 0.0F, 1.0F, 0.0F));
+            // GL11.glTexGen(8194 /*GL_R*/, 9473 /*GL_OBJECT_PLANE*/, func_40447_a(0.0F, 0.0F, 0.0F, 1.0F));
+            // GL11.glTexGen(8195 /*GL_Q*/, 9474 /*GL_EYE_PLANE*/, func_40447_a(0.0F, 1.0F, 0.0F, 0.0F));
+
             GL11.glEnable(3168 /*GL_TEXTURE_GEN_S*/);
             GL11.glEnable(3169 /*GL_TEXTURE_GEN_T*/);
             GL11.glEnable(3170 /*GL_TEXTURE_GEN_R*/);

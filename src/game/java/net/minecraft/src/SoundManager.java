@@ -11,7 +11,7 @@ import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
+
 
 // Referenced classes of package net.minecraft.src:
 //            SoundPool, GameSettings, CodecMus, SoundPoolEntry, 

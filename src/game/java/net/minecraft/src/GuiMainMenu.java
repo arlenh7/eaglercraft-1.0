@@ -81,6 +81,7 @@ public class GuiMainMenu extends GuiScreen
 
     public void initGui()
     {
+        
         viewportTexture = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -102,9 +103,11 @@ public class GuiMainMenu extends GuiScreen
         }
         StringTranslate stringtranslate = StringTranslate.getInstance();
         int i = height / 4 + 48;
+        GuiButton texturePacksButton = new GuiButton(3, width / 2 - 100, i + 48, stringtranslate.translateKey("menu.mods"));
+        texturePacksButton.enabled = false;
         controlList.add(new GuiButton(1, width / 2 - 100, i, stringtranslate.translateKey("menu.singleplayer")));
         controlList.add(multiplayerButton = new GuiButton(2, width / 2 - 100, i + 24, stringtranslate.translateKey("menu.multiplayer")));
-        controlList.add(new GuiButton(3, width / 2 - 100, i + 48, stringtranslate.translateKey("menu.mods")));
+        controlList.add(texturePacksButton);
         if(mc.hideQuitButton)
         {
             controlList.add(new GuiButton(0, width / 2 - 100, i + 72, stringtranslate.translateKey("menu.options")));
@@ -135,7 +138,7 @@ public class GuiMainMenu extends GuiScreen
         }
         if(guibutton.id == 3)
         {
-            mc.displayGuiScreen(new GuiTexturePacks(this));
+            
         }
         if(guibutton.id == 4)
         {

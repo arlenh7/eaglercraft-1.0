@@ -9,9 +9,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.opengl.EaglercraftGPU;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -360,7 +360,7 @@ public class RenderEngine
         singleIntBuffer.clear();
         singleIntBuffer.put(i);
         singleIntBuffer.flip();
-        GL11.glDeleteTextures(singleIntBuffer);
+        GL11.glDeleteTexture(singleIntBuffer.get());
     }
 
     public int getTextureForDownloadableImage(String s, String s1)

@@ -14,6 +14,14 @@ public class NBTTagDouble extends NBTBase
 
     public double doubleValue;
 
+    public void write(DataOutput var1) throws IOException {
+
+    }
+
+	public void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException {
+        
+    }
+
     public NBTTagDouble(String s)
     {
         super(s);

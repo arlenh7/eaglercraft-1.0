@@ -22,6 +22,10 @@ public abstract class NBTBase
     abstract void readTagContents(DataInput datainput)
         throws IOException;
 
+    abstract void write(DataOutput var1) throws IOException;
+
+	abstract void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException;
+
     public abstract byte getType();
 
     protected NBTBase(String s)
@@ -186,6 +190,35 @@ public abstract class NBTBase
         }
         return "UNKNOWN";
     }
+
+    protected static NBTBase createNewByType(byte id) {
+		switch (id) {
+		case 0:
+			return new NBTTagEnd();
+		case 1:
+			return new NBTTagByte("s");
+		case 2:
+			return new NBTTagShort("s");
+		case 3:
+			return new NBTTagInt("s");
+		case 4:
+			return new NBTTagLong("s");
+		case 5:
+			return new NBTTagFloat("s");
+		case 6:
+			return new NBTTagDouble("s");
+		case 7:
+			return new NBTTagByteArray("s");
+		case 8:
+			return new NBTTagString("s");
+		case 9:
+			return new NBTTagList();
+		case 10:
+			return new NBTTagCompound();
+		default:
+			return null;
+		}
+	}
 
     public abstract NBTBase func_40195_b();
 }

@@ -6,6 +6,9 @@ package net.minecraft.src;
 
 import org.lwjgl.opengl.*;
 
+import net.lax1dude.eaglercraft.opengl.EaglercraftGPU;
+import net.lax1dude.eaglercraft.opengl.GlStateManager;
+
 public class OpenGlHelper
 {
 
@@ -19,7 +22,6 @@ public class OpenGlHelper
 
     public static void initializeTextures()
     {
-        useMultitextureARB = GLContext.getCapabilities().GL_ARB_multitexture && !GLContext.getCapabilities().OpenGL13;
         if(useMultitextureARB)
         {
             lightmapDisabled = 33984 /*GL_TEXTURE0_ARB*/;
@@ -33,35 +35,17 @@ public class OpenGlHelper
 
     public static void setActiveTexture(int i)
     {
-        if(useMultitextureARB)
-        {
-            ARBMultitexture.glActiveTextureARB(i);
-        } else
-        {
-            GL13.glActiveTexture(i);
-        }
+        GlStateManager.setActiveTexture(i);
     }
 
     public static void setClientActiveTexture(int i)
     {
-        if(useMultitextureARB)
-        {
-            ARBMultitexture.glClientActiveTextureARB(i);
-        } else
-        {
-            GL13.glClientActiveTexture(i);
-        }
+        GlStateManager.setActiveTexture(i);
     }
 
     public static void setLightmapTextureCoords(int i, float f, float f1)
     {
-        if(useMultitextureARB)
-        {
-            ARBMultitexture.glMultiTexCoord2fARB(i, f, f1);
-        } else
-        {
-            GL13.glMultiTexCoord2f(i, f, f1);
-        }
+        
     }
 
 }
