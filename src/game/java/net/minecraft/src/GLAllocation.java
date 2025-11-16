@@ -4,7 +4,9 @@
 
 package net.minecraft.src;
 
-import java.nio.*;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.opengl.GlStateManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
@@ -29,7 +31,7 @@ public class GLAllocation
 
     public static synchronized void generateTextureNames(IntBuffer intbuffer)
     {
-        GL11.glGenTextures(intbuffer);
+        GlStateManager.generateTexture(intbuffer);
         for(int i = intbuffer.position(); i < intbuffer.limit(); i++)
         {
             textureNames.add(Integer.valueOf(intbuffer.get(i)));

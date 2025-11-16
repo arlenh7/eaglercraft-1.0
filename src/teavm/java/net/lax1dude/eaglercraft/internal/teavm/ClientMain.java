@@ -34,7 +34,7 @@ import net.lax1dude.eaglercraft.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.internal.teavm.opts.JSEaglercraftXOptsAssetsURI;
 import net.lax1dude.eaglercraft.internal.teavm.opts.JSEaglercraftXOptsRoot;
 import net.minecraft.client.Minecraft;
-
+import net.minecraft.client.MinecraftApplet;
 import net.lax1dude.eaglercraft.internal.ContextLostError;
 
 /**
@@ -211,7 +211,7 @@ public class ClientMain {
 			systemOut.println("ClientMain: [INFO] launching eaglercraftx main thread");
 
 			try {
-				new Minecraft().run();
+				new MinecraftApplet().start();
 			}catch(ContextLostError ex) {
 				systemErr.println("ClientMain: [ERROR] webgl context lost!");
 				try {

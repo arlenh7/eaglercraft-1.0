@@ -6,19 +6,25 @@ package net.minecraft.client;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.io.File;
-import java.io.PrintStream;
 import java.text.DecimalFormat;
-import net.minecraft.src.Achievement;
+
+import net.lax1dude.eaglercraft.EagRuntime;
+import net.lax1dude.eaglercraft.Keyboard;
+import net.lax1dude.eaglercraft.profile.EaglerProfile;
+import net.lax1dude.eaglercraft.opengl.GlStateManager;
+
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.input.Mouse;
+
 import net.minecraft.src.AchievementList;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
-import net.minecraft.src.BlockGrass;
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.ChunkProviderLoadOrGenerate;
 import net.minecraft.src.ColorizerFoliage;
@@ -108,15 +114,6 @@ import net.minecraft.src.WorldInfo;
 import net.minecraft.src.WorldProvider;
 import net.minecraft.src.WorldRenderer;
 import net.minecraft.src.WorldSettings;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controllers;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.PixelFormat;
-import org.lwjgl.util.glu.GLU;
 
 // Referenced classes of package net.minecraft.client:
 //            MinecraftApplet
@@ -190,6 +187,8 @@ public abstract class Minecraft
     long systemTime;
     private int joinPlayerCounter;
 
+    private static Minecraft mc;
+
     public Minecraft(Component component, Canvas canvas, MinecraftApplet minecraftapplet, int i, int j, boolean flag)
     {
         fullscreen = false;
@@ -250,54 +249,8 @@ public abstract class Minecraft
         serverPort = i;
     }
 
-    public void startGame()
-        throws LWJGLException
-    {
-        if(mcCanvas != null)
-        {
-            Graphics g = mcCanvas.getGraphics();
-            if(g != null)
-            {
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, displayWidth, displayHeight);
-                g.dispose();
-            }
-            Display.setParent(mcCanvas);
-        } else
-        if(fullscreen)
-        {
-            Display.setFullscreen(true);
-            displayWidth = Display.getDisplayMode().getWidth();
-            displayHeight = Display.getDisplayMode().getHeight();
-            if(displayWidth <= 0)
-            {
-                displayWidth = 1;
-            }
-            if(displayHeight <= 0)
-            {
-                displayHeight = 1;
-            }
-        } else
-        {
-            Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
-        }
-        Display.setTitle("Minecraft Minecraft 1.0.0");
-        try
-        {
-            PixelFormat pixelformat = new PixelFormat();
-            pixelformat = pixelformat.withDepthBits(24);
-            Display.create(pixelformat);
-        }
-        catch(LWJGLException lwjglexception)
-        {
-            lwjglexception.printStackTrace();
-            try
-            {
-                Thread.sleep(1000L);
-            }
-            catch(InterruptedException interruptedexception) { }
-            Display.create();
-        }
+    public void startGame() {
+        Display.setTitle("Minecraft 1.0.0");
         OpenGlHelper.initializeTextures();
         mcDataDir = getMinecraftDir();
         saveLoader = new SaveConverterMcRegion(new File(mcDataDir, "saves"));
@@ -315,17 +268,7 @@ public abstract class Minecraft
         statFileWriter = new StatFileWriter(session, mcDataDir);
         AchievementList.openInventory.setStatStringFormatter(new StatStringFormatKeyInv(this));
         loadScreen();
-        Keyboard.create();
-        Mouse.create();
         mouseHelper = new MouseHelper(mcCanvas);
-        try
-        {
-            Controllers.create();
-        }
-        catch(Exception exception)
-        {
-            exception.printStackTrace();
-        }
         checkGLError("Pre startup");
         GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
         GL11.glShadeModel(7425 /*GL_SMOOTH*/);
@@ -371,9 +314,7 @@ public abstract class Minecraft
         loadingScreen = new LoadingScreenRenderer(this);
     }
 
-    private void loadScreen()
-        throws LWJGLException
-    {
+    private void loadScreen() {
         ScaledResolution scaledresolution = new ScaledResolution(gameSettings, displayWidth, displayHeight);
         GL11.glClear(16640);
         GL11.glMatrixMode(5889 /*GL_PROJECTION*/);
@@ -405,7 +346,6 @@ public abstract class Minecraft
         GL11.glDisable(2912 /*GL_FOG*/);
         GL11.glEnable(3008 /*GL_ALPHA_TEST*/);
         GL11.glAlphaFunc(516, 0.1F);
-        Display.swapBuffers();
     }
 
     public void scaledTessellator(int i, int j, int k, int l, int i1, int j1)
@@ -591,12 +531,9 @@ public abstract class Minecraft
             }
             catch(Throwable throwable1) { }
             sndManager.closeMinecraft();
-            Mouse.destroy();
-            Keyboard.destroy();
         }
         finally
         {
-            Display.destroy();
             if(!hasCrashed)
             {
                 System.exit(0);
@@ -729,7 +666,6 @@ public abstract class Minecraft
             entityRenderer.updateCameraAndRender(timer.renderPartialTicks);
             Profiler.endSection();
         }
-        GL11.glFlush();
         Profiler.endSection();
         if(!Display.isActive() && fullscreen)
         {
@@ -1173,9 +1109,6 @@ public abstract class Minecraft
             fullscreen = !fullscreen;
             if(fullscreen)
             {
-                Display.setDisplayMode(Display.getDesktopDisplayMode());
-                displayWidth = Display.getDisplayMode().getWidth();
-                displayHeight = Display.getDisplayMode().getHeight();
                 if(displayWidth <= 0)
                 {
                     displayWidth = 1;
@@ -1208,7 +1141,6 @@ public abstract class Minecraft
             {
                 resize(displayWidth, displayHeight);
             }
-            Display.setFullscreen(fullscreen);
             Display.update();
         }
         catch(Exception exception)
@@ -1819,6 +1751,10 @@ public abstract class Minecraft
             char c1 = '\u07D0';
             theWorld.dropOldChunks();
         }
+    }
+
+    public static Minecraft getMinecraft() {
+        return mc;
     }
 
     public void installResource(String s, File file)

@@ -4,8 +4,9 @@
 
 package net.minecraft.src;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import net.lax1dude.eaglercraft.internal.buffer.*;
+import net.lax1dude.eaglercraft.opengl.GlStateManager;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
@@ -36,12 +37,10 @@ public class ActiveRenderInfo
 
     public static void func_41067_a(EntityPlayer entityplayer, boolean flag)
     {
-        GL11.glGetFloat(2982 /*GL_MODELVIEW_MATRIX*/, field_41076_j);
-        GL11.glGetFloat(2983 /*GL_PROJECTION_MATRIX*/, field_41077_k);
-        GL11.glGetInteger(2978 /*GL_VIEWPORT*/, field_41079_i);
+        GlStateManager.getFloat(2982 /*GL_MODELVIEW_MATRIX*/, field_41076_j);
+        GlStateManager.getFloat(2983 /*GL_PROJECTION_MATRIX*/, field_41077_k);
         float f = (field_41079_i.get(0) + field_41079_i.get(2)) / 2;
         float f1 = (field_41079_i.get(1) + field_41079_i.get(3)) / 2;
-        GLU.gluUnProject(f, f1, 0.0F, field_41076_j, field_41077_k, field_41079_i, field_41075_l);
         field_41074_a = field_41075_l.get(0);
         field_41072_b = field_41075_l.get(1);
         field_41073_c = field_41075_l.get(2);
