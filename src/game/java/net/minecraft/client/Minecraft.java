@@ -185,7 +185,7 @@ public abstract class Minecraft
     long systemTime;
     private int joinPlayerCounter;
 
-    private static Minecraft mc;
+    public static Minecraft mc;
 
     public Minecraft(Component component, Canvas canvas, MinecraftApplet minecraftapplet, int i, int j, boolean flag)
     {
@@ -228,6 +228,8 @@ public abstract class Minecraft
         fullscreen = flag;
         theMinecraft = this;
     }
+
+    public Minecraft() { }
 
     public void onMinecraftCrash(UnexpectedThrowable unexpectedthrowable)
     {
