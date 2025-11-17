@@ -226,10 +226,6 @@ public abstract class Minecraft
         displayWidth = i;
         displayHeight = j;
         fullscreen = flag;
-        if(minecraftapplet == null || "true".equals(minecraftapplet.getParameter("stand-alone")))
-        {
-            hideQuitButton = false;
-        }
         theMinecraft = this;
     }
 
@@ -589,11 +585,6 @@ public abstract class Minecraft
 
     private void func_40001_x()
     {
-        if(mcApplet != null && !mcApplet.isActive())
-        {
-            running = false;
-            return;
-        }
         AxisAlignedBB.clearBoundingBoxPool();
         Vec3D.initialize();
         Profiler.startSection("root");

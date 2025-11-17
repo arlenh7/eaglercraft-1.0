@@ -14,7 +14,7 @@ import net.minecraft.src.*;
 // Referenced classes of package net.minecraft.client:
 //            Minecraft
 
-public class MinecraftApplet extends Applet
+public class MinecraftApplet
 {
 
     private Canvas mcCanvas;
@@ -30,41 +30,8 @@ public class MinecraftApplet extends Applet
     {
         mcCanvas = new CanvasMinecraftApplet(this);
         boolean flag = false;
-        if(getParameter("fullscreen") != null)
-        {
-            flag = getParameter("fullscreen").equalsIgnoreCase("true");
-        }
-        mc = new MinecraftAppletImpl(this, this, mcCanvas, this, getWidth(), getHeight(), flag);
-        mc.minecraftUri = getDocumentBase().getHost();
-        if(getDocumentBase().getPort() > 0)
-        {
-            mc.minecraftUri += ":" + getDocumentBase().getPort();
-        }
-        if(getParameter("username") != null && getParameter("sessionid") != null)
-        {
-            mc.session = new Session(getParameter("username"), getParameter("sessionid"));
-            System.out.println((new StringBuilder()).append("Setting user: ").append(mc.session.username).append(", ").append(mc.session.sessionId).toString());
-            if(getParameter("mppass") != null)
-            {
-                mc.session.mpPassParameter = getParameter("mppass");
-            }
-        } else
-        {
-            mc.session = new Session("Player", "");
-        }
-        if(getParameter("server") != null && getParameter("port") != null)
-        {
-            mc.setServer(getParameter("server"), Integer.parseInt(getParameter("port")));
-        }
-        mc.hideQuitButton = true;
-        if("true".equals(getParameter("stand-alone")))
-        {
-            mc.hideQuitButton = false;
-        }
-        setLayout(new BorderLayout());
-        add(mcCanvas, "Center");
+    
         mcCanvas.setFocusable(true);
-        validate();
         return;
     }
 
@@ -134,8 +101,6 @@ public class MinecraftApplet extends Applet
         mcThread = null;
         try
         {
-            removeAll();
-            validate();
         }
         catch(Exception exception) { }
     }

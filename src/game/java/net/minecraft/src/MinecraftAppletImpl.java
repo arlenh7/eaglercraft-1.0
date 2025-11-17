@@ -24,9 +24,9 @@ public class MinecraftAppletImpl extends Minecraft
 
     public void displayUnexpectedThrowable(UnexpectedThrowable unexpectedthrowable)
     {
-        mainFrame.removeAll();
-        mainFrame.setLayout(new BorderLayout());
-        mainFrame.add(new PanelCrashReport(unexpectedthrowable), "Center");
-        mainFrame.validate();
+        // mainFrame.removeAll();
+        // mainFrame.setLayout(new BorderLayout());
+        // mainFrame.add(new PanelCrashReport(unexpectedthrowable), "Center");
+        // mainFrame.validate();
     }
 }
