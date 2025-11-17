@@ -211,7 +211,7 @@ public class ClientMain {
 			systemOut.println("ClientMain: [INFO] launching eaglercraftx main thread");
 
 			try {
-				new MinecraftApplet().run();
+				Minecraft.mc.run();
 			}catch(ContextLostError ex) {
 				systemErr.println("ClientMain: [ERROR] webgl context lost!");
 				try {
