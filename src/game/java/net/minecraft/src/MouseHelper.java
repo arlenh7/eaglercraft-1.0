@@ -4,7 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.Component;
 import net.lax1dude.eaglercraft.internal.buffer.*;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;

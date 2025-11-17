@@ -156,7 +156,6 @@ public abstract class Minecraft
     public ModelBiped playerModelBiped;
     public MovingObjectPosition objectMouseOver;
     public GameSettings gameSettings;
-    protected MinecraftApplet mcApplet;
     public SoundManager sndManager;
     public MouseHelper mouseHelper;
     public TexturePackList texturePackList;
@@ -185,51 +184,12 @@ public abstract class Minecraft
     long systemTime;
     private int joinPlayerCounter;
 
-    public static Minecraft mc;
-
-    public Minecraft(Component component, Canvas canvas, MinecraftApplet minecraftapplet, int i, int j, boolean flag)
-    {
-        fullscreen = false;
-        hasCrashed = false;
-        timer = new Timer(20F);
-        session = null;
-        hideQuitButton = false;
-        isGamePaused = false;
-        currentScreen = null;
-        ticksRan = 0;
-        leftClickCounter = 0;
-        guiAchievement = new GuiAchievement(this);
-        skipRenderWorld = false;
-        playerModelBiped = new ModelBiped(0.0F);
-        objectMouseOver = null;
-        sndManager = new SoundManager();
-        rightClickDelayTimer = 0;
-        textureWaterFX = new TextureWaterFX();
-        textureLavaFX = new TextureLavaFX();
-        running = true;
-        debug = "";
-        field_40004_N = System.currentTimeMillis();
-        fpsCounter = 0;
-        isTakingScreenshot = false;
-        prevFrameTime = -1L;
-        field_40006_ak = "root";
-        inGameHasFocus = false;
-        isRaining = false;
-        systemTime = System.currentTimeMillis();
-        joinPlayerCounter = 0;
-        StatList.func_27360_a();
-        tempDisplayHeight = j;
-        fullscreen = flag;
-        mcApplet = minecraftapplet;
-        new ThreadSleepForever(this, "Timer hack thread");
-        mcCanvas = canvas;
-        displayWidth = i;
-        displayHeight = j;
-        fullscreen = flag;
-        theMinecraft = this;
-    }
-
-    public Minecraft() { }
+    public Minecraft() {
+		this.displayWidth = Display.getWidth();
+		this.displayHeight = Display.getHeight();
+		this.session = new Session("Player", "Player");
+		theMinecraft = this;
+	}
 
     public void onMinecraftCrash(UnexpectedThrowable unexpectedthrowable)
     {
@@ -502,10 +462,6 @@ public abstract class Minecraft
         {
             statFileWriter.func_27175_b();
             statFileWriter.syncStats();
-            if(mcApplet != null)
-            {
-                mcApplet.clearApplet();
-            }
             try
             {
                 if(downloadResourcesThread != null)
@@ -1734,7 +1690,7 @@ public abstract class Minecraft
     }
 
     public static Minecraft getMinecraft() {
-        return mc;
+        return theMinecraft;
     }
 
     public void installResource(String s, File file)
@@ -1868,7 +1824,7 @@ public abstract class Minecraft
         canvas.setPreferredSize(new Dimension(854, 480));
         frame.pack();
         frame.setLocationRelativeTo(null);
-        MinecraftImpl minecraftimpl = new MinecraftImpl(frame, canvas, null, 854, 480, flag, frame);
+        MinecraftImpl minecraftimpl = new MinecraftImpl();
         Thread thread = new Thread(minecraftimpl, "Minecraft main thread");
         thread.setPriority(10);
         minecraftimpl.minecraftUri = "www.minecraft.net";

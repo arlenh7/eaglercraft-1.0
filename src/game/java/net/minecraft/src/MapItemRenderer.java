@@ -4,7 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import org.lwjgl.opengl.GL11;
 

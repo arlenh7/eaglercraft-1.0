@@ -8,7 +8,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MinecraftApplet;
+import net.minecraft.src.MinecraftImpl;
 import net.peyton.eagler.minecraft.ResourceLoader;
 
 /**
@@ -78,7 +78,7 @@ public class LWJGLEntryPoint {
 			}
 		}
 
-		new MinecraftApplet().init();
+		new MinecraftImpl().run();
 	}
 	
 	private static void loadResources(File file) {

@@ -4,8 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.image.BufferedImage;
-
 // Referenced classes of package net.minecraft.src:
 //            ThreadDownloadImage, ImageBuffer
 

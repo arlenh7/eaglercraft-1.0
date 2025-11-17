@@ -4,7 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 import net.minecraft.client.Minecraft;

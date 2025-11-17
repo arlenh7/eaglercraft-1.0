@@ -4,9 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import net.lax1dude.eaglercraft.internal.buffer.*;
@@ -18,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.imageio.ImageIO;
 import org.lwjgl.opengl.GL11;
 
 // Referenced classes of package net.minecraft.src:

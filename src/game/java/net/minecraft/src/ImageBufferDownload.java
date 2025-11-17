@@ -4,9 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.Graphics;
-import java.awt.image.*;
-
 // Referenced classes of package net.minecraft.src:
 //            ImageBuffer
 

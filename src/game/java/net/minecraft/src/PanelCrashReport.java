@@ -1,3 +1,4 @@
+/* 
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode fieldsfirst 
@@ -35,8 +36,8 @@ public class PanelCrashReport extends Panel
             s2 = (new StringBuilder()).append(s2).append("Java: ").append(System.getProperty("java.version")).append(", ").append(System.getProperty("java.vendor")).append("\n").toString();
             s2 = (new StringBuilder()).append(s2).append("VM: ").append(System.getProperty("java.vm.name")).append(" (").append(System.getProperty("java.vm.info")).append("), ").append(System.getProperty("java.vm.vendor")).append("\n").toString();
             s2 = (new StringBuilder()).append(s2).append("LWJGL: ").append("NONE").append("\n").toString();
-            s1 = GL11.glGetString(7936 /*GL_VENDOR*/);
-            s2 = (new StringBuilder()).append(s2).append("OpenGL: ").append(GL11.glGetString(7937 /*GL_RENDERER*/)).append(" version ").append(GL11.glGetString(7938 /*GL_VERSION*/)).append(", ").append(GL11.glGetString(7936 /*GL_VENDOR*/)).append("\n").toString();
+            s1 = GL11.glGetString(7936);
+            s2 = (new StringBuilder()).append(s2).append("OpenGL: ").append(GL11.glGetString(7937 )).append(" version ").append(GL11.glGetString(7938 )).append(", ").append(GL11.glGetString(7936)).append("\n").toString();
         }
         catch(Throwable throwable)
         {
@@ -93,3 +94,4 @@ public class PanelCrashReport extends Panel
         add(textarea, "Center");
     }
 }
+*/

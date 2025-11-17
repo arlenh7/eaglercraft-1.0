@@ -4,7 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.image.BufferedImage;
 import net.lax1dude.eaglercraft.internal.buffer.*;
 import net.lax1dude.eaglercraft.Random;
 import net.minecraft.client.Minecraft;

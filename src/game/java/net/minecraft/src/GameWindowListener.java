@@ -4,8 +4,6 @@
 
 package net.minecraft.src;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import net.minecraft.client.Minecraft;
 
 public class GameWindowListener extends WindowAdapter

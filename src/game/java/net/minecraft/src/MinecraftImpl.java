@@ -4,28 +4,21 @@
 
 package net.minecraft.src;
 
-import java.awt.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MinecraftApplet;
 
 // Referenced classes of package net.minecraft.src:
 //            PanelCrashReport, UnexpectedThrowable
 
-public class MinecraftImpl extends Minecraft
-{
+public class MinecraftImpl extends Minecraft {
 
-    final Frame mcFrame; /* synthetic field */
 
-    public MinecraftImpl(Component component, Canvas canvas, MinecraftApplet minecraftapplet, int i, int j, boolean flag, Frame frame)
+    public MinecraftImpl()
     {
-        super(component, canvas, minecraftapplet, i, j, flag);
-        mcFrame = frame;
+        super();
     }
 
     public void displayUnexpectedThrowable(UnexpectedThrowable unexpectedthrowable)
     {
-        mcFrame.removeAll();
-        mcFrame.add(new PanelCrashReport(unexpectedthrowable), "Center");
-        mcFrame.validate();
+        
     }
 }

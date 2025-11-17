@@ -6,8 +6,6 @@ package net.minecraft.src;
 
 import java.io.*;
 import java.net.URL;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import net.minecraft.client.Minecraft;
 import org.w3c.dom.*;
 

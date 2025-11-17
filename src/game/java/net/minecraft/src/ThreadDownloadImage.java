@@ -6,7 +6,6 @@ package net.minecraft.src;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import javax.imageio.ImageIO;
 
 // Referenced classes of package net.minecraft.src:
 //            ThreadDownloadImageData, ImageBuffer

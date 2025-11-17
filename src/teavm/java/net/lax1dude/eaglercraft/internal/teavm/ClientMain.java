@@ -1,5 +1,6 @@
 package net.lax1dude.eaglercraft.internal.teavm;
 
+import java.awt.Canvas;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -211,7 +212,7 @@ public class ClientMain {
 			systemOut.println("ClientMain: [INFO] launching eaglercraftx main thread");
 
 			try {
-				new Minecraft().run();
+				new MinecraftImpl().run();
 			}catch(ContextLostError ex) {
 				systemErr.println("ClientMain: [ERROR] webgl context lost!");
 				try {

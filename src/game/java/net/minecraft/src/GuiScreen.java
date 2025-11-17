@@ -57,10 +57,10 @@ public class GuiScreen extends Gui
     {
         try
         {
-            java.awt.datatransfer.Transferable transferable = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            if(transferable != null && transferable.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.stringFlavor))
+            Transferable transferable = getDefaultToolkit().getSystemClipboard().getContents(null);
+            if(transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor))
             {
-                String s = (String)transferable.getTransferData(java.awt.datatransfer.DataFlavor.stringFlavor);
+                String s = (String)transferable.getTransferData(DataFlavor.stringFlavor);
                 return s;
             }
         }

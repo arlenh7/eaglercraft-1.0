@@ -5,28 +5,22 @@
 package net.minecraft.src;
 
 import java.awt.Canvas;
-import net.minecraft.client.MinecraftApplet;
 
 public class CanvasMinecraftApplet extends Canvas
 {
 
-    final MinecraftApplet mcApplet; /* synthetic field */
-
-    public CanvasMinecraftApplet(MinecraftApplet minecraftapplet)
+    public CanvasMinecraftApplet()
     {
-        mcApplet = minecraftapplet;
 //        super();
     }
 
     public synchronized void addNotify()
     {
         super.addNotify();
-        mcApplet.startMainThread();
     }
 
     public synchronized void removeNotify()
     {
-        mcApplet.shutdown();
         super.removeNotify();
     }
 }
