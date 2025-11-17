@@ -211,11 +211,7 @@ public class ClientMain {
 			systemOut.println("ClientMain: [INFO] launching eaglercraftx main thread");
 
 			try {
-<<<<<<< HEAD
-				new MinecraftImpl().run();
-=======
-				Minecraft.mc.run();
->>>>>>> e970f6b356489d4041d7f8317beebb3e2ca0fb55
+				new Minecraft().run();
 			}catch(ContextLostError ex) {
 				systemErr.println("ClientMain: [ERROR] webgl context lost!");
 				try {
@@ -306,8 +302,8 @@ public class ClientMain {
 		}
 
 		StringBuilder str = new StringBuilder();
-		str.append("eaglercraft.version = \"").append("Beta 1.1_02").append("\"\n");
-		str.append("eaglercraft.minecraft = \"0.30\"\n");
+		str.append("eaglercraft.version = \"").append("1.0.0").append("\"\n");
+		str.append("eaglercraft.minecraft = \"1.0\"\n");
 		str.append("eaglercraft.brand = \"" + "eaglercraft" + "\"\n");
 		str.append('\n');
 		str.append(addWebGLToCrash());
